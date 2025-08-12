@@ -590,6 +590,12 @@ body {
     font-weight: 700;
 }
 
+.vehicle-card-gastos {
+    font-size: 14px;
+    color: var(--apple-orange);
+    font-weight: 600;
+}
+
 .vehicle-card-status {
     display: inline-flex;
     align-items: center;
@@ -631,7 +637,18 @@ body {
     border-top: 1px solid var(--apple-gray-medium);
     background: var(--apple-gray-light);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vehicle-card-actions-left {
+    display: flex;
+    align-items: center;
+}
+
+.vehicle-card-actions-right {
+    display: flex;
+    align-items: center;
     gap: var(--spacing-sm);
 }
 
@@ -703,6 +720,50 @@ body {
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-md);
+}
+
+.vehicle-card-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vehicle-card-badge-id {
+    background: rgba(142, 142, 147, 0.1);
+    color: var(--apple-gray);
+}
+
+.vehicle-card-badge-year {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--apple-blue);
+}
+
+.vehicle-card-vin {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 11px;
+    color: var(--apple-gray);
+    background: var(--apple-gray-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+.vehicle-card-fotos-link {
+    color: var(--apple-blue);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.vehicle-card-fotos-link:hover {
+    color: var(--apple-blue-dark);
 }
 
 /* ===== ACTIVITY LIST ===== */
@@ -1112,6 +1173,62 @@ body {
 }
 
 /* ===== MEJORAS ADICIONALES ===== */
+.chart-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apple-gray);
+    font-style: italic;
+}
+
+.table-container {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* ===== HEADER DE CONTENIDO MEJORADO ===== */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* ===== MEJORAS DE ACCESIBILIDAD Y UX ===== */
+.table-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xxl) !important;
+    color: var(--apple-gray);
+}
+
+.activity-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    color: var(--apple-gray);
+}
+
+/* ===== ANIMACIONES MEJORADAS ===== */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 .chart-container {
     height: 200px;
     display: flex;
