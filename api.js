@@ -540,7 +540,13 @@ class ApiService {
 
     // ===== VALIDACIONES =====
     validatePlaca(placa) {
-        return FORM_CONSTANTS.validation.placaPattern.test(placa);
+        if (!placa) return false;
+        const cleanPlaca = placa.trim().toUpperCase();
+
+        // Verificar contra todos los patrones válidos
+        return FORM_CONSTANTS.validation.placaPatterns.some(pattern =>
+            pattern.test(cleanPlaca)
+        );
     }
 
     validateVin(vin) {

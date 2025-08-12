@@ -12,7 +12,7 @@ class ModalManager {
         });
 
         this.validationRules.set('vehiculo', {
-            placa: { required: true, pattern: FORM_CONSTANTS.validation.placaPattern },
+            placa: { required: true, customValidation: 'placa' },
             marca_id: { required: true },
             modelo_id: { required: true },
             anio: { required: true, min: FORM_CONSTANTS.minYear, max: FORM_CONSTANTS.maxYear },
@@ -141,8 +141,7 @@ class ModalManager {
                                         class="input-minimal" 
                                         value="${this.escapeValue(item?.placa)}" 
                                         placeholder="${FORM_CONSTANTS.placeholders.placa}"
-                                        maxlength="7"
-                                        style="text-transform: uppercase;"
+                                        maxlength="10"
                                         required
                                     >
                                     <div class="validation-error" id="vehiculo-placa-error"></div>
@@ -673,6 +672,14 @@ class ModalManager {
         // Required validation
         if (rule.required && !value) {
             errorMessage = 'Este campo es obligatorio';
+        }
+        // Custom validation (like placa)
+        else if (rule.customValidation && value) {
+            if (rule.customValidation === 'placa') {
+                if (!api.validatePlaca(value)) {
+                    errorMessage = 'Formato de placa válido: ABC123, BDH657, 835282, ABC-123';
+                }
+            }
         }
         // MinLength validation
         else if (rule.minLength && value.length < rule.minLength) {

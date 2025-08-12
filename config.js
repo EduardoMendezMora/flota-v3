@@ -41,7 +41,7 @@ const FORM_CONSTANTS = {
     minYear: 1900,
     maxYear: new Date().getFullYear() + 2,
     placeholders: {
-        placa: 'ABC-123',
+        placa: 'ABC123, BDH657, 835282...',
         vin: '1HGBH41JXMN109186',
         empresa: 'Rent a Car Costa Rica S.A.',
         identificacion: '3-101-672906',
@@ -51,7 +51,15 @@ const FORM_CONSTANTS = {
         fotos: 'https://ejemplo.com/fotos'
     },
     validation: {
-        placaPattern: /^[A-Z]{3}-\d{3}$/,
+        // Patrones de placa más flexibles para diferentes formatos
+        placaPatterns: [
+            /^[A-Z]{3}-\d{3}$/,      // ABC-123 (estándar con guión)
+            /^[A-Z]{3}\d{3}$/,       // ABC123 (estándar sin guión)
+            /^[A-Z]{2,3}\d{3,4}$/,   // AB123, ABC123, AB1234, ABC1234
+            /^[A-Z]{2}-\d{4}$/,      // AB-1234 (placas antiguas)
+            /^\d{6}$/,               // 123456 (solo números)
+            /^[A-Z]{1,3}\d{1,4}$/    // A123, AB123, ABC1234 (flexible)
+        ],
         vinPattern: /^[A-HJ-NPR-Z0-9]{17}$/,
         urlPattern: /^https?:\/\/.+/
     }
