@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Administración de Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <h1 class="text-2xl font-bold">🚗 Sistema de Administración de Flota</h1>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-4 py-3">
+                <button onclick="showSection('dashboard')" class="nav-btn active">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                </button>
+                <button onclick="showSection('arrendadoras')" class="nav-btn">
+                    <i class="fas fa-building mr-2"></i>Arrendadoras
+                </button>
+                <button onclick="showSection('vehiculos')" class="nav-btn">
+                    <i class="fas fa-car mr-2"></i>Vehículos
+                </button>
+                <button onclick="showSection('marcas')" class="nav-btn">
+                    <i class="fas fa-tag mr-2"></i>Marcas
+                </button>
+                <button onclick="showSection('modelos')" class="nav-btn">
+                    <i class="fas fa-cogs mr-2"></i>Modelos
+                </button>
+                <button onclick="showSection('estados')" class="nav-btn">
+                    <i class="fas fa-list mr-2"></i>Estados
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-building text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-gray-500 text-sm">Arrendadoras</h3>
+                            <p class="text-2xl font-bold" id="total-arrendadoras">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-car text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-gray-500 text-sm">Vehículos</h3>
+                            <p class="text-2xl font-bold" id="total-vehiculos">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-tag text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-gray-500 text-sm">Marcas</h3>
+                            <p class="text-2xl font-bold" id="total-marcas">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                            <i class="fas fa-cogs text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-gray-500 text-sm">Modelos</h3>
+                            <p class="text-2xl font-bold" id="total-modelos">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Vehículos por Arrendadora</h3>
+                    <div id="vehiculos-chart" class="h-64"></div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Actividad Reciente</h3>
+                    <div id="actividad-reciente" class="space-y-3">
+                        <p class="text-gray-500">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arrendadoras Section -->
+        <section id="arrendadoras" class="section">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Gestión de Arrendadoras</h2>
+                        <button onclick="openModal('arrendadora')" class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Nueva Arrendadora
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <input type="text" id="search-arrendadoras" placeholder="Buscar arrendadoras..." 
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left">Nombre</th>
+                                    <th class="px-4 py-3 text-left">Identificación</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="arrendadoras-table">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vehículos Section -->
+        <section id="vehiculos" class="section">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Gestión de Vehículos</h2>
+                        <button onclick="openModal('vehiculo')" class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Nuevo Vehículo
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <input type="text" id="search-vehiculos" placeholder="Buscar vehículos..." 
+                               class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="filter-arrendadora" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todas las arrendadoras</option>
+                        </select>
+                        <select id="filter-estado" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos los estados</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">Placa</th>
+                                    <th class="px-4 py-3 text-left">Marca/Modelo</th>
+                                    <th class="px-4 py-3 text-left">Año</th>
+                                    <th class="px-4 py-3 text-left">Arrendadora</th>
+                                    <th class="px-4 py-3 text-left">Precio Semanal</th>
+                                    <th class="px-4 py-3 text-left">Estado</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehiculos-table">
+                                <tr>
+                                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marcas Section -->
+        <section id="marcas" class="section">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Gestión de Marcas</h2>
+                        <button onclick="openModal('marca')" class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Nueva Marca
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <input type="text" id="search-marcas" placeholder="Buscar marcas..." 
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left">Nombre</th>
+                                    <th class="px-4 py-3 text-left">Modelos</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marcas-table">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modelos Section -->
+        <section id="modelos" class="section">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Gestión de Modelos</h2>
+                        <button onclick="openModal('modelo')" class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Nuevo Modelo
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="text" id="search-modelos" placeholder="Buscar modelos..." 
+                               class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="filter-marca-modelo" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todas las marcas</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left">Nombre</th>
+                                    <th class="px-4 py-3 text-left">Marca</th>
+                                    <th class="px-4 py-3 text-left">Vehículos</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modelos-table">
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estados Section -->
+        <section id="estados" class="section">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Estados de Inventario</h2>
+                        <button onclick="openModal('estado')" class="btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Nuevo Estado
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <input type="text" id="search-estados" placeholder="Buscar estados..." 
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID</th>
+                                    <th class="px-4 py-3 text-left">Nombre</th>
+                                    <th class="px-4 py-3 text-left">Vehículos</th>
+                                    <th class="px-4 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="estados-table">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div id="modal-content" class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+</body>
+</html>
