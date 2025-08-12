@@ -8,70 +8,88 @@ const SUPABASE_CONFIG = {
     }
 };
 
-// Configuraciones globales
+// Configuraciones globales de la aplicación
 const APP_CONFIG = {
     itemsPerPage: 10,
     dateFormat: 'DD/MM/YYYY',
     currency: 'CRC',
+    debounceDelay: 300,
+    toastDuration: 5000,
     defaultFilters: {
         arrendadora: '',
         estado: '',
         marca: ''
+    },
+    animation: {
+        duration: 200,
+        easing: 'ease'
     }
 };
 
 // Estados predefinidos para vehículos
 const ESTADOS_VEHICULO = [
-    { id: 1, nombre: 'Disponible' },
-    { id: 2, nombre: 'Rentado' },
-    { id: 3, nombre: 'En Mantenimiento' },
-    { id: 4, nombre: 'Fuera de Servicio' },
-    { id: 5, nombre: 'Vendido' }
+    { id: 1, nombre: 'Disponible', color: '#34C759', class: 'status-available' },
+    { id: 2, nombre: 'Rentado', color: '#007AFF', class: 'status-rented' },
+    { id: 3, nombre: 'En Mantenimiento', color: '#FF9500', class: 'status-maintenance' },
+    { id: 4, nombre: 'Fuera de Servicio', color: '#FF3B30', class: 'status-out-of-service' },
+    { id: 5, nombre: 'Vendido', color: '#8E8E93', class: 'status-sold' }
 ];
 
-// Tipos de combustible
-const TIPOS_COMBUSTIBLE = [
-    { id: 1, nombre: 'Gasolina' },
-    { id: 2, nombre: 'Diesel' },
-    { id: 3, nombre: 'Eléctrico' },
-    { id: 4, nombre: 'Híbrido' },
-    { id: 5, nombre: 'Gas' }
-];
+// Constantes adicionales para formularios
+const FORM_CONSTANTS = {
+    currentYear: new Date().getFullYear(),
+    minYear: 1900,
+    maxYear: new Date().getFullYear() + 2,
+    placeholders: {
+        placa: 'ABC-123',
+        vin: '1HGBH41JXMN109186',
+        empresa: 'Rent a Car Costa Rica S.A.',
+        identificacion: '3-101-672906',
+        marca: 'Toyota, Honda, Ford',
+        modelo: 'Corolla, Civic, Focus',
+        estado: 'Disponible, En Mantenimiento',
+        fotos: 'https://ejemplo.com/fotos'
+    },
+    validation: {
+        placaPattern: /^[A-Z]{3}-\d{3}$/,
+        vinPattern: /^[A-HJ-NPR-Z0-9]{17}$/,
+        urlPattern: /^https?:\/\/.+/
+    }
+};
 
-// Tipos de transmisión
-const TIPOS_TRANSMISION = [
-    { id: 1, nombre: 'Manual' },
-    { id: 2, nombre: 'Automático' },
-    { id: 3, nombre: 'CVT' }
-];
+// Mensajes del sistema
+const MESSAGES = {
+    success: {
+        create: 'creado correctamente',
+        update: 'actualizado correctamente',
+        delete: 'eliminado correctamente',
+        load: 'cargado correctamente'
+    },
+    error: {
+        create: 'Error al crear',
+        update: 'Error al actualizar',
+        delete: 'Error al eliminar',
+        load: 'Error al cargar',
+        required: 'Por favor completa todos los campos obligatorios',
+        network: 'Error de conexión. Intenta nuevamente.',
+        validation: 'Los datos ingresados no son válidos'
+    },
+    confirm: {
+        delete: '¿Estás seguro de que quieres eliminar este elemento?'
+    }
+};
 
-// Tipos de tracción
-const TIPOS_TRACCION = [
-    { id: 1, nombre: '2WD' },
-    { id: 2, nombre: '4WD' },
-    { id: 3, nombre: 'AWD' }
-];
+// Configuración de performance
+const PERFORMANCE_CONFIG = {
+    enableCache: true,
+    cacheTimeout: 5 * 60 * 1000, // 5 minutos
+    maxRetries: 3,
+    retryDelay: 1000
+};
 
-// Tipos de carrocería
-const TIPOS_CARROCERIA = [
-    { id: 1, nombre: 'Sedán' },
-    { id: 2, nombre: 'SUV' },
-    { id: 3, nombre: 'Pickup' },
-    { id: 4, nombre: 'Van' },
-    { id: 5, nombre: 'Hatchback' },
-    { id: 6, nombre: 'Wagon' }
-];
-
-// Colores comunes
-const COLORES = [
-    { id: 1, nombre: 'Blanco' },
-    { id: 2, nombre: 'Negro' },
-    { id: 3, nombre: 'Gris' },
-    { id: 4, nombre: 'Plateado' },
-    { id: 5, nombre: 'Azul' },
-    { id: 6, nombre: 'Rojo' },
-    { id: 7, nombre: 'Verde' },
-    { id: 8, nombre: 'Amarillo' },
-    { id: 9, nombre: 'Naranja' },
-    { id: 10, nombre: 'Marrón' }
-];
+// Exportar configuraciones para uso global
+window.APP_CONFIG = APP_CONFIG;
+window.ESTADOS_VEHICULO = ESTADOS_VEHICULO;
+window.FORM_CONSTANTS = FORM_CONSTANTS;
+window.MESSAGES = MESSAGES;
+window.PERFORMANCE_CONFIG = PERFORMANCE_CONFIG;

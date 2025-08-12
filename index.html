@@ -3,15 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Administración de Flota de Vehículos - Gestiona tu flota de manera eficiente">
+    <meta name="keywords" content="flota, vehículos, administración, arrendadoras, gestión">
+    <meta name="author" content="Sistema Flota">
+
     <title>Flota • Sistema de Administración</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" as="style">
+
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwN0FGRiIvPgo8cGF0aCBkPSJNOCAxMkg0VjIwSDhWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjggMTJIMjRWMjBIMjhWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgOEg4VjI0SDI0VjhaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZsb3RhIC0gU2lzdGVtYSBkZSBBZG1pbmlzdHJhY2nDs24iLAogICJzaG9ydF9uYW1lIjogIkZsb3RhIiwKICAiZGVzY3JpcHRpb24iOiAiR2VzdGlvbmEgdHUgZmxvdGEgZGUgdmVow61jdWxvcyBkZSBtYW5lcmEgZWZpY2llbnRlIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJ0aGVtZV9jb2xvciI6ICIjMDA3QUZGIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjRjJGMkY3IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTXpJaUlHaGxhV2RvZEQwaU16SWlJSFpwWlhkQ2IzZzlJakFnTUNBek1pQXpNaUlnWm1sc2JEMGlibTl1WlNJZ2VHMXNibk05SW1oMGRIQTZMeTkzZDNjdWR6TXViM0puTHpJd01EQXZjM1puSWo0S1BISmxZM1FnZDJsa2RHZzlJak15SWlCb1pXbG5hSFE5SWpNeUlpQnllRDBpT0NJZ1ptbHNiRDBpSXpBd04wRkdSaUl2UGdvOGNHRjBhQ0JrUFNKTk9DQXhNa2cwVmpJd1NEaFdNVEpaSWlCbWFXeHNQU0ozYUdsMFpTSXZQZ284Y0dGMGFDQmtQU0pOTWpnZ01USkZNalJXTWpCb01qUldNVEpaSWlCbWFXeHNQU0ozYUdsMFpTSXZQZ284Y0dGMGFDQmtQU0pOTWpRZ09FZzRWakkwU0RJMFdqVmFJaUJ6ZEhKdmEyVTlJbmRvYVhSbElpQnpkSEp2YTJVdGQybGtkR2c5SWpJaUx6NEtQQzl6ZG1jKyIsIC0KICAgICAgInNpemVzIjogIjMyeDMyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
+
+    <!-- Performance and Security -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body class="bg-gray-50 font-inter">
+<!-- Loading Screen -->
+<div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+    <div class="text-center">
+        <div class="app-icon mb-4 mx-auto">
+            <i class="fas fa-car"></i>
+        </div>
+        <div class="loading-spinner mb-4"></div>
+        <p class="text-gray-600">Cargando sistema...</p>
+    </div>
+</div>
+
 <!-- Header Estilo Apple -->
 <header class="header-apple">
     <div class="container mx-auto px-6 py-4">
@@ -26,11 +56,14 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="header-btn">
+                <button class="header-btn" title="Notificaciones" aria-label="Notificaciones">
                     <i class="fas fa-bell"></i>
                 </button>
-                <button class="header-btn">
+                <button class="header-btn" title="Perfil de usuario" aria-label="Perfil de usuario">
                     <i class="fas fa-user-circle"></i>
+                </button>
+                <button class="header-btn" id="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
@@ -38,42 +71,42 @@
 </header>
 
 <!-- Navigation Estilo Apple -->
-<nav class="nav-apple">
+<nav class="nav-apple" role="navigation" aria-label="Navegación principal">
     <div class="container mx-auto px-6">
         <div class="nav-container">
-            <button onclick="showSection('dashboard')" class="nav-item active" data-section="dashboard">
+            <button onclick="showSection('dashboard')" class="nav-item active" data-section="dashboard" aria-label="Panel de control">
                 <div class="nav-icon">
-                    <i class="fas fa-squares-2x2"></i>
+                    <i class="fas fa-chart-pie" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Panel</span>
             </button>
-            <button onclick="showSection('arrendadoras')" class="nav-item" data-section="arrendadoras">
+            <button onclick="showSection('arrendadoras')" class="nav-item" data-section="arrendadoras" aria-label="Gestión de empresas">
                 <div class="nav-icon">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-building" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Empresas</span>
             </button>
-            <button onclick="showSection('vehiculos')" class="nav-item" data-section="vehiculos">
+            <button onclick="showSection('vehiculos')" class="nav-item" data-section="vehiculos" aria-label="Gestión de vehículos">
                 <div class="nav-icon">
-                    <i class="fas fa-car"></i>
+                    <i class="fas fa-car" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Vehículos</span>
             </button>
-            <button onclick="showSection('marcas')" class="nav-item" data-section="marcas">
+            <button onclick="showSection('marcas')" class="nav-item" data-section="marcas" aria-label="Gestión de marcas">
                 <div class="nav-icon">
-                    <i class="fas fa-tag"></i>
+                    <i class="fas fa-tag" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Marcas</span>
             </button>
-            <button onclick="showSection('modelos')" class="nav-item" data-section="modelos">
+            <button onclick="showSection('modelos')" class="nav-item" data-section="modelos" aria-label="Gestión de modelos">
                 <div class="nav-icon">
-                    <i class="fas fa-cogs"></i>
+                    <i class="fas fa-cogs" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Modelos</span>
             </button>
-            <button onclick="showSection('estados')" class="nav-item" data-section="estados">
+            <button onclick="showSection('estados')" class="nav-item" data-section="estados" aria-label="Gestión de estados">
                 <div class="nav-icon">
-                    <i class="fas fa-list-check"></i>
+                    <i class="fas fa-list-check" aria-hidden="true"></i>
                 </div>
                 <span class="nav-label">Estados</span>
             </button>
@@ -82,48 +115,54 @@
 </nav>
 
 <!-- Main Content -->
-<main class="main-content">
+<main class="main-content" role="main">
     <!-- Dashboard Section -->
-    <section id="dashboard" class="section active">
+    <section id="dashboard" class="section active" data-loading="dashboard">
         <div class="section-header">
-            <h2 class="section-title">Panel de Control</h2>
-            <p class="section-subtitle">Vista general de tu flota</p>
+            <div>
+                <h2 class="section-title">Panel de Control</h2>
+                <p class="section-subtitle">Vista general de tu flota</p>
+            </div>
+            <button onclick="app.refreshCurrentSection()" class="btn-primary-apple" title="Actualizar datos">
+                <i class="fas fa-sync-alt"></i>
+                <span>Actualizar</span>
+            </button>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card stat-card-blue">
                 <div class="stat-icon">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-building" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-arrendadoras">-</div>
+                    <div class="stat-number" id="total-arrendadoras" aria-live="polite">0</div>
                     <div class="stat-label">Empresas</div>
                 </div>
             </div>
             <div class="stat-card stat-card-green">
                 <div class="stat-icon">
-                    <i class="fas fa-car"></i>
+                    <i class="fas fa-car" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-vehiculos">-</div>
+                    <div class="stat-number" id="total-vehiculos" aria-live="polite">0</div>
                     <div class="stat-label">Vehículos</div>
                 </div>
             </div>
             <div class="stat-card stat-card-purple">
                 <div class="stat-icon">
-                    <i class="fas fa-tag"></i>
+                    <i class="fas fa-tag" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-marcas">-</div>
+                    <div class="stat-number" id="total-marcas" aria-live="polite">0</div>
                     <div class="stat-label">Marcas</div>
                 </div>
             </div>
             <div class="stat-card stat-card-orange">
                 <div class="stat-icon">
-                    <i class="fas fa-cogs"></i>
+                    <i class="fas fa-cogs" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-modelos">-</div>
+                    <div class="stat-number" id="total-modelos" aria-live="polite">0</div>
                     <div class="stat-label">Modelos</div>
                 </div>
             </div>
@@ -133,23 +172,26 @@
             <div class="dashboard-card">
                 <div class="card-header">
                     <h3 class="card-title">Distribución por Empresa</h3>
-                    <button class="card-action">
-                        <i class="fas fa-chart-pie"></i>
+                    <button class="card-action" title="Ver más detalles">
+                        <i class="fas fa-chart-pie" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="card-content">
-                    <div id="vehiculos-chart" class="chart-container"></div>
+                    <div id="vehiculos-chart" class="chart-container">
+                        <i class="fas fa-chart-pie text-4xl mb-2 opacity-50" aria-hidden="true"></i>
+                        <p>Gráfico de distribución</p>
+                    </div>
                 </div>
             </div>
             <div class="dashboard-card">
                 <div class="card-header">
                     <h3 class="card-title">Actividad Reciente</h3>
-                    <button class="card-action">
-                        <i class="fas fa-clock"></i>
+                    <button class="card-action" title="Ver toda la actividad">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="card-content">
-                    <div id="actividad-reciente" class="activity-list">
+                    <div id="actividad-reciente" class="activity-list" aria-live="polite">
                         <div class="activity-loading">
                             <div class="loading-spinner"></div>
                             <span>Cargando actividad...</span>
@@ -161,14 +203,14 @@
     </section>
 
     <!-- Arrendadoras Section -->
-    <section id="arrendadoras" class="section">
+    <section id="arrendadoras" class="section" data-loading="arrendadoras">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Empresas Arrendadoras</h2>
                 <p class="section-subtitle">Gestiona las empresas de tu red</p>
             </div>
             <button onclick="openModal('arrendadora')" class="btn-primary-apple">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <span>Nueva Empresa</span>
             </button>
         </div>
@@ -176,18 +218,22 @@
         <div class="content-card">
             <div class="card-tools">
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-arrendadoras" placeholder="Buscar empresas..." class="search-input">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text"
+                           id="search-arrendadoras"
+                           placeholder="Buscar empresas..."
+                           class="search-input"
+                           aria-label="Buscar empresas">
                 </div>
             </div>
             <div class="table-container">
-                <table class="table-apple">
+                <table class="table-apple" role="table" aria-label="Lista de empresas arrendadoras">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Empresa</th>
-                        <th>Identificación</th>
-                        <th>Acciones</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Empresa</th>
+                        <th scope="col">Identificación</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                     </thead>
                     <tbody id="arrendadoras-table">
@@ -204,14 +250,14 @@
     </section>
 
     <!-- Vehículos Section -->
-    <section id="vehiculos" class="section">
+    <section id="vehiculos" class="section" data-loading="vehiculos">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Flota de Vehículos</h2>
                 <p class="section-subtitle">Administra todos los vehículos</p>
             </div>
             <button onclick="openModal('vehiculo')" class="btn-primary-apple">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <span>Nuevo Vehículo</span>
             </button>
         </div>
@@ -220,18 +266,22 @@
             <div class="card-tools">
                 <div class="filters-grid">
                     <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="search-vehiculos" placeholder="Buscar vehículos..." class="search-input">
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="text"
+                               id="search-vehiculos"
+                               placeholder="Buscar por placa o VIN..."
+                               class="search-input"
+                               aria-label="Buscar vehículos">
                     </div>
-                    <select id="filter-arrendadora" class="filter-select">
+                    <select id="filter-arrendadora" class="filter-select" aria-label="Filtrar por empresa">
                         <option value="">Todas las empresas</option>
                     </select>
-                    <select id="filter-estado" class="filter-select">
+                    <select id="filter-estado" class="filter-select" aria-label="Filtrar por estado">
                         <option value="">Todos los estados</option>
                     </select>
                 </div>
             </div>
-            <div id="vehiculos-grid" class="vehicles-grid">
+            <div id="vehiculos-grid" class="vehicles-grid" role="grid" aria-label="Cuadrícula de vehículos">
                 <div class="grid-loading">
                     <div class="loading-spinner"></div>
                     <span>Cargando vehículos...</span>
@@ -241,14 +291,14 @@
     </section>
 
     <!-- Marcas Section -->
-    <section id="marcas" class="section">
+    <section id="marcas" class="section" data-loading="marcas">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Marcas de Vehículos</h2>
                 <p class="section-subtitle">Catálogo de marcas disponibles</p>
             </div>
             <button onclick="openModal('marca')" class="btn-primary-apple">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <span>Nueva Marca</span>
             </button>
         </div>
@@ -256,18 +306,22 @@
         <div class="content-card">
             <div class="card-tools">
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-marcas" placeholder="Buscar marcas..." class="search-input">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text"
+                           id="search-marcas"
+                           placeholder="Buscar marcas..."
+                           class="search-input"
+                           aria-label="Buscar marcas">
                 </div>
             </div>
             <div class="table-container">
-                <table class="table-apple">
+                <table class="table-apple" role="table" aria-label="Lista de marcas">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Marca</th>
-                        <th>Modelos</th>
-                        <th>Acciones</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">Modelos</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                     </thead>
                     <tbody id="marcas-table">
@@ -284,14 +338,14 @@
     </section>
 
     <!-- Modelos Section -->
-    <section id="modelos" class="section">
+    <section id="modelos" class="section" data-loading="modelos">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Modelos de Vehículos</h2>
                 <p class="section-subtitle">Catálogo de modelos por marca</p>
             </div>
             <button onclick="openModal('modelo')" class="btn-primary-apple">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <span>Nuevo Modelo</span>
             </button>
         </div>
@@ -300,23 +354,27 @@
             <div class="card-tools">
                 <div class="filters-grid">
                     <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="search-modelos" placeholder="Buscar modelos..." class="search-input">
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="text"
+                               id="search-modelos"
+                               placeholder="Buscar modelos..."
+                               class="search-input"
+                               aria-label="Buscar modelos">
                     </div>
-                    <select id="filter-marca-modelo" class="filter-select">
+                    <select id="filter-marca-modelo" class="filter-select" aria-label="Filtrar por marca">
                         <option value="">Todas las marcas</option>
                     </select>
                 </div>
             </div>
             <div class="table-container">
-                <table class="table-apple">
+                <table class="table-apple" role="table" aria-label="Lista de modelos">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Modelo</th>
-                        <th>Marca</th>
-                        <th>Vehículos</th>
-                        <th>Acciones</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Modelo</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">Vehículos</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                     </thead>
                     <tbody id="modelos-table">
@@ -333,14 +391,14 @@
     </section>
 
     <!-- Estados Section -->
-    <section id="estados" class="section">
+    <section id="estados" class="section" data-loading="estados">
         <div class="section-header">
             <div>
                 <h2 class="section-title">Estados de Inventario</h2>
                 <p class="section-subtitle">Gestiona los estados de los vehículos</p>
             </div>
             <button onclick="openModal('estado')" class="btn-primary-apple">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <span>Nuevo Estado</span>
             </button>
         </div>
@@ -348,18 +406,22 @@
         <div class="content-card">
             <div class="card-tools">
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-estados" placeholder="Buscar estados..." class="search-input">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text"
+                           id="search-estados"
+                           placeholder="Buscar estados..."
+                           class="search-input"
+                           aria-label="Buscar estados">
                 </div>
             </div>
             <div class="table-container">
-                <table class="table-apple">
+                <table class="table-apple" role="table" aria-label="Lista de estados">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Estado</th>
-                        <th>Vehículos</th>
-                        <th>Acciones</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Vehículos</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                     </thead>
                     <tbody id="estados-table">
@@ -377,7 +439,7 @@
 </main>
 
 <!-- Modal Overlay -->
-<div id="modal-overlay" class="modal-overlay">
+<div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-backdrop"></div>
     <div id="modal-content" class="modal-content">
         <!-- Modal content will be inserted here -->
@@ -385,8 +447,116 @@
 </div>
 
 <!-- Toast Container -->
-<div id="toast-container" class="toast-container"></div>
+<div id="toast-container" class="toast-container" role="region" aria-live="assertive" aria-label="Notificaciones"></div>
 
+<!-- Network Status Indicator -->
+<div id="network-status" class="fixed bottom-4 left-4 px-4 py-2 rounded-lg text-white text-sm font-medium hidden">
+    <i class="fas fa-wifi mr-2"></i>
+    <span id="network-status-text">Sin conexión</span>
+</div>
+
+<!-- Scripts -->
+<script>
+    // Hide loading screen when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 300);
+            }, 500);
+        }
+    });
+
+    // Network status monitoring
+    function updateNetworkStatus() {
+        const networkStatus = document.getElementById('network-status');
+        const networkStatusText = document.getElementById('network-status-text');
+
+        if (navigator.onLine) {
+            networkStatus.classList.add('hidden');
+        } else {
+            networkStatus.classList.remove('hidden');
+            networkStatus.style.backgroundColor = '#FF3B30';
+            networkStatusText.textContent = 'Sin conexión a internet';
+        }
+    }
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
+    // Theme toggle functionality
+    document.getElementById('theme-toggle')?.addEventListener('click', function() {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle('dark');
+        const icon = this.querySelector('i');
+
+        if (isDark) {
+            icon.className = 'fas fa-sun';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.className = 'fas fa-moon';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for quick search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const activeSearchInput = document.querySelector('.section.active .search-input');
+            if (activeSearchInput) {
+                activeSearchInput.focus();
+            }
+        }
+
+        // Number keys for quick navigation
+        if (e.altKey && e.key >= '1' && e.key <= '6') {
+            e.preventDefault();
+            const sections = ['dashboard', 'arrendadoras', 'vehiculos', 'marcas', 'modelos', 'estados'];
+            const sectionIndex = parseInt(e.key) - 1;
+            if (sections[sectionIndex]) {
+                showSection(sections[sectionIndex]);
+            }
+        }
+    });
+
+    // Service Worker registration for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            // Register service worker if needed
+            // navigator.serviceWorker.register('/sw.js');
+        });
+    }
+
+    // Error handling for uncaught errors
+    window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error);
+        if (window.app) {
+            window.app.showToast('Ha ocurrido un error inesperado', 'error');
+        }
+    });
+
+    // Performance monitoring
+    window.addEventListener('load', function() {
+        if ('performance' in window) {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+            console.log(`Page loaded in ${loadTime}ms`);
+        }
+    });
+</script>
+
+<!-- Application Scripts -->
 <script src="config.js"></script>
 <script src="api.js"></script>
 <script src="app.js"></script>
