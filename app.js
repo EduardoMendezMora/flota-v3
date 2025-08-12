@@ -229,43 +229,112 @@ class FlotaApp {
             <div class="vehicle-card">
                 <!-- Header de la tarjeta -->
                 <div class="vehicle-card-header">
-                    <div class="vehicle-card-placa">${vehiculo.placa}</div>
-                    <div class="vehicle-card-modelo">${vehiculo.marcas?.nombre} ${vehiculo.modelos?.nombre}</div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="vehicle-card-placa">${vehiculo.placa}</div>
+                            <div class="vehicle-card-modelo">${vehiculo.marcas?.nombre} ${vehiculo.modelos?.nombre}</div>
+                            ${vehiculo.vin ? `<div class="vehicle-card-vin">VIN: ${vehiculo.vin}</div>` : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            <span class="vehicle-card-badge vehicle-card-badge-id">#${vehiculo.id}</span>
+                            <span class="vehicle-card-badge vehicle-card-badge-year">${vehiculo.anio}</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Body de la tarjeta -->
                 <div class="vehicle-card-body">
-                    <div class="vehicle-card-info">
-                        <span class="vehicle-card-label">Año</span>
-                        <span class="vehicle-card-value">${vehiculo.anio}</span>
+                    <!-- Información Básica -->
+                    <div class="vehicle-card-section">
+                        <div class="vehicle-card-section-title">Información Básica</div>
+                        <div class="vehicle-card-grid">
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Marca</span>
+                                <span class="vehicle-card-value">${vehiculo.marcas?.nombre || 'Sin marca'}</span>
+                            </div>
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Modelo</span>
+                                <span class="vehicle-card-value">${vehiculo.modelos?.nombre || 'Sin modelo'}</span>
+                            </div>
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Año</span>
+                                <span class="vehicle-card-value">${vehiculo.anio || 'N/A'}</span>
+                            </div>
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Estado</span>
+                                <span class="vehicle-card-status ${api.getStatusBadgeClass(vehiculo.estado_inventario_id)}">
+                                    ${vehiculo.estados_inventario?.nombre || 'Sin estado'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="vehicle-card-info">
-                        <span class="vehicle-card-label">Arrendadora</span>
-                        <span class="vehicle-card-value">${vehiculo.arrendadoras?.nombre || 'Sin asignar'}</span>
+
+                    <div class="vehicle-card-divider"></div>
+
+                    <!-- Información de Asignación -->
+                    <div class="vehicle-card-section">
+                        <div class="vehicle-card-section-title">Asignación</div>
+                        <div class="vehicle-card-grid">
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Arrendadora</span>
+                                <span class="vehicle-card-value">${vehiculo.arrendadoras?.nombre || 'Sin asignar'}</span>
+                            </div>
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">ID Arrendadora</span>
+                                <span class="vehicle-card-value">${vehiculo.arrendadora_id || 'N/A'}</span>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="vehicle-card-info">
-                        <span class="vehicle-card-label">Precio Semanal</span>
-                        <span class="vehicle-card-price">${api.formatCurrency(vehiculo.precio_semanal || 0)}</span>
+
+                    <div class="vehicle-card-divider"></div>
+
+                    <!-- Información Económica -->
+                    <div class="vehicle-card-section">
+                        <div class="vehicle-card-section-title">Información Económica</div>
+                        <div class="vehicle-card-grid">
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Precio Semanal</span>
+                                <span class="vehicle-card-price">${api.formatCurrency(vehiculo.precio_semanal || 0)}</span>
+                            </div>
+                            <div class="vehicle-card-info">
+                                <span class="vehicle-card-label">Gastos Administrativos</span>
+                                <span class="vehicle-card-gastos">${api.formatCurrency(vehiculo.gastos_adms || 0)}</span>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="vehicle-card-info">
-                        <span class="vehicle-card-label">Estado</span>
-                        <span class="vehicle-card-status ${api.getStatusBadgeClass(vehiculo.estado_inventario_id)}">
-                            ${vehiculo.estados_inventario?.nombre || 'Sin estado'}
-                        </span>
-                    </div>
+
+                    ${vehiculo.link_fotos ? `
+                        <div class="vehicle-card-divider"></div>
+                        
+                        <!-- Enlaces de Fotos -->
+                        <div class="vehicle-card-section">
+                            <div class="vehicle-card-section-title">Fotos</div>
+                            <div class="vehicle-card-fotos">
+                                <i class="fas fa-images text-gray-400"></i>
+                                <a href="${vehiculo.link_fotos}" target="_blank" class="vehicle-card-fotos-link" title="${vehiculo.link_fotos}">
+                                    Ver fotos del vehículo
+                                </a>
+                            </div>
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <!-- Acciones de la tarjeta -->
                 <div class="vehicle-card-actions">
-                    <button onclick="app.editVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-edit" title="Editar vehículo">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="app.deleteVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-delete" title="Eliminar vehículo">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <div class="vehicle-card-actions-left">
+                        <span class="text-xs text-gray-500">
+                            <i class="fas fa-clock mr-1"></i>
+                            ${api.formatDate(vehiculo.created_at)}
+                        </span>
+                    </div>
+                    <div class="vehicle-card-actions-right">
+                        <button onclick="app.editVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-edit" title="Editar vehículo">
+                            <i class="fas fa-edit mr-2"></i>Editar
+                        </button>
+                        <button onclick="app.deleteVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-delete" title="Eliminar vehículo">
+                            <i class="fas fa-trash mr-2"></i>Eliminar
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
