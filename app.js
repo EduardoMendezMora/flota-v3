@@ -1,4 +1,4 @@
-// Aplicación principal mejorada - SISTEMA COMPLETO
+// Aplicación principal mejorada - SISTEMA COMPLETO CON COMENTARIOS Y ADJUNTOS
 class FlotaApp {
     constructor() {
         this.currentSection = 'dashboard';
@@ -7,6 +7,7 @@ class FlotaApp {
         this.modalManager = new ModalManager();
         this.loadingStates = new Map();
         this.debounceTimers = new Map();
+        this.currentTareaId = null; // Para manejar la tarea actual en detalle
         this.init();
     }
 
@@ -85,6 +86,9 @@ class FlotaApp {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.currentModal) {
                 this.closeModal();
+            }
+            if (e.key === 'Escape') {
+                this.closeTareaDetailModal();
             }
         });
 
@@ -785,8 +789,10 @@ class FlotaApp {
         await this.loadTareas();
     }
 
+    // ===== MODAL DETALLE DE TAREA CON COMENTARIOS Y ADJUNTOS =====
     async showTareaDetail(tareaId) {
         try {
+            this.currentTareaId = tareaId;
             const [tarea, colaboradores, comentarios, adjuntos] = await Promise.all([
                 api.getTarea(tareaId),
                 api.getTareaColaboradores(tareaId),
@@ -805,6 +811,9 @@ class FlotaApp {
             if (modal && content) {
                 content.innerHTML = this.getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos);
                 modal.classList.remove('hidden');
+
+                // Configurar event listeners para comentarios y adjuntos
+                this.setupTareaDetailListeners();
             }
 
         } catch (error) {
@@ -813,6 +822,264 @@ class FlotaApp {
         }
     }
 
+    setupTareaDetailListeners() {
+        // Listener para agregar comentario
+        const addCommentBtn = document.getElementById('add-comment-btn');
+        const commentInput = document.getElementById('new-comment-input');
+        const commentSelect = document.getElementById('comment-collaborator-select');
+
+        if (addCommentBtn && commentInput) {
+            addCommentBtn.addEventListener('click', () => this.addComentario());
+
+            // Agregar comentario con Enter
+            commentInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.addComentario();
+                }
+            });
+        }
+
+        // Listener para subir archivos
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-file-btn');
+
+        if (fileInput && uploadBtn) {
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        }
+
+        // Listener para asignar colaboradores
+        const assignBtn = document.getElementById('assign-collaborator-btn');
+        const collaboratorSelect = document.getElementById('assign-collaborator-select');
+
+        if (assignBtn && collaboratorSelect) {
+            assignBtn.addEventListener('click', () => this.assignColaborador());
+        }
+    }
+
+    // ===== FUNCIONES PARA COMENTARIOS =====
+    async addComentario() {
+        if (!this.currentTareaId) return;
+
+        const commentInput = document.getElementById('new-comment-input');
+        const collaboratorSelect = document.getElementById('comment-collaborator-select');
+
+        if (!commentInput || !collaboratorSelect) return;
+
+        const comentario = commentInput.value.trim();
+        const colaboradorId = collaboratorSelect.value;
+
+        if (!comentario) {
+            this.showToast('Por favor ingresa un comentario', 'warning');
+            return;
+        }
+
+        if (!colaboradorId) {
+            this.showToast('Por favor selecciona un colaborador', 'warning');
+            return;
+        }
+
+        try {
+            await api.createTareaComentario(this.currentTareaId, parseInt(colaboradorId), comentario);
+            this.showToast('Comentario agregado correctamente', 'success');
+
+            // Limpiar campos
+            commentInput.value = '';
+
+            // Recargar comentarios
+            await this.refreshTareaComments();
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            this.showToast('Error al agregar comentario', 'error');
+        }
+    }
+
+    async refreshTareaComments() {
+        if (!this.currentTareaId) return;
+
+        try {
+            const comentarios = await api.getTareaComentarios(this.currentTareaId);
+            const commentsContainer = document.getElementById('comments-container');
+
+            if (commentsContainer) {
+                commentsContainer.innerHTML = this.renderComentarios(comentarios);
+            }
+        } catch (error) {
+            console.error('Error refreshing comments:', error);
+        }
+    }
+
+    async deleteComentario(comentarioId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return;
+
+        try {
+            await api.deleteTareaComentario(comentarioId);
+            this.showToast('Comentario eliminado correctamente', 'success');
+            await this.refreshTareaComments();
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+            this.showToast('Error al eliminar comentario', 'error');
+        }
+    }
+
+    // ===== FUNCIONES PARA ADJUNTOS =====
+    async handleFileUpload(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        const file = files[0];
+
+        // Validar tamaño de archivo (10MB máximo)
+        if (file.size > FORM_CONSTANTS.limits.maxFileSize) {
+            this.showToast('El archivo es demasiado grande (máximo 10MB)', 'error');
+            return;
+        }
+
+        try {
+            // Simular subida de archivo (en producción esto iría a un servicio de storage)
+            const fileUrl = await this.uploadFileToStorage(file);
+
+            const adjuntoData = {
+                tarea_id: this.currentTareaId,
+                nombre_archivo: file.name,
+                tipo_archivo: this.getFileType(file),
+                ruta_archivo: fileUrl,
+                subido_por_id: 1 // En producción, esto sería el ID del usuario actual
+            };
+
+            await api.createTareaAdjunto(adjuntoData);
+            this.showToast('Archivo subido correctamente', 'success');
+
+            // Recargar adjuntos
+            await this.refreshTareaAdjuntos();
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            this.showToast('Error al subir archivo', 'error');
+        }
+
+        // Limpiar input
+        event.target.value = '';
+    }
+
+    async uploadFileToStorage(file) {
+        // Simular subida de archivo - en producción esto sería Supabase Storage o similar
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const fakeUrl = `https://storage.example.com/files/${Date.now()}_${file.name}`;
+                resolve(fakeUrl);
+            }, 1000);
+        });
+    }
+
+    getFileType(file) {
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
+            return 'foto';
+        } else if (['pdf'].includes(extension)) {
+            return 'pdf';
+        } else if (['doc', 'docx', 'txt'].includes(extension)) {
+            return 'documento';
+        } else if (['xls', 'xlsx', 'csv'].includes(extension)) {
+            return 'excel';
+        } else if (['mp4', 'avi', 'mov'].includes(extension)) {
+            return 'video';
+        } else {
+            return 'otro';
+        }
+    }
+
+    async refreshTareaAdjuntos() {
+        if (!this.currentTareaId) return;
+
+        try {
+            const adjuntos = await api.getTareaAdjuntos(this.currentTareaId);
+            const adjuntosContainer = document.getElementById('adjuntos-container');
+
+            if (adjuntosContainer) {
+                adjuntosContainer.innerHTML = this.renderAdjuntos(adjuntos);
+            }
+        } catch (error) {
+            console.error('Error refreshing adjuntos:', error);
+        }
+    }
+
+    async deleteAdjunto(adjuntoId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este archivo?')) return;
+
+        try {
+            await api.deleteTareaAdjunto(adjuntoId);
+            this.showToast('Archivo eliminado correctamente', 'success');
+            await this.refreshTareaAdjuntos();
+        } catch (error) {
+            console.error('Error deleting adjunto:', error);
+            this.showToast('Error al eliminar archivo', 'error');
+        }
+    }
+
+    // ===== FUNCIONES PARA COLABORADORES =====
+    async assignColaborador() {
+        if (!this.currentTareaId) return;
+
+        const collaboratorSelect = document.getElementById('assign-collaborator-select');
+        const roleSelect = document.getElementById('assign-role-select');
+
+        if (!collaboratorSelect || !roleSelect) return;
+
+        const colaboradorId = collaboratorSelect.value;
+        const rol = roleSelect.value;
+
+        if (!colaboradorId) {
+            this.showToast('Por favor selecciona un colaborador', 'warning');
+            return;
+        }
+
+        try {
+            await api.addColaboradorToTarea(this.currentTareaId, parseInt(colaboradorId), rol);
+            this.showToast('Colaborador asignado correctamente', 'success');
+
+            // Resetear selects
+            collaboratorSelect.value = '';
+            roleSelect.value = 'ejecutor';
+
+            // Recargar colaboradores
+            await this.refreshTareaColaboradores();
+        } catch (error) {
+            console.error('Error assigning colaborador:', error);
+            this.showToast('Error al asignar colaborador', 'error');
+        }
+    }
+
+    async refreshTareaColaboradores() {
+        if (!this.currentTareaId) return;
+
+        try {
+            const colaboradores = await api.getTareaColaboradores(this.currentTareaId);
+            const colaboradoresContainer = document.getElementById('colaboradores-container');
+
+            if (colaboradoresContainer) {
+                colaboradoresContainer.innerHTML = this.renderColaboradoresTarea(colaboradores);
+            }
+        } catch (error) {
+            console.error('Error refreshing colaboradores:', error);
+        }
+    }
+
+    async removeColaboradorFromTarea(colaboradorId) {
+        if (!confirm('¿Estás seguro de que quieres quitar este colaborador de la tarea?')) return;
+
+        try {
+            await api.removeColaboradorFromTarea(this.currentTareaId, colaboradorId);
+            this.showToast('Colaborador removido correctamente', 'success');
+            await this.refreshTareaColaboradores();
+        } catch (error) {
+            console.error('Error removing colaborador:', error);
+            this.showToast('Error al remover colaborador', 'error');
+        }
+    }
+
+    // ===== RENDER FUNCTIONS PARA DETALLE DE TAREA =====
     getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos) {
         const estadoClass = api.getTareaStatusBadgeClass(tarea.estado);
         const prioridadClass = api.getTareaPrioridadBadgeClass(tarea.prioridad);
@@ -892,16 +1159,27 @@ class FlotaApp {
                                 <i class="fas fa-users"></i>
                                 Colaboradores Asignados
                             </h3>
-                            <div class="tarea-colaboradores-list">
-                                ${colaboradores.length > 0 ? colaboradores.map(col => `
-                                    <div class="tarea-colaborador-item">
-                                        <div class="colaborador-info">
-                                            <span class="colaborador-nombre">${this.escapeHtml(col.colaboradores.nombre)}</span>
-                                            <span class="colaborador-rol rol-${col.rol}">${this.escapeHtml(col.rol)}</span>
-                                        </div>
-                                        <small class="colaborador-fecha">Asignado: ${api.formatDate(col.asignado_at)}</small>
-                                    </div>
-                                `).join('') : '<p class="text-gray-500">No hay colaboradores asignados</p>'}
+                            
+                            <!-- Formulario para asignar colaborador -->
+                            <div class="assign-collaborator-form mb-4">
+                                <div class="flex gap-2 mb-2">
+                                    <select id="assign-collaborator-select" class="select-minimal flex-1">
+                                        <option value="">Seleccionar colaborador</option>
+                                        ${this.getColaboradoresOptions()}
+                                    </select>
+                                    <select id="assign-role-select" class="select-minimal">
+                                        <option value="ejecutor">Ejecutor</option>
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="apoyo">Apoyo</option>
+                                    </select>
+                                    <button id="assign-collaborator-btn" class="btn-primary-apple">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="colaboradores-container" class="tarea-colaboradores-list">
+                                ${this.renderColaboradoresTarea(colaboradores)}
                             </div>
                         </div>
                     </div>
@@ -912,16 +1190,31 @@ class FlotaApp {
                             <i class="fas fa-comments"></i>
                             Comentarios (${comentarios.length})
                         </h3>
-                        <div class="tarea-comentarios-list">
-                            ${comentarios.length > 0 ? comentarios.map(com => `
-                                <div class="tarea-comentario-item">
-                                    <div class="comentario-header">
-                                        <span class="comentario-autor">${this.escapeHtml(com.colaboradores.nombre)}</span>
-                                        <span class="comentario-fecha">${api.formatDateTime(com.created_at)}</span>
-                                    </div>
-                                    <div class="comentario-texto">${this.escapeHtml(com.comentario)}</div>
-                                </div>
-                            `).join('') : '<p class="text-gray-500">No hay comentarios</p>'}
+                        
+                        <!-- Formulario para agregar comentario -->
+                        <div class="add-comment-form mb-4">
+                            <div class="flex gap-2 mb-2">
+                                <select id="comment-collaborator-select" class="select-minimal">
+                                    <option value="">Seleccionar colaborador</option>
+                                    ${this.getColaboradoresOptions()}
+                                </select>
+                            </div>
+                            <div class="flex gap-2">
+                                <textarea 
+                                    id="new-comment-input" 
+                                    class="input-minimal flex-1" 
+                                    rows="2" 
+                                    placeholder="Escribe un comentario..."
+                                    maxlength="500"
+                                ></textarea>
+                                <button id="add-comment-btn" class="btn-primary-apple">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="comments-container" class="tarea-comentarios-list">
+                            ${this.renderComentarios(comentarios)}
                         </div>
                     </div>
 
@@ -931,27 +1224,19 @@ class FlotaApp {
                             <i class="fas fa-paperclip"></i>
                             Adjuntos (${adjuntos.length})
                         </h3>
-                        <div class="tarea-adjuntos-list">
-                            ${adjuntos.length > 0 ? adjuntos.map(adj => `
-                                <div class="tarea-adjunto-item">
-                                    <div class="adjunto-icon">
-                                        <i class="fas fa-${this.getFileIcon(adj.tipo_archivo)}"></i>
-                                    </div>
-                                    <div class="adjunto-info">
-                                        <div class="adjunto-nombre">${this.escapeHtml(adj.nombre_archivo)}</div>
-                                        <div class="adjunto-meta">
-                                            <span>${this.escapeHtml(adj.tipo_archivo)}</span>
-                                            <span>•</span>
-                                            <span>Subido por ${this.escapeHtml(adj.colaboradores?.nombre || 'Desconocido')}</span>
-                                            <span>•</span>
-                                            <span>${api.formatDate(adj.created_at)}</span>
-                                        </div>
-                                    </div>
-                                    <a href="${this.escapeHtml(adj.ruta_archivo)}" target="_blank" class="adjunto-download">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                </div>
-                            `).join('') : '<p class="text-gray-500">No hay archivos adjuntos</p>'}
+                        
+                        <!-- Formulario para subir archivo -->
+                        <div class="upload-file-form mb-4">
+                            <input type="file" id="file-input" class="hidden" multiple>
+                            <button id="upload-file-btn" class="btn-secondary-apple">
+                                <i class="fas fa-upload"></i>
+                                Subir Archivo
+                            </button>
+                            <small class="text-gray-500 ml-2">Máximo 10MB por archivo</small>
+                        </div>
+                        
+                        <div id="adjuntos-container" class="tarea-adjuntos-list">
+                            ${this.renderAdjuntos(adjuntos)}
                         </div>
                     </div>
                 </div>
@@ -967,6 +1252,99 @@ class FlotaApp {
                 </div>
             </div>
         `;
+    }
+
+    renderColaboradoresTarea(colaboradores) {
+        if (colaboradores.length === 0) {
+            return '<p class="text-gray-500">No hay colaboradores asignados</p>';
+        }
+
+        return colaboradores.map(col => `
+            <div class="tarea-colaborador-item">
+                <div class="colaborador-info">
+                    <span class="colaborador-nombre">${this.escapeHtml(col.colaboradores.nombre)}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="colaborador-rol rol-${col.rol}">${this.escapeHtml(col.rol)}</span>
+                        <button onclick="app.removeColaboradorFromTarea(${col.colaborador_id})" 
+                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                title="Remover colaborador">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <small class="colaborador-fecha">Asignado: ${api.formatDate(col.asignado_at)}</small>
+            </div>
+        `).join('');
+    }
+
+    renderComentarios(comentarios) {
+        if (comentarios.length === 0) {
+            return '<p class="text-gray-500">No hay comentarios</p>';
+        }
+
+        return comentarios.map(com => `
+            <div class="tarea-comentario-item">
+                <div class="comentario-header">
+                    <span class="comentario-autor">${this.escapeHtml(com.colaboradores.nombre)}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="comentario-fecha">${api.formatDateTime(com.created_at)}</span>
+                        <button onclick="app.deleteComentario(${com.id})" 
+                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                title="Eliminar comentario">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="comentario-texto">${this.escapeHtml(com.comentario)}</div>
+            </div>
+        `).join('');
+    }
+
+    renderAdjuntos(adjuntos) {
+        if (adjuntos.length === 0) {
+            return '<p class="text-gray-500">No hay archivos adjuntos</p>';
+        }
+
+        return adjuntos.map(adj => `
+            <div class="tarea-adjunto-item">
+                <div class="adjunto-icon">
+                    <i class="fas fa-${this.getFileIcon(adj.tipo_archivo)}"></i>
+                </div>
+                <div class="adjunto-info">
+                    <div class="adjunto-nombre">${this.escapeHtml(adj.nombre_archivo)}</div>
+                    <div class="adjunto-meta">
+                        <span>${this.escapeHtml(adj.tipo_archivo)}</span>
+                        <span>•</span>
+                        <span>Subido por ${this.escapeHtml(adj.colaboradores?.nombre || 'Desconocido')}</span>
+                        <span>•</span>
+                        <span>${api.formatDate(adj.created_at)}</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="${this.escapeHtml(adj.ruta_archivo)}" target="_blank" class="adjunto-download">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <button onclick="app.deleteAdjunto(${adj.id})" 
+                            class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                            title="Eliminar archivo">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async getColaboradoresOptions() {
+        try {
+            const colaboradores = await api.getColaboradores();
+            return colaboradores
+                .filter(c => c.activo)
+                .map(c => `<option value="${c.id}">${this.escapeHtml(c.nombre)}</option>`)
+                .join('');
+        } catch (error) {
+            console.error('Error loading colaboradores options:', error);
+            return '';
+        }
     }
 
     getFileIcon(tipoArchivo) {
@@ -986,6 +1364,7 @@ class FlotaApp {
         if (modal) {
             modal.classList.add('hidden');
         }
+        this.currentTareaId = null;
     }
 
     // ===== MARCAS =====
@@ -1334,6 +1713,8 @@ class FlotaApp {
         try {
             const tarea = await api.getTarea(id);
             if (tarea) {
+                // Cerrar modal de detalle si está abierto
+                this.closeTareaDetailModal();
                 await this.openModal('tarea', tarea);
             }
         } catch (error) {
@@ -1348,6 +1729,10 @@ class FlotaApp {
         try {
             await api.deleteTarea(id);
             this.showToast('Tarea eliminada correctamente', 'success');
+
+            // Cerrar modal de detalle si está abierto
+            this.closeTareaDetailModal();
+
             await this.loadTareas();
         } catch (error) {
             console.error('Error deleting tarea:', error);

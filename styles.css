@@ -115,6 +115,10 @@ body {
     border: 0;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* ===== ESTADOS DE COLABORADORES ===== */
 .colaborador-status {
     display: inline-flex;
@@ -1434,6 +1438,30 @@ body {
     color: var(--apple-gray);
 }
 
+/* ===== FORMULARIOS DE COMENTARIOS Y ADJUNTOS ===== */
+.add-comment-form,
+.upload-file-form,
+.assign-collaborator-form {
+    background: var(--apple-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--apple-gray-medium);
+    margin-bottom: var(--spacing-lg);
+}
+
+.add-comment-form textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.upload-file-form {
+    text-align: center;
+}
+
+.upload-file-form input[type="file"] {
+    display: none;
+}
+
 /* ===== COMENTARIOS EN DETALLE DE TAREA ===== */
 .tarea-comentarios-list {
     display: flex;
@@ -2094,6 +2122,14 @@ select:disabled {
     .tarea-detail-info-grid {
         grid-template-columns: 1fr;
     }
+
+    /* Formularios móviles */
+    .add-comment-form .flex,
+    .upload-file-form .flex,
+    .assign-collaborator-form .flex {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
 }
 
 @media (max-width: 480px) {
@@ -2138,6 +2174,19 @@ select:disabled {
     .modal-title,
     .tarea-detail-title {
         font-size: var(--font-size-xl);
+    }
+
+    /* Ajustes para comentarios y adjuntos en móvil */
+    .tarea-comentario-item,
+    .tarea-adjunto-item,
+    .tarea-colaborador-item {
+        padding: var(--spacing-sm);
+    }
+
+    .adjunto-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
     }
 }
 
@@ -2189,6 +2238,51 @@ select:disabled {
     border-top-color: var(--apple-blue);
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+/* ===== UTILIDADES DE FLEXBOX ADICIONALES ===== */
+.flex {
+    display: flex;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.space-x-2 > * + * {
+    margin-left: 0.5rem;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.mr-1 {
+    margin-right: 0.25rem;
 }
 
 /* ===== PRINT STYLES ===== */
