@@ -126,17 +126,27 @@ function getVehiculoModalContent(item = null) {
                                 <label for="vehiculo-marca" class="label-minimal">
                                     Marca <span class="required">*</span>
                                 </label>
-                                <select id="vehiculo-marca" class="select-minimal" required>
-                                    <option value="">Seleccionar marca</option>
-                                </select>
+                                <div class="flex space-x-2">
+                                    <select id="vehiculo-marca" class="select-minimal flex-1" required>
+                                        <option value="">Seleccionar marca</option>
+                                    </select>
+                                    <button type="button" onclick="createMarcaFromVehiculo()" class="btn-secondary text-sm px-3 py-2 rounded-lg">
+                                        <i class="fas fa-plus mr-1"></i>Nueva
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-field-minimal">
                                 <label for="vehiculo-modelo" class="label-minimal">
                                     Modelo <span class="required">*</span>
                                 </label>
-                                <select id="vehiculo-modelo" class="select-minimal" required>
-                                    <option value="">Seleccionar modelo</option>
-                                </select>
+                                <div class="flex space-x-2">
+                                    <select id="vehiculo-modelo" class="select-minimal flex-1" required>
+                                        <option value="">Seleccionar modelo</option>
+                                    </select>
+                                    <button type="button" onclick="createModeloFromVehiculo()" class="btn-secondary text-sm px-3 py-2 rounded-lg">
+                                        <i class="fas fa-plus mr-1"></i>Nuevo
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-field-minimal">
                                 <label for="vehiculo-anio" class="label-minimal">
@@ -687,3 +697,216 @@ window.editEstado = (id) => app.editEstado(id);
 window.deleteEstado = (id) => app.deleteEstado(id);
 window.loadVehiculoModalData = loadVehiculoModalData;
 window.loadModeloModalData = loadModeloModalData;
+
+// ===== FUNCIONES PARA CREAR DESDE MODAL DE VEHÍCULOS =====
+
+// Crear marca desde modal de vehículo
+async function createMarcaFromVehiculo() {
+    // Crear un modal temporal para la marca
+    const modalHtml = `
+        <div class="modal-minimal" style="max-width: 400px;">
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">Nueva Marca</h2>
+                    <button onclick="closeQuickModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body-minimal">
+                <form id="quick-marca-form" class="form-minimal">
+                    <div class="form-field-minimal">
+                        <label for="quick-marca-nombre" class="label-minimal">
+                            Nombre de la Marca <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="quick-marca-nombre" 
+                            class="input-minimal" 
+                            placeholder="Ej: Toyota, Honda, Ford"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer-minimal">
+                <button onclick="closeQuickModal()" class="btn-cancel-minimal">
+                    Cancelar
+                </button>
+                <button onclick="saveQuickMarca()" class="btn-save-minimal">
+                    Crear Marca
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Mostrar el modal temporal
+    showQuickModal(modalHtml);
+}
+
+// Crear modelo desde modal de vehículo
+async function createModeloFromVehiculo() {
+    const marcaId = document.getElementById('vehiculo-marca').value;
+    
+    if (!marcaId) {
+        app.showToast('Primero selecciona una marca', 'error');
+        return;
+    }
+    
+    const marcaSelect = document.getElementById('vehiculo-marca');
+    const marcaNombre = marcaSelect.options[marcaSelect.selectedIndex].text;
+    
+    // Crear un modal temporal para el modelo
+    const modalHtml = `
+        <div class="modal-minimal" style="max-width: 400px;">
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">Nuevo Modelo</h2>
+                    <button onclick="closeQuickModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body-minimal">
+                <form id="quick-modelo-form" class="form-minimal">
+                    <div class="form-field-minimal">
+                        <label class="label-minimal">Marca</label>
+                        <div class="input-minimal bg-gray-50 text-gray-600" style="pointer-events: none;">
+                            ${marcaNombre}
+                        </div>
+                    </div>
+                    <div class="form-field-minimal">
+                        <label for="quick-modelo-nombre" class="label-minimal">
+                            Nombre del Modelo <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="quick-modelo-nombre" 
+                            class="input-minimal" 
+                            placeholder="Ej: Corolla, Civic, Focus"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer-minimal">
+                <button onclick="closeQuickModal()" class="btn-cancel-minimal">
+                    Cancelar
+                </button>
+                <button onclick="saveQuickModelo()" class="btn-save-minimal">
+                    Crear Modelo
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Mostrar el modal temporal
+    showQuickModal(modalHtml);
+}
+
+// Funciones auxiliares para modales rápidos
+function showQuickModal(html) {
+    // Crear overlay temporal
+    const overlay = document.createElement('div');
+    overlay.id = 'quick-modal-overlay';
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4';
+    overlay.innerHTML = html;
+    
+    // Cerrar con ESC
+    overlay.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeQuickModal();
+    });
+    
+    // Cerrar con click fuera
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeQuickModal();
+    });
+    
+    document.body.appendChild(overlay);
+    
+    // Enfocar el primer input
+    setTimeout(() => {
+        const firstInput = overlay.querySelector('input[autofocus]');
+        if (firstInput) firstInput.focus();
+    }, 100);
+}
+
+function closeQuickModal() {
+    const overlay = document.getElementById('quick-modal-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+// Guardar marca rápida
+async function saveQuickMarca() {
+    const nombre = document.getElementById('quick-marca-nombre').value.trim();
+    
+    if (!nombre) {
+        app.showToast('El nombre de la marca es obligatorio', 'error');
+        return;
+    }
+    
+    try {
+        const nuevaMarca = await api.createMarca({ nombre });
+        app.showToast('Marca creada correctamente', 'success');
+        
+        // Cerrar modal rápido
+        closeQuickModal();
+        
+        // Recargar las marcas en el select
+        await loadVehiculoModalData();
+        
+        // Seleccionar la nueva marca
+        const marcaSelect = document.getElementById('vehiculo-marca');
+        marcaSelect.value = nuevaMarca[0].id;
+        
+        // Limpiar el select de modelos ya que cambió la marca
+        const modeloSelect = document.getElementById('vehiculo-modelo');
+        modeloSelect.innerHTML = '<option value="">Seleccionar modelo</option>';
+        
+    } catch (error) {
+        app.showToast('Error al crear la marca', 'error');
+    }
+}
+
+// Guardar modelo rápido
+async function saveQuickModelo() {
+    const marcaId = document.getElementById('vehiculo-marca').value;
+    const nombre = document.getElementById('quick-modelo-nombre').value.trim();
+    
+    if (!nombre) {
+        app.showToast('El nombre del modelo es obligatorio', 'error');
+        return;
+    }
+    
+    try {
+        const nuevoModelo = await api.createModelo({ 
+            marca_id: parseInt(marcaId), 
+            nombre 
+        });
+        app.showToast('Modelo creado correctamente', 'success');
+        
+        // Cerrar modal rápido
+        closeQuickModal();
+        
+        // Recargar los modelos en el select
+        await loadVehiculoModalData();
+        
+        // Seleccionar el nuevo modelo
+        const modeloSelect = document.getElementById('vehiculo-modelo');
+        modeloSelect.value = nuevoModelo[0].id;
+        
+    } catch (error) {
+        app.showToast('Error al crear el modelo', 'error');
+    }
+}
+
+// Funciones globales para crear desde modal de vehículos
+window.createMarcaFromVehiculo = createMarcaFromVehiculo;
+window.createModeloFromVehiculo = createModeloFromVehiculo;
+window.closeQuickModal = closeQuickModal;
+window.saveQuickMarca = saveQuickMarca;
+window.saveQuickModelo = saveQuickModelo;
