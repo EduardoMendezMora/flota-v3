@@ -1,465 +1,1225 @@
-/* Estilos personalizados */
+/* ===== FUENTE Y VARIABLES GLOBALES ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Navegación */
-.nav-btn {
-    @apply px-4 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200;
+:root {
+    /* Colores principales */
+    --apple-blue: #007AFF;
+    --apple-blue-dark: #0056CC;
+    --apple-gray: #8E8E93;
+    --apple-gray-light: #F2F2F7;
+    --apple-gray-medium: #E5E5EA;
+    --apple-gray-dark: #3A3A3C;
+    --apple-black: #1C1C1E;
+    --apple-white: #FFFFFF;
+    --apple-green: #34C759;
+    --apple-red: #FF3B30;
+    --apple-orange: #FF9500;
+    --apple-purple: #AF52DE;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.16);
+
+    /* Bordes */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
 }
 
-.nav-btn.active {
-    @apply bg-blue-100 text-blue-600 font-medium;
+/* ===== RESET Y BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Botones */
-.btn-primary {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center;
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--apple-gray-light);
+    color: var(--apple-black);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.btn-secondary {
-    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center;
+.font-inter {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.btn-danger {
-    @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center;
+/* ===== HEADER ESTILO APPLE ===== */
+.header-apple {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.btn-success {
-    @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center;
+.app-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--apple-blue), var(--apple-blue-dark));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: var(--shadow-md);
 }
 
-/* Secciones */
+.app-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--apple-black);
+    letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+    font-size: 14px;
+    color: var(--apple-gray);
+    font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.header-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--apple-gray-light);
+    border-radius: var(--radius-md);
+    color: var(--apple-gray);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-btn:hover {
+    background: var(--apple-gray-medium);
+    color: var(--apple-black);
+    transform: scale(1.05);
+}
+
+/* ===== NAVEGACIÓN ESTILO APPLE ===== */
+.nav-apple {
+    background: var(--apple-white);
+    border-bottom: 1px solid var(--apple-gray-medium);
+    padding: var(--spacing-md) 0;
+}
+
+.nav-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-container::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+    position: relative;
+}
+
+.nav-item:hover {
+    background: var(--apple-gray-light);
+    transform: translateY(-1px);
+}
+
+.nav-item.active {
+    background: var(--apple-blue);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.nav-item.active .nav-icon {
+    color: white;
+}
+
+.nav-item.active .nav-label {
+    color: white;
+}
+
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apple-gray);
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.nav-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--apple-gray);
+    transition: all 0.2s ease;
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.main-content {
+    padding: var(--spacing-xl) var(--spacing-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 .section {
     display: none;
 }
 
 .section.active {
     display: block;
+    animation: fadeIn 0.3s ease;
 }
 
-/* Tablas */
-.table-auto th {
-    @apply font-semibold text-gray-700;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.table-auto td {
-    @apply border-b border-gray-100;
+/* ===== HEADERS DE SECCIÓN ===== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+    gap: var(--spacing-lg);
 }
 
-.table-auto tr:hover {
-    @apply bg-gray-50;
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--apple-black);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-xs);
 }
 
-/* ===== SISTEMA DE MODALES MINIMALISTA ===== */
-
-/* Contenedor del modal minimalista */
-.modal-minimal {
-    @apply bg-white rounded-2xl shadow-2xl max-w-3xl w-full mx-4 max-h-[95vh] overflow-hidden;
-    animation: modalFadeIn 0.4s ease-out;
+.section-subtitle {
+    font-size: 16px;
+    color: var(--apple-gray);
+    font-weight: 500;
 }
 
-/* Header minimalista */
-.modal-header-minimal {
-    @apply px-8 py-6 border-b border-gray-100;
+/* ===== BOTONES ESTILO APPLE ===== */
+.btn-primary-apple {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--apple-blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
 }
 
-.header-content {
-    @apply flex justify-between items-center;
+.btn-primary-apple:hover {
+    background: var(--apple-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
-.modal-title {
-    @apply text-2xl font-light text-gray-800;
+.btn-primary-apple:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
 }
 
-.close-btn-minimal {
-    @apply p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all duration-200;
+/* ===== TARJETAS DE ESTADÍSTICAS ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xxl);
 }
 
-/* Body minimalista */
-.modal-body-minimal {
-    @apply px-8 py-8 max-h-[70vh] overflow-y-auto;
+.stat-card {
+    background: var(--apple-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--apple-gray-medium);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Footer minimalista */
-.modal-footer-minimal {
-    @apply flex justify-end space-x-4 px-8 py-6 border-t border-gray-100 bg-gray-50;
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-start), var(--color-end));
 }
 
-/* Botones minimalistas */
-.btn-cancel-minimal {
-    @apply px-6 py-3 text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium;
+.stat-card-blue {
+    --color-start: var(--apple-blue);
+    --color-end: var(--apple-blue-dark);
 }
 
-.btn-save-minimal {
-    @apply px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium;
+.stat-card-green {
+    --color-start: var(--apple-green);
+    --color-end: #28A745;
 }
 
-/* ===== SISTEMA DE FORMULARIOS MINIMALISTA ===== */
-
-/* Formulario minimalista */
-.form-minimal {
-    @apply space-y-8;
+.stat-card-purple {
+    --color-start: var(--apple-purple);
+    --color-end: #8E44AD;
 }
 
-/* Campos de formulario minimalistas */
-.form-field-minimal {
-    @apply mb-8;
+.stat-card-orange {
+    --color-start: var(--apple-orange);
+    --color-end: #E67E22;
 }
 
-.label-minimal {
-    @apply block text-sm font-medium text-gray-700 mb-3;
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
-.input-minimal {
-    @apply w-full px-4 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800;
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-start), var(--color-end));
+    color: white;
 }
 
-.select-minimal {
-    @apply w-full px-4 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800;
+.stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--apple-black);
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: -0.02em;
 }
 
-/* Texto de ayuda */
-.help-text {
-    @apply text-sm text-gray-500 mt-2;
+.stat-label {
+    font-size: 14px;
+    color: var(--apple-gray);
+    font-weight: 500;
 }
 
-/* Campos requeridos */
-.required {
-    @apply text-red-500 ml-1;
+/* ===== DASHBOARD GRID ===== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-lg);
 }
 
-/* Secciones de formulario minimalistas */
-.form-section-minimal {
-    @apply mb-12 p-6 bg-gray-50 rounded-xl border border-gray-100;
+.dashboard-card {
+    background: var(--apple-white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--apple-gray-medium);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.section-title-minimal {
-    @apply text-lg font-medium text-gray-800 mb-6 flex items-center;
+.dashboard-card:hover {
+    box-shadow: var(--shadow-md);
 }
 
-.section-title-minimal i {
-    @apply text-blue-500 mr-3;
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--apple-gray-medium);
+    background: var(--apple-gray-light);
 }
 
-/* Grid de formulario minimalista */
-.form-grid-minimal {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--apple-black);
 }
 
-/* Grupos de input con prefijos minimalistas */
-.input-group-minimal {
-    @apply relative flex items-center;
+.card-action {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--apple-white);
+    border-radius: var(--radius-sm);
+    color: var(--apple-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.currency-prefix {
-    @apply absolute left-4 text-gray-500 font-medium;
+.card-action:hover {
+    color: var(--apple-blue);
+    background: var(--apple-blue);
+    color: white;
 }
 
-.input-group-minimal .input-minimal {
-    @apply pl-10;
+.card-content {
+    padding: var(--spacing-lg);
 }
 
-/* ===== ANIMACIONES MINIMALISTAS ===== */
+/* ===== TARJETAS DE CONTENIDO ===== */
+.content-card {
+    background: var(--apple-white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--apple-gray-medium);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-tools {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--apple-gray-medium);
+    background: var(--apple-gray-light);
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.search-container {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--apple-gray);
+    font-size: 14px;
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 40px;
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    background: var(--apple-white);
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.filter-select {
+    padding: var(--spacing-md);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    background: var(--apple-white);
+    color: var(--apple-black);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 160px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* ===== TABLAS ESTILO APPLE ===== */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-apple {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-apple th {
+    text-align: left;
+    padding: var(--spacing-lg);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--apple-gray-dark);
+    background: var(--apple-gray-light);
+    border-bottom: 1px solid var(--apple-gray-medium);
+}
+
+.table-apple td {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--apple-gray-medium);
+    font-size: 14px;
+    color: var(--apple-black);
+}
+
+.table-apple tr:hover {
+    background: var(--apple-gray-light);
+}
+
+.table-loading {
+    text-align: center;
+    padding: var(--spacing-xxl) !important;
+    color: var(--apple-gray);
+}
+
+/* ===== GRID DE VEHÍCULOS ESTILO APPLE ===== */
+.vehicles-grid {
+    padding: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.vehicle-card {
+    background: var(--apple-white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--apple-gray-medium);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.vehicle-card-header {
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--apple-gray-light), var(--apple-white));
+    border-bottom: 1px solid var(--apple-gray-medium);
+}
+
+.vehicle-card-placa {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--apple-black);
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: -0.01em;
+}
+
+.vehicle-card-modelo {
+    font-size: 16px;
+    color: var(--apple-gray);
+    font-weight: 500;
+}
+
+.vehicle-card-body {
+    padding: var(--spacing-lg);
+}
+
+.vehicle-card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--apple-gray-light);
+}
+
+.vehicle-card-info:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.vehicle-card-label {
+    font-size: 12px;
+    color: var(--apple-gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vehicle-card-value {
+    font-size: 14px;
+    color: var(--apple-black);
+    font-weight: 600;
+}
+
+.vehicle-card-price {
+    font-size: 18px;
+    color: var(--apple-green);
+    font-weight: 700;
+}
+
+.vehicle-card-status {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-available {
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--apple-green);
+}
+
+.status-rented {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--apple-blue);
+}
+
+.status-maintenance {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--apple-orange);
+}
+
+.status-out-of-service {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--apple-red);
+}
+
+.status-sold {
+    background: rgba(142, 142, 147, 0.1);
+    color: var(--apple-gray);
+}
+
+.vehicle-card-actions {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--apple-gray-medium);
+    background: var(--apple-gray-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+}
+
+.vehicle-card-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.vehicle-card-btn-edit {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--apple-blue);
+}
+
+.vehicle-card-btn-edit:hover {
+    background: var(--apple-blue);
+    color: white;
+    transform: scale(1.1);
+}
+
+.vehicle-card-btn-delete {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--apple-red);
+}
+
+.vehicle-card-btn-delete:hover {
+    background: var(--apple-red);
+    color: white;
+    transform: scale(1.1);
+}
+
+.vehicle-card-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--apple-gray);
+}
+
+.vehicle-card-empty-icon {
+    font-size: 64px;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.3;
+}
+
+.vehicle-card-empty-text {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.vehicle-card-empty-subtext {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.grid-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--apple-gray);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* ===== ACTIVITY LIST ===== */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.activity-loading {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--apple-gray);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* ===== SPINNER DE CARGA ===== */
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--apple-gray-medium);
+    border-top-color: var(--apple-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== MODALES ESTILO APPLE ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.modal-overlay:not(.hidden) {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalFadeIn 0.3s ease-out;
+}
 
 @keyframes modalFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-30px) scale(0.98);
+        transform: scale(0.95) translateY(20px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: scale(1) translateY(0);
     }
 }
 
-/* Toast notifications */
-.toast {
-    @apply bg-white border-l-4 p-4 rounded-lg shadow-lg max-w-sm;
-    animation: slideIn 0.3s ease-out;
+/* Estilos para modales - Actualizados para mantener consistencia */
+.modal-minimal {
+    background: var(--apple-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    border: 1px solid var(--apple-gray-medium);
 }
 
-.toast.success {
-    @apply border-green-500;
+.modal-header-minimal {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--apple-gray-light);
+    border-bottom: 1px solid var(--apple-gray-medium);
 }
 
-.toast.error {
-    @apply border-red-500;
+.modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--apple-black);
+    letter-spacing: -0.01em;
 }
 
-.toast.warning {
-    @apply border-yellow-500;
+.close-btn-minimal {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(142, 142, 147, 0.1);
+    border-radius: 50%;
+    color: var(--apple-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.toast.info {
-    @apply border-blue-500;
+.close-btn-minimal:hover {
+    background: rgba(142, 142, 147, 0.2);
+    color: var(--apple-black);
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.modal-body-minimal {
+    padding: var(--spacing-xl);
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
-/* Badges de estado */
-.status-badge {
-    @apply px-2 py-1 rounded-full text-xs font-medium;
+.modal-footer-minimal {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--apple-gray-light);
+    border-top: 1px solid var(--apple-gray-medium);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
 }
 
-.status-badge.available {
-    @apply bg-green-100 text-green-800;
+.btn-cancel-minimal {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 1px solid var(--apple-gray-medium);
+    background: var(--apple-white);
+    color: var(--apple-black);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.status-badge.maintenance {
-    @apply bg-yellow-100 text-yellow-800;
+.btn-cancel-minimal:hover {
+    background: var(--apple-gray-light);
 }
 
-.status-badge.rented {
-    @apply bg-blue-100 text-blue-800;
+.btn-save-minimal {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    background: var(--apple-blue);
+    color: white;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.status-badge.unavailable {
-    @apply bg-red-100 text-red-800;
+.btn-save-minimal:hover {
+    background: var(--apple-blue-dark);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .modal-minimal {
-        @apply mx-2 max-w-full;
-    }
-    
-    .form-grid-minimal {
-        @apply grid-cols-1;
-    }
-    
-    .modal-footer-minimal {
-        @apply flex-col space-y-3 space-x-0;
-    }
-    
-    .modal-footer-minimal button {
-        @apply w-full justify-center;
-    }
-    
-    .modal-header-minimal,
-    .modal-body-minimal,
-    .modal-footer-minimal {
-        @apply px-6;
-    }
+/* Formularios en modales */
+.form-minimal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
 }
 
-/* Estados de hover y focus mejorados */
-.input-minimal:hover {
-    @apply border-gray-300;
+.form-field-minimal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
 }
 
-.select-minimal:hover {
-    @apply border-gray-300;
+.label-minimal {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--apple-black);
 }
 
-/* Loading states */
-.loading {
-    @apply opacity-50 pointer-events-none;
+.required {
+    color: var(--apple-red);
 }
 
-.loading::after {
-    content: '';
-    @apply absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center;
-}
-
-/* Mejoras en la accesibilidad */
-.input-minimal:focus,
-.select-minimal:focus {
-    @apply ring-2 ring-blue-500 ring-opacity-30;
-}
-
-/* Estilos para errores de validación */
-.input-minimal.error {
-    @apply border-red-500 focus:ring-red-500;
-}
-
-.error-message {
-    @apply text-red-500 text-sm mt-1;
-}
-
-/* Scrollbar personalizada para el modal */
-.modal-body-minimal::-webkit-scrollbar {
-    width: 6px;
-}
-
-.modal-body-minimal::-webkit-scrollbar-track {
-    @apply bg-gray-100 rounded-full;
-}
-
-.modal-body-minimal::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
-}
-
-.modal-body-minimal::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
-}
-
-/* Efectos sutiles */
-.form-section-minimal:hover {
-    @apply border-gray-200;
+.input-minimal {
+    padding: var(--spacing-md);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    background: var(--apple-white);
+    transition: all 0.2s ease;
 }
 
 .input-minimal:focus {
-    @apply shadow-sm;
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
-/* Espaciado adicional para mejor legibilidad */
-.form-field-minimal:last-child {
-    @apply mb-0;
+.select-minimal {
+    padding: var(--spacing-md);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    background: var(--apple-white);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.form-section-minimal:last-child {
-    @apply mb-0;
+.select-minimal:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
-/* ===== TARJETAS DE VEHÍCULOS - ESTILO APPLE MINIMALISTA ===== */
-.vehicle-card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.01] bg-gradient-to-br from-white to-gray-50;
+.form-section-minimal {
+    padding: var(--spacing-lg);
+    background: var(--apple-gray-light);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--apple-gray-medium);
 }
 
-.vehicle-card-header {
-    @apply p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100;
+.section-title-minimal {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--apple-black);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
 }
 
-.vehicle-card-placa {
-    @apply text-2xl font-bold text-gray-900 mb-2 tracking-tight;
+.form-grid-minimal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
 }
 
-.vehicle-card-modelo {
-    @apply text-base text-gray-600 font-medium;
+.input-group-minimal {
+    position: relative;
 }
 
-.vehicle-card-vin {
-    @apply text-sm text-gray-500 font-mono;
+.currency-prefix {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--apple-gray);
+    font-weight: 600;
 }
 
-.vehicle-card-body {
-    @apply p-6 space-y-6;
+.input-group-minimal .input-minimal {
+    padding-left: 40px;
 }
 
-.vehicle-card-section {
-    @apply space-y-4;
+.help-text {
+    font-size: 12px;
+    color: var(--apple-gray);
+    margin-top: var(--spacing-xs);
 }
 
-.vehicle-card-section-title {
-    @apply text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3;
+/* ===== TOASTS ESTILO APPLE ===== */
+.toast-container {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
 }
 
-.vehicle-card-grid {
-    @apply grid grid-cols-2 gap-4;
+.toast {
+    background: var(--apple-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--apple-gray-medium);
+    max-width: 400px;
+    animation: toastSlideIn 0.3s ease-out;
 }
 
-.vehicle-card-info {
-    @apply flex flex-col space-y-1;
+.toast.success {
+    border-left: 4px solid var(--apple-green);
 }
 
-.vehicle-card-label {
-    @apply text-xs text-gray-500 font-medium uppercase tracking-wide;
+.toast.error {
+    border-left: 4px solid var(--apple-red);
 }
 
-.vehicle-card-value {
-    @apply text-sm font-medium text-gray-900;
+.toast.warning {
+    border-left: 4px solid var(--apple-orange);
 }
 
-.vehicle-card-price {
-    @apply text-xl font-bold text-green-600;
+.toast.info {
+    border-left: 4px solid var(--apple-blue);
 }
 
-.vehicle-card-gastos {
-    @apply text-sm font-medium text-orange-600;
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
-.vehicle-card-status {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+/* ===== BOTONES DE ACCIÓN EN TABLAS ===== */
+.table-apple .fa-edit {
+    color: var(--apple-blue);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
 }
 
-.vehicle-card-status.available {
-    @apply bg-green-100 text-green-800;
+.table-apple .fa-edit:hover {
+    background: rgba(0, 122, 255, 0.1);
 }
 
-.vehicle-card-status.maintenance {
-    @apply bg-yellow-100 text-yellow-800;
+.table-apple .fa-trash {
+    color: var(--apple-red);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
 }
 
-.vehicle-card-status.rented {
-    @apply bg-blue-100 text-blue-800;
+.table-apple .fa-trash:hover {
+    background: rgba(255, 59, 48, 0.1);
 }
 
-.vehicle-card-status.unavailable {
-    @apply bg-red-100 text-red-800;
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicles-grid {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-md);
+    }
+
+    .main-content {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    .nav-container {
+        padding: 0 var(--spacing-md);
+    }
+
+    .form-grid-minimal {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer-minimal {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .modal-footer-minimal button {
+        width: 100%;
+    }
 }
 
-.vehicle-card-fotos {
-    @apply flex items-center space-x-2;
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 24px;
+    }
+
+    .stat-card {
+        padding: var(--spacing-lg);
+    }
+
+    .stat-number {
+        font-size: 28px;
+    }
+
+    .vehicle-card-placa {
+        font-size: 20px;
+    }
+
+    .modal-content {
+        margin: var(--spacing-md);
+    }
+
+    .modal-header-minimal,
+    .modal-body-minimal,
+    .modal-footer-minimal {
+        padding: var(--spacing-lg);
+    }
 }
 
-.vehicle-card-fotos-link {
-    @apply text-sm text-blue-600 hover:text-blue-800 font-medium truncate;
+/* ===== MEJORAS ADICIONALES ===== */
+.chart-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apple-gray);
+    font-style: italic;
 }
 
-.vehicle-card-actions {
-    @apply p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center;
+.table-container {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
-.vehicle-card-actions-left {
-    @apply flex items-center space-x-3;
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-.vehicle-card-actions-right {
-    @apply flex items-center space-x-2;
+::-webkit-scrollbar-track {
+    background: var(--apple-gray-light);
 }
 
-.vehicle-card-btn {
-    @apply p-3 rounded-xl transition-all duration-200 font-medium text-sm;
+::-webkit-scrollbar-thumb {
+    background: var(--apple-gray-medium);
+    border-radius: 4px;
 }
 
-.vehicle-card-btn-edit {
-    @apply text-blue-600 hover:text-blue-800 hover:bg-blue-50;
+::-webkit-scrollbar-thumb:hover {
+    background: var(--apple-gray);
 }
 
-.vehicle-card-btn-delete {
-    @apply text-red-600 hover:text-red-800 hover:bg-red-50;
+/* Estados de focus mejorados */
+button:focus,
+input:focus,
+select:focus {
+    outline: none;
 }
 
-.vehicle-card-btn-view {
-    @apply text-gray-600 hover:text-gray-800 hover:bg-gray-50;
+/* Animaciones sutiles */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.vehicle-card-empty {
-    @apply col-span-full flex flex-col items-center justify-center py-16 text-gray-500;
+/* Mejoras en accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
-.vehicle-card-empty-icon {
-    @apply text-6xl mb-6 text-gray-200;
+/* Estados disabled */
+button:disabled,
+input:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.vehicle-card-empty-text {
-    @apply text-xl font-medium text-gray-400;
+/* Hover states mejorados */
+.content-card:hover {
+    box-shadow: var(--shadow-md);
 }
 
-.vehicle-card-empty-subtext {
-    @apply text-sm text-gray-300 mt-2;
+.stat-card:hover {
+    border-color: var(--apple-blue);
 }
 
-.vehicle-card-divider {
-    @apply border-t border-gray-100 my-4;
+/* Estados activos */
+.nav-item:active {
+    transform: scale(0.98);
 }
 
-.vehicle-card-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium;
+button:active {
+    transform: scale(0.98);
 }
 
-.vehicle-card-badge-id {
-    @apply bg-gray-100 text-gray-700;
+/* Mejoras tipográficas */
+h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.01em;
+    line-height: 1.2;
 }
 
-.vehicle-card-badge-year {
-    @apply bg-blue-100 text-blue-700;
+p {
+    line-height: 1.5;
 }
 
+/* Utilidades adicionales */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
