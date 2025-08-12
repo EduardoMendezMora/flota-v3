@@ -411,8 +411,22 @@ class FlotaApp {
         
         document.getElementById('modal-overlay').classList.remove('hidden');
         
-        // Enfocar el primer input
-        setTimeout(() => {
+        // Cargar datos específicos del modal después de renderizar
+        setTimeout(async () => {
+            try {
+                switch (type) {
+                    case 'vehiculo':
+                        await loadVehiculoModalData();
+                        break;
+                    case 'modelo':
+                        await loadModeloModalData();
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading modal data:', error);
+            }
+            
+            // Enfocar el primer input
             const firstInput = modalContent.querySelector('input, select, textarea');
             if (firstInput) firstInput.focus();
         }, 100);
@@ -452,6 +466,137 @@ class FlotaApp {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+
+    // ===== FUNCIONES CRUD =====
+    // Arrendadoras
+    async editArrendadora(id) {
+        try {
+            const arrendadora = await api.getArrendadora(id);
+            if (arrendadora && arrendadora.length > 0) {
+                this.openModal('arrendadora', arrendadora[0]);
+            }
+        } catch (error) {
+            this.showToast('Error al cargar la arrendadora', 'error');
+        }
+    }
+
+    async deleteArrendadora(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta arrendadora?')) {
+            return;
+        }
+        
+        try {
+            await api.deleteArrendadora(id);
+            this.showToast('Arrendadora eliminada correctamente', 'success');
+            this.loadArrendadoras();
+        } catch (error) {
+            this.showToast('Error al eliminar la arrendadora', 'error');
+        }
+    }
+
+    // Vehículos
+    async editVehiculo(id) {
+        try {
+            const vehiculo = await api.getVehiculo(id);
+            if (vehiculo && vehiculo.length > 0) {
+                this.openModal('vehiculo', vehiculo[0]);
+            }
+        } catch (error) {
+            this.showToast('Error al cargar el vehículo', 'error');
+        }
+    }
+
+    async deleteVehiculo(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este vehículo?')) {
+            return;
+        }
+        
+        try {
+            await api.deleteVehiculo(id);
+            this.showToast('Vehículo eliminado correctamente', 'success');
+            this.loadVehiculos();
+        } catch (error) {
+            this.showToast('Error al eliminar el vehículo', 'error');
+        }
+    }
+
+    // Marcas
+    async editMarca(id) {
+        try {
+            const marca = await api.getMarca(id);
+            if (marca && marca.length > 0) {
+                this.openModal('marca', marca[0]);
+            }
+        } catch (error) {
+            this.showToast('Error al cargar la marca', 'error');
+        }
+    }
+
+    async deleteMarca(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta marca?')) {
+            return;
+        }
+        
+        try {
+            await api.deleteMarca(id);
+            this.showToast('Marca eliminada correctamente', 'success');
+            this.loadMarcas();
+        } catch (error) {
+            this.showToast('Error al eliminar la marca', 'error');
+        }
+    }
+
+    // Modelos
+    async editModelo(id) {
+        try {
+            const modelo = await api.getModelo(id);
+            if (modelo && modelo.length > 0) {
+                this.openModal('modelo', modelo[0]);
+            }
+        } catch (error) {
+            this.showToast('Error al cargar el modelo', 'error');
+        }
+    }
+
+    async deleteModelo(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este modelo?')) {
+            return;
+        }
+        
+        try {
+            await api.deleteModelo(id);
+            this.showToast('Modelo eliminado correctamente', 'success');
+            this.loadModelos();
+        } catch (error) {
+            this.showToast('Error al eliminar el modelo', 'error');
+        }
+    }
+
+    // Estados
+    async editEstado(id) {
+        try {
+            const estado = await api.getEstadoInventario(id);
+            if (estado && estado.length > 0) {
+                this.openModal('estado', estado[0]);
+            }
+        } catch (error) {
+            this.showToast('Error al cargar el estado', 'error');
+        }
+    }
+
+    async deleteEstado(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este estado?')) {
+            return;
+        }
+        
+        try {
+            await api.deleteEstadoInventario(id);
+            this.showToast('Estado eliminado correctamente', 'success');
+            this.loadEstados();
+        } catch (error) {
+            this.showToast('Error al eliminar el estado', 'error');
+        }
     }
 
     showToast(message, type = 'info') {

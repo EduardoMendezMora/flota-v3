@@ -446,30 +446,7 @@ async function saveArrendadora() {
     }
 }
 
-async function editArrendadora(id) {
-    try {
-        const arrendadora = await api.getArrendadora(id);
-        if (arrendadora && arrendadora.length > 0) {
-            app.openModal('arrendadora', arrendadora[0]);
-        }
-    } catch (error) {
-        app.showToast('Error al cargar la arrendadora', 'error');
-    }
-}
 
-async function deleteArrendadora(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta arrendadora?')) {
-        return;
-    }
-    
-    try {
-        await api.deleteArrendadora(id);
-        app.showToast('Arrendadora eliminada correctamente', 'success');
-        app.loadArrendadoras();
-    } catch (error) {
-        app.showToast('Error al eliminar la arrendadora', 'error');
-    }
-}
 
 // Vehículos
 async function loadVehiculoModalData() {
@@ -575,31 +552,7 @@ async function saveVehiculo() {
     }
 }
 
-async function editVehiculo(id) {
-    try {
-        const vehiculo = await api.getVehiculo(id);
-        if (vehiculo && vehiculo.length > 0) {
-            app.openModal('vehiculo', vehiculo[0]);
-            await loadVehiculoModalData();
-        }
-    } catch (error) {
-        app.showToast('Error al cargar el vehículo', 'error');
-    }
-}
 
-async function deleteVehiculo(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este vehículo?')) {
-        return;
-    }
-    
-    try {
-        await api.deleteVehiculo(id);
-        app.showToast('Vehículo eliminado correctamente', 'success');
-        app.loadVehiculos();
-    } catch (error) {
-        app.showToast('Error al eliminar el vehículo', 'error');
-    }
-}
 
 // Marcas
 async function saveMarca() {
@@ -628,30 +581,7 @@ async function saveMarca() {
     }
 }
 
-async function editMarca(id) {
-    try {
-        const marca = await api.getMarca(id);
-        if (marca && marca.length > 0) {
-            app.openModal('marca', marca[0]);
-        }
-    } catch (error) {
-        app.showToast('Error al cargar la marca', 'error');
-    }
-}
 
-async function deleteMarca(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta marca?')) {
-        return;
-    }
-    
-    try {
-        await api.deleteMarca(id);
-        app.showToast('Marca eliminada correctamente', 'success');
-        app.loadMarcas();
-    } catch (error) {
-        app.showToast('Error al eliminar la marca', 'error');
-    }
-}
 
 // Modelos
 async function loadModeloModalData() {
@@ -699,31 +629,7 @@ async function saveModelo() {
     }
 }
 
-async function editModelo(id) {
-    try {
-        const modelo = await api.getModelo(id);
-        if (modelo && modelo.length > 0) {
-            app.openModal('modelo', modelo[0]);
-            await loadModeloModalData();
-        }
-    } catch (error) {
-        app.showToast('Error al cargar el modelo', 'error');
-    }
-}
 
-async function deleteModelo(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este modelo?')) {
-        return;
-    }
-    
-    try {
-        await api.deleteModelo(id);
-        app.showToast('Modelo eliminado correctamente', 'success');
-        app.loadModelos();
-    } catch (error) {
-        app.showToast('Error al eliminar el modelo', 'error');
-    }
-}
 
 // Estados
 async function saveEstado() {
@@ -752,30 +658,7 @@ async function saveEstado() {
     }
 }
 
-async function editEstado(id) {
-    try {
-        const estado = await api.getEstadoInventario(id);
-        if (estado && estado.length > 0) {
-            app.openModal('estado', estado[0]);
-        }
-    } catch (error) {
-        app.showToast('Error al cargar el estado', 'error');
-    }
-}
 
-async function deleteEstado(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este estado?')) {
-        return;
-    }
-    
-    try {
-        await api.deleteEstadoInventario(id);
-        app.showToast('Estado eliminado correctamente', 'success');
-        app.loadEstados();
-    } catch (error) {
-        app.showToast('Error al eliminar el estado', 'error');
-    }
-}
 
 // Extender la clase FlotaApp con los métodos de modales
 Object.assign(FlotaApp.prototype, {
@@ -788,19 +671,19 @@ Object.assign(FlotaApp.prototype, {
 
 // Funciones globales
 window.saveArrendadora = saveArrendadora;
-window.editArrendadora = editArrendadora;
-window.deleteArrendadora = deleteArrendadora;
+window.editArrendadora = (id) => app.editArrendadora(id);
+window.deleteArrendadora = (id) => app.deleteArrendadora(id);
 window.saveVehiculo = saveVehiculo;
-window.editVehiculo = editVehiculo;
-window.deleteVehiculo = deleteVehiculo;
+window.editVehiculo = (id) => app.editVehiculo(id);
+window.deleteVehiculo = (id) => app.deleteVehiculo(id);
 window.saveMarca = saveMarca;
-window.editMarca = editMarca;
-window.deleteMarca = deleteMarca;
+window.editMarca = (id) => app.editMarca(id);
+window.deleteMarca = (id) => app.deleteMarca(id);
 window.saveModelo = saveModelo;
-window.editModelo = editModelo;
-window.deleteModelo = deleteModelo;
+window.editModelo = (id) => app.editModelo(id);
+window.deleteModelo = (id) => app.deleteModelo(id);
 window.saveEstado = saveEstado;
-window.editEstado = editEstado;
-window.deleteEstado = deleteEstado;
+window.editEstado = (id) => app.editEstado(id);
+window.deleteEstado = (id) => app.deleteEstado(id);
 window.loadVehiculoModalData = loadVehiculoModalData;
 window.loadModeloModalData = loadModeloModalData;
