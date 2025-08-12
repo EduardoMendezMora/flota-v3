@@ -793,11 +793,12 @@ class FlotaApp {
     async showTareaDetail(tareaId) {
         try {
             this.currentTareaId = tareaId;
-            const [tarea, colaboradores, comentarios, adjuntos] = await Promise.all([
+            const [tarea, colaboradores, comentarios, adjuntos, todosColaboradores] = await Promise.all([
                 api.getTarea(tareaId),
                 api.getTareaColaboradores(tareaId),
                 api.getTareaComentarios(tareaId),
-                api.getTareaAdjuntos(tareaId)
+                api.getTareaAdjuntos(tareaId),
+                api.getColaboradores()
             ]);
 
             if (!tarea) {
@@ -809,7 +810,7 @@ class FlotaApp {
             const content = document.getElementById('tarea-detail-content');
 
             if (modal && content) {
-                content.innerHTML = this.getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos);
+                content.innerHTML = this.getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos, todosColaboradores);
                 modal.classList.remove('hidden');
 
                 // Configurar event listeners para comentarios y adjuntos
@@ -1080,9 +1081,15 @@ class FlotaApp {
     }
 
     // ===== RENDER FUNCTIONS PARA DETALLE DE TAREA =====
-    getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos) {
+    getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos, todosColaboradores) {
         const estadoClass = api.getTareaStatusBadgeClass(tarea.estado);
         const prioridadClass = api.getTareaPrioridadBadgeClass(tarea.prioridad);
+
+        // Generar opciones de colaboradores
+        const colaboradoresOptions = todosColaboradores
+            .filter(c => c.activo)
+            .map(c => `<option value="${c.id}">${this.escapeHtml(c.nombre)}</option>`)
+            .join('');
 
         return `
             <div class="tarea-detail-modal">
@@ -1165,7 +1172,7 @@ class FlotaApp {
                                 <div class="flex gap-2 mb-2">
                                     <select id="assign-collaborator-select" class="select-minimal flex-1">
                                         <option value="">Seleccionar colaborador</option>
-                                        ${this.getColaboradoresOptions()}
+                                        ${colaboradoresOptions}
                                     </select>
                                     <select id="assign-role-select" class="select-minimal">
                                         <option value="ejecutor">Ejecutor</option>
@@ -1196,7 +1203,7 @@ class FlotaApp {
                             <div class="flex gap-2 mb-2">
                                 <select id="comment-collaborator-select" class="select-minimal">
                                     <option value="">Seleccionar colaborador</option>
-                                    ${this.getColaboradoresOptions()}
+                                    ${colaboradoresOptions}
                                 </select>
                             </div>
                             <div class="flex gap-2">
@@ -1332,19 +1339,6 @@ class FlotaApp {
                 </div>
             </div>
         `).join('');
-    }
-
-    async getColaboradoresOptions() {
-        try {
-            const colaboradores = await api.getColaboradores();
-            return colaboradores
-                .filter(c => c.activo)
-                .map(c => `<option value="${c.id}">${this.escapeHtml(c.nombre)}</option>`)
-                .join('');
-        } catch (error) {
-            console.error('Error loading colaboradores options:', error);
-            return '';
-        }
     }
 
     getFileIcon(tipoArchivo) {
