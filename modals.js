@@ -1,48 +1,423 @@
-// Modales y funciones CRUD
+// Sistema de Modales Mejorado
 
-// ===== MODALES DE ARRENDADORAS =====
+// ===== MODAL DE ARRENDADORAS =====
 function getArrendadoraModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Arrendadora' : 'Nueva Arrendadora';
+    const icon = isEditing ? 'fa-edit' : 'fa-plus';
     
     return `
-        <div class="modal-header">
-            <h3 class="text-lg font-semibold">${title}</h3>
-            <button onclick="app.closeModal()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="arrendadora-form" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Nombre *</label>
-                <input type="text" id="arrendadora-nombre" class="form-input" 
-                       value="${item?.nombre || ''}" required>
+        <div class="modal-container">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i class="fas ${icon} text-blue-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+                </div>
+                <button onclick="app.closeModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="form-group">
-                <label class="form-label">Identificación Jurídica</label>
-                <input type="text" id="arrendadora-identificacion" class="form-input" 
-                       value="${item?.identificacion_juridica || ''}" 
-                       placeholder="Ej: 3-101-672906">
+            
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="arrendadora-form" class="space-y-6">
+                    <!-- Nombre -->
+                    <div class="form-field">
+                        <label for="arrendadora-nombre" class="form-label">
+                            <i class="fas fa-building mr-2"></i>Nombre de la Empresa
+                        </label>
+                        <input 
+                            type="text" 
+                            id="arrendadora-nombre" 
+                            class="form-input" 
+                            value="${item?.nombre || ''}" 
+                            placeholder="Ej: Rent a Car Costa Rica S.A."
+                            required
+                        >
+                        <p class="form-help">Nombre completo de la empresa arrendadora</p>
+                    </div>
+                    
+                    <!-- Identificación Jurídica -->
+                    <div class="form-field">
+                        <label for="arrendadora-identificacion" class="form-label">
+                            <i class="fas fa-id-card mr-2"></i>Identificación Jurídica
+                        </label>
+                        <input 
+                            type="text" 
+                            id="arrendadora-identificacion" 
+                            class="form-input" 
+                            value="${item?.identificacion_juridica || ''}" 
+                            placeholder="Ej: 3-101-672906"
+                        >
+                        <p class="form-help">Número de identificación legal (opcional)</p>
+                    </div>
+                </form>
             </div>
-        </form>
-        <div class="modal-footer">
-            <button onclick="app.closeModal()" class="btn-secondary">
-                <i class="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button onclick="saveArrendadora()" class="btn-primary">
-                <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Guardar'}
-            </button>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button onclick="app.closeModal()" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </button>
+                <button onclick="saveArrendadora()" class="btn-save">
+                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                </button>
+            </div>
         </div>
     `;
 }
 
+// ===== MODAL DE VEHÍCULOS =====
+function getVehiculoModalContent(item = null) {
+    const isEditing = item !== null;
+    const title = isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo';
+    const icon = isEditing ? 'fa-edit' : 'fa-car';
+    
+    return `
+        <div class="modal-container">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i class="fas ${icon} text-blue-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+                </div>
+                <button onclick="app.closeModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="vehiculo-form" class="space-y-6">
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle mr-2"></i>Información Básica
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="vehiculo-placa" class="form-label">Placa *</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-placa" 
+                                    class="form-input" 
+                                    value="${item?.placa || ''}" 
+                                    placeholder="ABC-123"
+                                    required
+                                >
+                            </div>
+                            <div class="form-field">
+                                <label for="vehiculo-vin" class="form-label">VIN</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-vin" 
+                                    class="form-input" 
+                                    value="${item?.vin || ''}" 
+                                    placeholder="1HGBH41JXMN109186"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Marca y Modelo -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-tags mr-2"></i>Marca y Modelo
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="vehiculo-marca" class="form-label">Marca *</label>
+                                <select id="vehiculo-marca" class="form-select" required>
+                                    <option value="">Seleccionar marca</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="vehiculo-modelo" class="form-label">Modelo *</label>
+                                <select id="vehiculo-modelo" class="form-select" required>
+                                    <option value="">Seleccionar modelo</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="vehiculo-anio" class="form-label">Año *</label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-anio" 
+                                    class="form-input" 
+                                    value="${item?.anio || ''}" 
+                                    min="1900" 
+                                    max="2030" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Asignación -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-link mr-2"></i>Asignación
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="vehiculo-arrendadora" class="form-label">Arrendadora *</label>
+                                <select id="vehiculo-arrendadora" class="form-select" required>
+                                    <option value="">Seleccionar arrendadora</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="vehiculo-estado" class="form-label">Estado *</label>
+                                <select id="vehiculo-estado" class="form-select" required>
+                                    <option value="">Seleccionar estado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información Económica -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-dollar-sign mr-2"></i>Información Económica
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="vehiculo-precio" class="form-label">Precio Semanal (CRC)</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">₡</span>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-precio" 
+                                        class="form-input" 
+                                        value="${item?.precio_semanal || ''}" 
+                                        min="0" 
+                                        step="1000"
+                                        placeholder="0"
+                                    >
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label for="vehiculo-gastos" class="form-label">Gastos Administrativos (CRC)</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">₡</span>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-gastos" 
+                                        class="form-input" 
+                                        value="${item?.gastos_adms || ''}" 
+                                        min="0" 
+                                        step="1000"
+                                        placeholder="0"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fotos -->
+                    <div class="form-field">
+                        <label for="vehiculo-fotos" class="form-label">
+                            <i class="fas fa-images mr-2"></i>Link de Fotos
+                        </label>
+                        <input 
+                            type="url" 
+                            id="vehiculo-fotos" 
+                            class="form-input" 
+                            value="${item?.link_fotos || ''}" 
+                            placeholder="https://ejemplo.com/fotos"
+                        >
+                        <p class="form-help">URL donde se encuentran las fotos del vehículo</p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button onclick="app.closeModal()" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </button>
+                <button onclick="saveVehiculo()" class="btn-save">
+                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ===== MODAL DE MARCAS =====
+function getMarcaModalContent(item = null) {
+    const isEditing = item !== null;
+    const title = isEditing ? 'Editar Marca' : 'Nueva Marca';
+    const icon = isEditing ? 'fa-edit' : 'fa-tag';
+    
+    return `
+        <div class="modal-container">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i class="fas ${icon} text-blue-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+                </div>
+                <button onclick="app.closeModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="marca-form" class="space-y-6">
+                    <div class="form-field">
+                        <label for="marca-nombre" class="form-label">
+                            <i class="fas fa-tag mr-2"></i>Nombre de la Marca
+                        </label>
+                        <input 
+                            type="text" 
+                            id="marca-nombre" 
+                            class="form-input" 
+                            value="${item?.nombre || ''}" 
+                            placeholder="Ej: Toyota, Honda, Ford"
+                            required
+                        >
+                        <p class="form-help">Nombre del fabricante del vehículo</p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button onclick="app.closeModal()" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </button>
+                <button onclick="saveMarca()" class="btn-save">
+                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ===== MODAL DE MODELOS =====
+function getModeloModalContent(item = null) {
+    const isEditing = item !== null;
+    const title = isEditing ? 'Editar Modelo' : 'Nuevo Modelo';
+    const icon = isEditing ? 'fa-edit' : 'fa-car-side';
+    
+    return `
+        <div class="modal-container">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i class="fas ${icon} text-blue-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+                </div>
+                <button onclick="app.closeModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="modelo-form" class="space-y-6">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="modelo-marca" class="form-label">
+                                <i class="fas fa-tag mr-2"></i>Marca *
+                            </label>
+                            <select id="modelo-marca" class="form-select" required>
+                                <option value="">Seleccionar marca</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="modelo-nombre" class="form-label">
+                                <i class="fas fa-car-side mr-2"></i>Nombre del Modelo *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="modelo-nombre" 
+                                class="form-input" 
+                                value="${item?.nombre || ''}" 
+                                placeholder="Ej: Corolla, Civic, Focus"
+                                required
+                            >
+                        </div>
+                    </div>
+                    <p class="form-help">Selecciona la marca y especifica el nombre del modelo</p>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button onclick="app.closeModal()" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </button>
+                <button onclick="saveModelo()" class="btn-save">
+                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ===== MODAL DE ESTADOS =====
+function getEstadoModalContent(item = null) {
+    const isEditing = item !== null;
+    const title = isEditing ? 'Editar Estado' : 'Nuevo Estado';
+    const icon = isEditing ? 'fa-edit' : 'fa-clipboard-list';
+    
+    return `
+        <div class="modal-container">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="flex items-center">
+                    <i class="fas ${icon} text-blue-600 mr-3"></i>
+                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+                </div>
+                <button onclick="app.closeModal()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="estado-form" class="space-y-6">
+                    <div class="form-field">
+                        <label for="estado-nombre" class="form-label">
+                            <i class="fas fa-clipboard-list mr-2"></i>Nombre del Estado
+                        </label>
+                        <input 
+                            type="text" 
+                            id="estado-nombre" 
+                            class="form-input" 
+                            value="${item?.nombre || ''}" 
+                            placeholder="Ej: Disponible, En Mantenimiento, Alquilado"
+                            required
+                        >
+                        <p class="form-help">Estado actual del vehículo en el inventario</p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button onclick="app.closeModal()" class="btn-cancel">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </button>
+                <button onclick="saveEstado()" class="btn-save">
+                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ===== FUNCIONES CRUD MEJORADAS =====
+
+// Arrendadoras
 async function saveArrendadora() {
-    const form = document.getElementById('arrendadora-form');
     const nombre = document.getElementById('arrendadora-nombre').value.trim();
     const identificacion = document.getElementById('arrendadora-identificacion').value.trim();
     
     if (!nombre) {
-        app.showToast('El nombre es obligatorio', 'error');
+        app.showToast('El nombre de la empresa es obligatorio', 'error');
         return;
     }
     
@@ -92,97 +467,7 @@ async function deleteArrendadora(id) {
     }
 }
 
-// ===== MODALES DE VEHÍCULOS =====
-function getVehiculoModalContent(item = null) {
-    const isEditing = item !== null;
-    const title = isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo';
-    
-    return `
-        <div class="modal-header">
-            <h3 class="text-lg font-semibold">${title}</h3>
-            <button onclick="app.closeModal()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="vehiculo-form" class="modal-body">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Placa *</label>
-                    <input type="text" id="vehiculo-placa" class="form-input" 
-                           value="${item?.placa || ''}" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">VIN</label>
-                    <input type="text" id="vehiculo-vin" class="form-input" 
-                           value="${item?.vin || ''}">
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Marca *</label>
-                    <select id="vehiculo-marca" class="form-select" required>
-                        <option value="">Seleccionar marca</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Modelo *</label>
-                    <select id="vehiculo-modelo" class="form-select" required>
-                        <option value="">Seleccionar modelo</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Año *</label>
-                    <input type="number" id="vehiculo-anio" class="form-input" 
-                           value="${item?.anio || ''}" min="1900" max="2030" required>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Arrendadora *</label>
-                    <select id="vehiculo-arrendadora" class="form-select" required>
-                        <option value="">Seleccionar arrendadora</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Estado *</label>
-                    <select id="vehiculo-estado" class="form-select" required>
-                        <option value="">Seleccionar estado</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <label class="form-label">Precio Semanal (CRC)</label>
-                    <input type="number" id="vehiculo-precio" class="form-input" 
-                           value="${item?.precio_semanal || ''}" min="0" step="1000">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Gastos Administrativos (CRC)</label>
-                    <input type="number" id="vehiculo-gastos" class="form-input" 
-                           value="${item?.gastos_adms || ''}" min="0" step="1000">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Link de Fotos</label>
-                <input type="url" id="vehiculo-fotos" class="form-input" 
-                       value="${item?.link_fotos || ''}" placeholder="https://...">
-            </div>
-        </form>
-        <div class="modal-footer">
-            <button onclick="app.closeModal()" class="btn-secondary">
-                <i class="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button onclick="saveVehiculo()" class="btn-primary">
-                <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Guardar'}
-            </button>
-        </div>
-    `;
-}
-
+// Vehículos
 async function loadVehiculoModalData() {
     try {
         const [marcas, arrendadoras, estados] = await Promise.all([
@@ -241,7 +526,6 @@ async function loadModelosForMarca(marcaId) {
 }
 
 async function saveVehiculo() {
-    const form = document.getElementById('vehiculo-form');
     const placa = document.getElementById('vehiculo-placa').value.trim();
     const vin = document.getElementById('vehiculo-vin').value.trim();
     const marcaId = document.getElementById('vehiculo-marca').value;
@@ -313,41 +597,12 @@ async function deleteVehiculo(id) {
     }
 }
 
-// ===== MODALES DE MARCAS =====
-function getMarcaModalContent(item = null) {
-    const isEditing = item !== null;
-    const title = isEditing ? 'Editar Marca' : 'Nueva Marca';
-    
-    return `
-        <div class="modal-header">
-            <h3 class="text-lg font-semibold">${title}</h3>
-            <button onclick="app.closeModal()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="marca-form" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Nombre *</label>
-                <input type="text" id="marca-nombre" class="form-input" 
-                       value="${item?.nombre || ''}" required>
-            </div>
-        </form>
-        <div class="modal-footer">
-            <button onclick="app.closeModal()" class="btn-secondary">
-                <i class="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button onclick="saveMarca()" class="btn-primary">
-                <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Guardar'}
-            </button>
-        </div>
-    `;
-}
-
+// Marcas
 async function saveMarca() {
     const nombre = document.getElementById('marca-nombre').value.trim();
     
     if (!nombre) {
-        app.showToast('El nombre es obligatorio', 'error');
+        app.showToast('El nombre de la marca es obligatorio', 'error');
         return;
     }
     
@@ -394,42 +649,7 @@ async function deleteMarca(id) {
     }
 }
 
-// ===== MODALES DE MODELOS =====
-function getModeloModalContent(item = null) {
-    const isEditing = item !== null;
-    const title = isEditing ? 'Editar Modelo' : 'Nuevo Modelo';
-    
-    return `
-        <div class="modal-header">
-            <h3 class="text-lg font-semibold">${title}</h3>
-            <button onclick="app.closeModal()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="modelo-form" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Marca *</label>
-                <select id="modelo-marca" class="form-select" required>
-                    <option value="">Seleccionar marca</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nombre *</label>
-                <input type="text" id="modelo-nombre" class="form-input" 
-                       value="${item?.nombre || ''}" required>
-            </div>
-        </form>
-        <div class="modal-footer">
-            <button onclick="app.closeModal()" class="btn-secondary">
-                <i class="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button onclick="saveModelo()" class="btn-primary">
-                <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Guardar'}
-            </button>
-        </div>
-    `;
-}
-
+// Modelos
 async function loadModeloModalData() {
     try {
         const marcas = await api.getMarcas();
@@ -501,41 +721,12 @@ async function deleteModelo(id) {
     }
 }
 
-// ===== MODALES DE ESTADOS =====
-function getEstadoModalContent(item = null) {
-    const isEditing = item !== null;
-    const title = isEditing ? 'Editar Estado' : 'Nuevo Estado';
-    
-    return `
-        <div class="modal-header">
-            <h3 class="text-lg font-semibold">${title}</h3>
-            <button onclick="app.closeModal()" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form id="estado-form" class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Nombre *</label>
-                <input type="text" id="estado-nombre" class="form-input" 
-                       value="${item?.nombre || ''}" required>
-            </div>
-        </form>
-        <div class="modal-footer">
-            <button onclick="app.closeModal()" class="btn-secondary">
-                <i class="fas fa-times mr-2"></i>Cancelar
-            </button>
-            <button onclick="saveEstado()" class="btn-primary">
-                <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Guardar'}
-            </button>
-        </div>
-    `;
-}
-
+// Estados
 async function saveEstado() {
     const nombre = document.getElementById('estado-nombre').value.trim();
     
     if (!nombre) {
-        app.showToast('El nombre es obligatorio', 'error');
+        app.showToast('El nombre del estado es obligatorio', 'error');
         return;
     }
     

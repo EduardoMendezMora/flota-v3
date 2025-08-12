@@ -48,38 +48,112 @@
     @apply bg-gray-50;
 }
 
-/* Modales */
+/* ===== SISTEMA DE MODALES MEJORADO ===== */
+
+/* Contenedor del modal */
+.modal-container {
+    @apply bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+/* Header del modal */
 .modal-header {
-    @apply flex justify-between items-center p-6 border-b border-gray-200;
+    @apply flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50;
 }
 
+.modal-header h2 {
+    @apply text-xl font-bold text-gray-800;
+}
+
+.close-btn {
+    @apply p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200;
+}
+
+/* Body del modal */
 .modal-body {
-    @apply p-6;
+    @apply p-6 max-h-[60vh] overflow-y-auto;
 }
 
+/* Footer del modal */
 .modal-footer {
     @apply flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50;
 }
 
-/* Formularios */
-.form-group {
-    @apply mb-4;
+/* Botones del modal */
+.btn-cancel {
+    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center;
+}
+
+.btn-save {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center;
+}
+
+/* ===== SISTEMA DE FORMULARIOS MEJORADO ===== */
+
+/* Campos de formulario */
+.form-field {
+    @apply mb-6;
 }
 
 .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-semibold text-gray-700 mb-2 flex items-center;
 }
 
 .form-input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
 }
 
 .form-select {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
 }
 
 .form-textarea {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical;
+}
+
+/* Texto de ayuda */
+.form-help {
+    @apply text-sm text-gray-500 mt-1;
+}
+
+/* Secciones de formulario */
+.form-section {
+    @apply mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200;
+}
+
+.section-title {
+    @apply text-lg font-semibold text-gray-800 mb-4 flex items-center;
+}
+
+/* Grid de formulario */
+.form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+/* Grupos de input con prefijos */
+.input-group {
+    @apply relative flex items-center;
+}
+
+.input-prefix {
+    @apply absolute left-3 text-gray-500 font-medium;
+}
+
+.input-group .form-input {
+    @apply pl-8;
+}
+
+/* ===== ANIMACIONES ===== */
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* Toast notifications */
@@ -106,13 +180,62 @@
 
 @keyframes slideIn {
     from {
-        transform: translateX(100%);
         opacity: 0;
+        transform: translateX(100%);
     }
     to {
-        transform: translateX(0);
         opacity: 1;
+        transform: translateX(0);
     }
+}
+
+/* Badges de estado */
+.status-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-badge.available {
+    @apply bg-green-100 text-green-800;
+}
+
+.status-badge.maintenance {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-badge.rented {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.status-badge.unavailable {
+    @apply bg-red-100 text-red-800;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-container {
+        @apply mx-2 max-w-full;
+    }
+    
+    .form-grid {
+        @apply grid-cols-1;
+    }
+    
+    .modal-footer {
+        @apply flex-col space-y-2 space-x-0;
+    }
+    
+    .modal-footer button {
+        @apply w-full justify-center;
+    }
+}
+
+/* Estados de hover y focus mejorados */
+.form-input:hover {
+    @apply border-gray-400;
+}
+
+.form-select:hover {
+    @apply border-gray-400;
 }
 
 /* Loading states */
@@ -120,109 +243,24 @@
     @apply opacity-50 pointer-events-none;
 }
 
-.loading-spinner {
-    @apply animate-spin;
+.loading::after {
+    content: '';
+    @apply absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center;
 }
 
-/* Status badges */
-.status-badge {
-    @apply px-2 py-1 rounded-full text-xs font-medium;
+/* Estilos para campos requeridos */
+.form-label.required::after {
+    content: ' *';
+    @apply text-red-500;
 }
 
-.status-available {
-    @apply bg-green-100 text-green-800;
+/* Mejoras en la accesibilidad */
+.form-input:focus,
+.form-select:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-50;
 }
 
-.status-rented {
-    @apply bg-blue-100 text-blue-800;
-}
-
-.status-maintenance {
-    @apply bg-yellow-100 text-yellow-800;
-}
-
-.status-out-of-service {
-    @apply bg-red-100 text-red-800;
-}
-
-.status-sold {
-    @apply bg-gray-100 text-gray-800;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .nav-btn {
-        @apply px-2 py-1 text-sm;
-    }
-    
-    .btn-primary, .btn-secondary, .btn-danger, .btn-success {
-        @apply px-3 py-1 text-sm;
-    }
-    
-    .modal-content {
-        @apply mx-4;
-    }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    @apply bg-gray-100;
-}
-
-::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
-}
-
-/* Animaciones */
-.fade-in {
-    animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Card hover effects */
-.card-hover {
-    @apply transition-transform duration-200 hover:scale-105;
-}
-
-/* Input focus effects */
-.input-focus {
-    @apply transition-all duration-200;
-}
-
-/* Button loading states */
-.btn-loading {
-    @apply opacity-75 cursor-not-allowed;
-}
-
-/* Table responsive */
-@media (max-width: 640px) {
-    .table-responsive {
-        @apply block w-full overflow-x-auto;
-    }
-}
-
-/* Modal backdrop */
-.modal-backdrop {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-40;
-}
-
-/* Form validation */
+/* Estilos para errores de validación */
 .form-input.error {
     @apply border-red-500 focus:ring-red-500;
 }
@@ -231,7 +269,3 @@
     @apply text-red-500 text-sm mt-1;
 }
 
-/* Success message */
-.success-message {
-    @apply text-green-500 text-sm mt-1;
-}
