@@ -1,4 +1,4 @@
-// API Service mejorado para Supabase - SISTEMA COMPLETO
+// API Service mejorado para Supabase - CÓDIGO COMPLETO CORREGIDO
 class ApiService {
     constructor() {
         this.baseUrl = SUPABASE_CONFIG.url + '/rest/v1';
@@ -19,7 +19,7 @@ class ApiService {
         });
     }
 
-    // Método genérico mejorado para hacer peticiones
+    // Método genérico CORREGIDO para hacer peticiones
     async request(endpoint, options = {}) {
         if (!this.isOnline && !this.isCached(endpoint)) {
             throw new Error('Sin conexión a internet');
@@ -42,7 +42,19 @@ class ApiService {
             const response = await this.fetchWithRetry(url, config);
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Obtener detalles del error para debugging
+                const errorText = await response.text();
+                console.error(`🔴 HTTP ${response.status} Error en ${endpoint}:`, errorText);
+
+                // Log detallado para debugging
+                console.error('📋 Detalles del error:', {
+                    url: url,
+                    status: response.status,
+                    statusText: response.statusText,
+                    method: config.method || 'GET'
+                });
+
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
             }
 
             // Para operaciones DELETE, retornar éxito sin parsear JSON
@@ -67,7 +79,7 @@ class ApiService {
 
             return data;
         } catch (error) {
-            console.error('API Error:', error);
+            console.error('💥 API Error:', error);
             throw this.handleError(error);
         }
     }
@@ -178,41 +190,100 @@ class ApiService {
         return result;
     }
 
-    // ===== TAREAS =====
+    // ===== TAREAS CORREGIDAS =====
     async getTareas(filters = {}) {
-        let query = '/tareas?select=*,vehiculos(placa,marcas(nombre),modelos(nombre)),colaboradores!tareas_responsable_id_fkey(nombre)&order=id.desc';
+        try {
+            // Consulta simplificada SIN join complejo
+            let query = '/tareas?select=*&order=id.desc';
 
-        // Aplicar filtros
-        const params = [];
-        if (filters.vehiculo_id) {
-            params.push(`vehiculo_id=eq.${filters.vehiculo_id}`);
-        }
-        if (filters.responsable_id) {
-            params.push(`responsable_id=eq.${filters.responsable_id}`);
-        }
-        if (filters.estado) {
-            params.push(`estado=eq.${filters.estado}`);
-        }
-        if (filters.prioridad) {
-            params.push(`prioridad=eq.${filters.prioridad}`);
-        }
-        if (filters.search) {
-            params.push(`or=(titulo.ilike.*${filters.search}*,descripcion.ilike.*${filters.search}*)`);
-        }
-        if (filters.limit) {
-            params.push(`limit=${filters.limit}`);
-        }
+            const params = [];
+            if (filters.responsable_id) {
+                params.push(`responsable_id=eq.${filters.responsable_id}`);
+            }
+            if (filters.estado) {
+                params.push(`estado=eq.${encodeURIComponent(filters.estado)}`);
+            }
+            if (filters.prioridad) {
+                params.push(`prioridad=eq.${encodeURIComponent(filters.prioridad)}`);
+            }
+            if (filters.search) {
+                // Codificar correctamente caracteres especiales
+                const searchEncoded = encodeURIComponent(filters.search);
+                params.push(`or=(titulo.ilike.*${searchEncoded}*,descripcion.ilike.*${searchEncoded}*)`);
+            }
+            if (filters.limit) {
+                params.push(`limit=${filters.limit}`);
+            }
 
-        if (params.length > 0) {
-            query += '&' + params.join('&');
-        }
+            if (params.length > 0) {
+                query += '&' + params.join('&');
+            }
 
-        return this.request(query);
+            console.log('🔍 Ejecutando consulta de tareas:', query);
+            const tareas = await this.request(query);
+
+            // Si no hay tareas, retornar array vacío
+            if (!tareas || tareas.length === 0) {
+                console.log('📝 No hay tareas en la base de datos');
+                return [];
+            }
+
+            // Obtener datos relacionados en consultas separadas
+            const vehiculoIds = [...new Set(tareas.map(t => t.vehiculo_id).filter(id => id))];
+            const colaboradorIds = [...new Set(tareas.map(t => t.responsable_id).filter(id => id))];
+
+            console.log('🚗 Vehículos a buscar:', vehiculoIds);
+            console.log('👥 Colaboradores a buscar:', colaboradorIds);
+
+            const [vehiculosData, colaboradoresData] = await Promise.all([
+                vehiculoIds.length > 0 ? this.getVehiculosConRelaciones(vehiculoIds) : [],
+                colaboradorIds.length > 0 ? this.getColaboradoresByIds(colaboradorIds) : []
+            ]);
+
+            // Combinar datos
+            const tareasCompletas = tareas.map(tarea => ({
+                ...tarea,
+                vehiculos: vehiculosData.find(v => v.id === tarea.vehiculo_id) || null,
+                colaboradores: colaboradoresData.find(c => c.id === tarea.responsable_id) || null
+            }));
+
+            console.log('✅ Tareas completadas:', tareasCompletas.length);
+            return tareasCompletas;
+
+        } catch (error) {
+            console.error('❌ Error en getTareas:', error);
+            // En caso de error, retornar array vacío en lugar de fallar
+            return [];
+        }
     }
 
     async getTarea(id) {
-        const result = await this.request(`/tareas?id=eq.${id}&select=*,vehiculos(placa,marcas(nombre),modelos(nombre)),colaboradores!tareas_responsable_id_fkey(nombre)`);
-        return result?.[0] || null;
+        try {
+            const tarea = await this.request(`/tareas?id=eq.${id}&select=*`);
+
+            if (!tarea || tarea.length === 0) {
+                console.log(`⚠️ Tarea ${id} no encontrada`);
+                return null;
+            }
+
+            const tareaData = tarea[0];
+
+            // Obtener datos relacionados
+            const [vehiculo, colaborador] = await Promise.all([
+                tareaData.vehiculo_id ? this.getVehiculoCompleto(tareaData.vehiculo_id) : null,
+                tareaData.responsable_id ? this.getColaborador(tareaData.responsable_id) : null
+            ]);
+
+            return {
+                ...tareaData,
+                vehiculos: vehiculo,
+                colaboradores: colaborador
+            };
+
+        } catch (error) {
+            console.error(`❌ Error obteniendo tarea ${id}:`, error);
+            return null;
+        }
     }
 
     async createTarea(data) {
@@ -400,35 +471,180 @@ class ApiService {
         return result;
     }
 
-    // ===== VEHÍCULOS =====
+    // ===== VEHÍCULOS CORREGIDOS =====
     async getVehiculos(filters = {}) {
-        let query = '/vehiculos?select=*,arrendadoras(nombre),marcas(nombre),modelos(nombre),estados_inventario(nombre)&order=id.desc';
+        try {
+            let query = '/vehiculos?select=*&order=id.desc';
 
-        // Aplicar filtros
-        const params = [];
-        if (filters.arrendadora_id) {
-            params.push(`arrendadora_id=eq.${filters.arrendadora_id}`);
-        }
-        if (filters.estado_inventario_id) {
-            params.push(`estado_inventario_id=eq.${filters.estado_inventario_id}`);
-        }
-        if (filters.search) {
-            params.push(`or=(placa.ilike.*${filters.search}*,vin.ilike.*${filters.search}*)`);
-        }
-        if (filters.limit) {
-            params.push(`limit=${filters.limit}`);
-        }
+            const params = [];
+            if (filters.arrendadora_id) {
+                params.push(`arrendadora_id=eq.${filters.arrendadora_id}`);
+            }
+            if (filters.estado_inventario_id) {
+                params.push(`estado_inventario_id=eq.${filters.estado_inventario_id}`);
+            }
+            if (filters.search) {
+                const searchEncoded = encodeURIComponent(filters.search);
+                params.push(`or=(placa.ilike.*${searchEncoded}*,vin.ilike.*${searchEncoded}*)`);
+            }
+            if (filters.limit) {
+                params.push(`limit=${filters.limit}`);
+            }
 
-        if (params.length > 0) {
-            query += '&' + params.join('&');
-        }
+            if (params.length > 0) {
+                query += '&' + params.join('&');
+            }
 
-        return this.request(query);
+            console.log('🔍 Ejecutando consulta de vehículos:', query);
+            const vehiculos = await this.request(query);
+
+            if (!vehiculos || vehiculos.length === 0) {
+                console.log('🚗 No hay vehículos que coincidan con los filtros');
+                return [];
+            }
+
+            // Obtener datos relacionados
+            return await this.enrichVehiculosData(vehiculos);
+
+        } catch (error) {
+            console.error('❌ Error en getVehiculos:', error);
+            return [];
+        }
     }
 
     async getVehiculo(id) {
-        const result = await this.request(`/vehiculos?id=eq.${id}&select=*,arrendadoras(nombre),marcas(nombre),modelos(nombre),estados_inventario(nombre)`);
-        return result?.[0] || null;
+        try {
+            const vehiculo = await this.request(`/vehiculos?id=eq.${id}&select=*`);
+
+            if (!vehiculo || vehiculo.length === 0) {
+                return null;
+            }
+
+            const vehiculoData = vehiculo[0];
+            return await this.enrichVehiculoIndividual(vehiculoData);
+
+        } catch (error) {
+            console.error('Error in getVehiculo:', error);
+            return null;
+        }
+    }
+
+    async getVehiculoCompleto(id) {
+        try {
+            const vehiculo = await this.request(`/vehiculos?id=eq.${id}&select=*`);
+
+            if (!vehiculo || vehiculo.length === 0) {
+                return null;
+            }
+
+            const vehiculoData = vehiculo[0];
+
+            // Obtener datos relacionados
+            const [marca, modelo] = await Promise.all([
+                vehiculoData.marca_id ? this.getMarca(vehiculoData.marca_id) : null,
+                vehiculoData.modelo_id ? this.getModelo(vehiculoData.modelo_id) : null
+            ]);
+
+            return {
+                ...vehiculoData,
+                marcas: marca,
+                modelos: modelo
+            };
+
+        } catch (error) {
+            console.error(`❌ Error obteniendo vehículo completo ${id}:`, error);
+            return null;
+        }
+    }
+
+    // NUEVA FUNCIÓN: Enriquecer datos de vehículos
+    async enrichVehiculosData(vehiculos) {
+        try {
+            // Obtener IDs únicos para consultas relacionadas
+            const marcaIds = [...new Set(vehiculos.map(v => v.marca_id).filter(id => id))];
+            const modeloIds = [...new Set(vehiculos.map(v => v.modelo_id).filter(id => id))];
+            const arrendadoraIds = [...new Set(vehiculos.map(v => v.arrendadora_id).filter(id => id))];
+            const estadoInventarioIds = [...new Set(vehiculos.map(v => v.estado_inventario_id).filter(id => id))];
+
+            console.log('📊 Obteniendo datos relacionados...');
+            console.log('- Marcas:', marcaIds);
+            console.log('- Modelos:', modeloIds);
+            console.log('- Arrendadoras:', arrendadoraIds);
+            console.log('- Estados:', estadoInventarioIds);
+
+            // Hacer consultas en paralelo
+            const [marcas, modelos, arrendadoras, estadosInventario] = await Promise.all([
+                marcaIds.length > 0 ? this.request(`/marcas?id=in.(${marcaIds.join(',')})&select=id,nombre`) : [],
+                modeloIds.length > 0 ? this.request(`/modelos?id=in.(${modeloIds.join(',')})&select=id,nombre`) : [],
+                arrendadoraIds.length > 0 ? this.request(`/arrendadoras?id=in.(${arrendadoraIds.join(',')})&select=id,nombre`) : [],
+                estadoInventarioIds.length > 0 ? this.request(`/estados_inventario?id=in.(${estadoInventarioIds.join(',')})&select=id,nombre`) : []
+            ]);
+
+            // Combinar datos
+            return vehiculos.map(vehiculo => ({
+                ...vehiculo,
+                marcas: marcas.find(m => m.id === vehiculo.marca_id) || null,
+                modelos: modelos.find(m => m.id === vehiculo.modelo_id) || null,
+                arrendadoras: arrendadoras.find(a => a.id === vehiculo.arrendadora_id) || null,
+                estados_inventario: estadosInventario.find(e => e.id === vehiculo.estado_inventario_id) || null
+            }));
+
+        } catch (error) {
+            console.error('❌ Error enriqueciendo datos de vehículos:', error);
+            // Retornar vehículos sin datos relacionados si falla
+            return vehiculos;
+        }
+    }
+
+    // NUEVA FUNCIÓN: Enriquecer vehículo individual
+    async enrichVehiculoIndividual(vehiculo) {
+        try {
+            const [marca, modelo, arrendadora, estadoInventario] = await Promise.all([
+                vehiculo.marca_id ? this.getMarca(vehiculo.marca_id) : null,
+                vehiculo.modelo_id ? this.getModelo(vehiculo.modelo_id) : null,
+                vehiculo.arrendadora_id ? this.getArrendadora(vehiculo.arrendadora_id) : null,
+                vehiculo.estado_inventario_id ? this.getEstadoInventario(vehiculo.estado_inventario_id) : null
+            ]);
+
+            return {
+                ...vehiculo,
+                marcas: marca,
+                modelos: modelo,
+                arrendadoras: arrendadora,
+                estados_inventario: estadoInventario
+            };
+        } catch (error) {
+            console.error('Error enriching vehiculo individual:', error);
+            return vehiculo;
+        }
+    }
+
+    // NUEVA FUNCIÓN: Obtener vehículos con relaciones para tareas
+    async getVehiculosConRelaciones(vehiculoIds) {
+        try {
+            const vehiculos = await this.request(`/vehiculos?id=in.(${vehiculoIds.join(',')})&select=*`);
+
+            if (!vehiculos || vehiculos.length === 0) {
+                return [];
+            }
+
+            return await this.enrichVehiculosData(vehiculos);
+        } catch (error) {
+            console.error('❌ Error obteniendo vehículos con relaciones:', error);
+            return [];
+        }
+    }
+
+    // NUEVA FUNCIÓN: Obtener colaboradores por IDs
+    async getColaboradoresByIds(ids) {
+        try {
+            if (!ids || ids.length === 0) return [];
+
+            return await this.request(`/colaboradores?id=in.(${ids.join(',')})&select=id,nombre`);
+        } catch (error) {
+            console.error('❌ Error obteniendo colaboradores:', error);
+            return [];
+        }
     }
 
     async createVehiculo(data) {
@@ -515,26 +731,56 @@ class ApiService {
 
     // ===== MODELOS =====
     async getModelos(filters = {}) {
-        let query = '/modelos?select=*,marcas(nombre)&order=nombre.asc';
+        let query = '/modelos?select=*&order=nombre.asc';
 
         const params = [];
         if (filters.marca_id) {
             params.push(`marca_id=eq.${filters.marca_id}`);
         }
         if (filters.search) {
-            params.push(`nombre.ilike.*${filters.search}*`);
+            params.push(`nombre.ilike.*${encodeURIComponent(filters.search)}*`);
         }
 
         if (params.length > 0) {
             query += '&' + params.join('&');
         }
 
-        return this.request(query);
+        try {
+            const modelos = await this.request(query);
+
+            if (modelos && modelos.length > 0) {
+                const marcaIds = [...new Set(modelos.map(m => m.marca_id).filter(id => id))];
+
+                if (marcaIds.length > 0) {
+                    const marcas = await this.request(`/marcas?id=in.(${marcaIds.join(',')})&select=id,nombre`);
+
+                    return modelos.map(modelo => ({
+                        ...modelo,
+                        marcas: marcas.find(m => m.id === modelo.marca_id) || null
+                    }));
+                }
+            }
+
+            return modelos || [];
+        } catch (error) {
+            console.error('Error in getModelos:', error);
+            return [];
+        }
     }
 
     async getModelo(id) {
-        const result = await this.request(`/modelos?id=eq.${id}&select=*,marcas(nombre)`);
-        return result?.[0] || null;
+        const result = await this.request(`/modelos?id=eq.${id}&select=*`);
+        const modelo = result?.[0];
+
+        if (modelo && modelo.marca_id) {
+            const marca = await this.getMarca(modelo.marca_id);
+            return {
+                ...modelo,
+                marcas: marca
+            };
+        }
+
+        return modelo || null;
     }
 
     async createModelo(data) {
