@@ -212,36 +212,62 @@ class FlotaApp {
     }
 
     renderVehiculosTable(vehiculos) {
-        const tbody = document.getElementById('vehiculos-table');
+        const grid = document.getElementById('vehiculos-grid');
         
         if (vehiculos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">No hay vehículos registrados</td></tr>';
+            grid.innerHTML = `
+                <div class="vehicle-card-empty">
+                    <i class="fas fa-car vehicle-card-empty-icon"></i>
+                    <div class="vehicle-card-empty-text">No hay vehículos registrados</div>
+                    <div class="vehicle-card-empty-subtext">Crea tu primer vehículo para comenzar</div>
+                </div>
+            `;
             return;
         }
 
-        tbody.innerHTML = vehiculos.map(vehiculo => `
-            <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 font-medium">${vehiculo.placa}</td>
-                <td class="px-4 py-3">${vehiculo.marcas?.nombre} ${vehiculo.modelos?.nombre}</td>
-                <td class="px-4 py-3">${vehiculo.anio}</td>
-                <td class="px-4 py-3">${vehiculo.arrendadoras?.nombre}</td>
-                <td class="px-4 py-3">${api.formatCurrency(vehiculo.precio_semanal || 0)}</td>
-                <td class="px-4 py-3">
-                    <span class="status-badge ${api.getStatusBadgeClass(vehiculo.estado_inventario_id)}">
-                        ${vehiculo.estados_inventario?.nombre || 'Sin estado'}
-                    </span>
-                </td>
-                <td class="px-4 py-3">
-                    <div class="flex space-x-2">
-                        <button onclick="app.editVehiculo(${vehiculo.id})" class="text-blue-600 hover:text-blue-800">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="app.deleteVehiculo(${vehiculo.id})" class="text-red-600 hover:text-red-800">
-                            <i class="fas fa-trash"></i>
-                        </button>
+        grid.innerHTML = vehiculos.map(vehiculo => `
+            <div class="vehicle-card">
+                <!-- Header de la tarjeta -->
+                <div class="vehicle-card-header">
+                    <div class="vehicle-card-placa">${vehiculo.placa}</div>
+                    <div class="vehicle-card-modelo">${vehiculo.marcas?.nombre} ${vehiculo.modelos?.nombre}</div>
+                </div>
+                
+                <!-- Body de la tarjeta -->
+                <div class="vehicle-card-body">
+                    <div class="vehicle-card-info">
+                        <span class="vehicle-card-label">Año</span>
+                        <span class="vehicle-card-value">${vehiculo.anio}</span>
                     </div>
-                </td>
-            </tr>
+                    
+                    <div class="vehicle-card-info">
+                        <span class="vehicle-card-label">Arrendadora</span>
+                        <span class="vehicle-card-value">${vehiculo.arrendadoras?.nombre || 'Sin asignar'}</span>
+                    </div>
+                    
+                    <div class="vehicle-card-info">
+                        <span class="vehicle-card-label">Precio Semanal</span>
+                        <span class="vehicle-card-price">${api.formatCurrency(vehiculo.precio_semanal || 0)}</span>
+                    </div>
+                    
+                    <div class="vehicle-card-info">
+                        <span class="vehicle-card-label">Estado</span>
+                        <span class="vehicle-card-status ${api.getStatusBadgeClass(vehiculo.estado_inventario_id)}">
+                            ${vehiculo.estados_inventario?.nombre || 'Sin estado'}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Acciones de la tarjeta -->
+                <div class="vehicle-card-actions">
+                    <button onclick="app.editVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-edit" title="Editar vehículo">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="app.deleteVehiculo(${vehiculo.id})" class="vehicle-card-btn vehicle-card-btn-delete" title="Eliminar vehículo">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
         `).join('');
     }
 

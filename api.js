@@ -20,7 +20,18 @@ class ApiService {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            return await response.json();
+            // Para operaciones DELETE, no intentar parsear JSON
+            if (options.method === 'DELETE') {
+                return { success: true };
+            }
+            
+            // Para otras operaciones, intentar parsear JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            } else {
+                return { success: true };
+            }
         } catch (error) {
             console.error('API Error:', error);
             throw error;

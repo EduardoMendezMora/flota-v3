@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <input type="text" id="search-vehiculos" placeholder="Buscar vehículos..." 
                                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <select id="filter-arrendadora" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -168,27 +168,10 @@
                             <option value="">Todos los estados</option>
                         </select>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left">Placa</th>
-                                    <th class="px-4 py-3 text-left">Marca/Modelo</th>
-                                    <th class="px-4 py-3 text-left">Año</th>
-                                    <th class="px-4 py-3 text-left">Arrendadora</th>
-                                    <th class="px-4 py-3 text-left">Precio Semanal</th>
-                                    <th class="px-4 py-3 text-left">Estado</th>
-                                    <th class="px-4 py-3 text-left">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="vehiculos-table">
-                                <tr>
-                                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                                        <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="vehiculos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div class="flex items-center justify-center p-8 text-gray-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                        </div>
                     </div>
                 </div>
             </div>
