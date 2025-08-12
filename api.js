@@ -1,4 +1,4 @@
-// API Service mejorado para Supabase - CÓDIGO COMPLETO CORREGIDO
+// API Service CORREGIDO - Solución para errores de relaciones
 class ApiService {
     constructor() {
         this.baseUrl = SUPABASE_CONFIG.url + '/rest/v1';
@@ -42,11 +42,9 @@ class ApiService {
             const response = await this.fetchWithRetry(url, config);
 
             if (!response.ok) {
-                // Obtener detalles del error para debugging
                 const errorText = await response.text();
                 console.error(`🔴 HTTP ${response.status} Error en ${endpoint}:`, errorText);
 
-                // Log detallado para debugging
                 console.error('📋 Detalles del error:', {
                     url: url,
                     status: response.status,
@@ -62,7 +60,6 @@ class ApiService {
                 return { success: true };
             }
 
-            // Para otras operaciones, intentar parsear JSON
             const contentType = response.headers.get('content-type');
             let data;
 
@@ -193,7 +190,6 @@ class ApiService {
     // ===== TAREAS CORREGIDAS =====
     async getTareas(filters = {}) {
         try {
-            // Consulta simplificada SIN join complejo
             let query = '/tareas?select=*&order=id.desc';
 
             const params = [];
@@ -207,7 +203,6 @@ class ApiService {
                 params.push(`prioridad=eq.${encodeURIComponent(filters.prioridad)}`);
             }
             if (filters.search) {
-                // Codificar correctamente caracteres especiales
                 const searchEncoded = encodeURIComponent(filters.search);
                 params.push(`or=(titulo.ilike.*${searchEncoded}*,descripcion.ilike.*${searchEncoded}*)`);
             }
@@ -222,7 +217,6 @@ class ApiService {
             console.log('🔍 Ejecutando consulta de tareas:', query);
             const tareas = await this.request(query);
 
-            // Si no hay tareas, retornar array vacío
             if (!tareas || tareas.length === 0) {
                 console.log('📝 No hay tareas en la base de datos');
                 return [];
@@ -252,7 +246,6 @@ class ApiService {
 
         } catch (error) {
             console.error('❌ Error en getTareas:', error);
-            // En caso de error, retornar array vacío en lugar de fallar
             return [];
         }
     }
@@ -324,7 +317,32 @@ class ApiService {
 
     // ===== TAREA COLABORADORES =====
     async getTareaColaboradores(tareaId) {
-        return this.request(`/tarea_colaboradores?tarea_id=eq.${tareaId}&select=*,colaboradores(nombre)`);
+        try {
+            // Consulta sin JOIN problemático - usar consultas separadas
+            const tareaColaboradores = await this.request(`/tarea_colaboradores?tarea_id=eq.${tareaId}&select=*`);
+
+            if (!tareaColaboradores || tareaColaboradores.length === 0) {
+                return [];
+            }
+
+            // Obtener datos de colaboradores por separado
+            const colaboradorIds = [...new Set(tareaColaboradores.map(tc => tc.colaborador_id).filter(id => id))];
+
+            if (colaboradorIds.length > 0) {
+                const colaboradores = await this.request(`/colaboradores?id=in.(${colaboradorIds.join(',')})&select=id,nombre`);
+
+                // Combinar datos
+                return tareaColaboradores.map(tc => ({
+                    ...tc,
+                    colaboradores: colaboradores.find(c => c.id === tc.colaborador_id) || { nombre: 'Desconocido' }
+                }));
+            }
+
+            return tareaColaboradores;
+        } catch (error) {
+            console.error('❌ Error obteniendo colaboradores de tarea:', error);
+            return [];
+        }
     }
 
     async addColaboradorToTarea(tareaId, colaboradorId, rol = 'ejecutor') {
@@ -369,7 +387,32 @@ class ApiService {
 
     // ===== TAREA COMENTARIOS =====
     async getTareaComentarios(tareaId) {
-        return this.request(`/tarea_comentarios?tarea_id=eq.${tareaId}&select=*,colaboradores(nombre)&order=created_at.desc`);
+        try {
+            // Consulta sin JOIN problemático
+            const comentarios = await this.request(`/tarea_comentarios?tarea_id=eq.${tareaId}&select=*&order=created_at.desc`);
+
+            if (!comentarios || comentarios.length === 0) {
+                return [];
+            }
+
+            // Obtener datos de colaboradores por separado
+            const colaboradorIds = [...new Set(comentarios.map(c => c.colaborador_id).filter(id => id))];
+
+            if (colaboradorIds.length > 0) {
+                const colaboradores = await this.request(`/colaboradores?id=in.(${colaboradorIds.join(',')})&select=id,nombre`);
+
+                // Combinar datos
+                return comentarios.map(comentario => ({
+                    ...comentario,
+                    colaboradores: colaboradores.find(c => c.id === comentario.colaborador_id) || { nombre: 'Desconocido' }
+                }));
+            }
+
+            return comentarios;
+        } catch (error) {
+            console.error('❌ Error obteniendo comentarios de tarea:', error);
+            return [];
+        }
     }
 
     async createTareaComentario(tareaId, colaboradorId, comentario) {
@@ -398,9 +441,34 @@ class ApiService {
         return result;
     }
 
-    // ===== TAREA ADJUNTOS =====
+    // ===== TAREA ADJUNTOS CORREGIDO =====
     async getTareaAdjuntos(tareaId) {
-        return this.request(`/tarea_adjuntos?tarea_id=eq.${tareaId}&select=*,colaboradores!tarea_adjuntos_subido_por_id_fkey(nombre)&order=created_at.desc`);
+        try {
+            // CORRECCIÓN: Consulta sin JOIN problemático
+            const adjuntos = await this.request(`/tarea_adjuntos?tarea_id=eq.${tareaId}&select=*&order=created_at.desc`);
+
+            if (!adjuntos || adjuntos.length === 0) {
+                return [];
+            }
+
+            // Obtener datos de colaboradores por separado si existe la columna subido_por_id
+            const colaboradorIds = [...new Set(adjuntos.map(a => a.subido_por_id).filter(id => id))];
+
+            if (colaboradorIds.length > 0) {
+                const colaboradores = await this.request(`/colaboradores?id=in.(${colaboradorIds.join(',')})&select=id,nombre`);
+
+                // Combinar datos
+                return adjuntos.map(adjunto => ({
+                    ...adjunto,
+                    colaboradores: colaboradores.find(c => c.id === adjunto.subido_por_id) || { nombre: 'Desconocido' }
+                }));
+            }
+
+            return adjuntos;
+        } catch (error) {
+            console.error('❌ Error obteniendo adjuntos de tarea:', error);
+            return [];
+        }
     }
 
     async createTareaAdjunto(data) {

@@ -21,14 +21,23 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzAwN0FGRiIvPgo8cGF0aCBkPSJNOCAxMkg0VjIwSDhWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjggMTJIMjRWMjBIMjhWMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgOEg4VjI0SDI0VjhaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+">
 
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkZsb3RhIC0gU2lzdGVtYSBkZSBBZG1pbmlzdHJhY2nDs24iLAogICJzaG9ydF9uYW1lIjogIkZsb3RhIiwKICAiZGVzY3JpcHRpb24iOiAiR2VzdGlvbmEgdHUgZmxvdGEgZGUgdmVow61jdWxvcyBkZSBtYW5lcmEgZWZpY2llbnRlIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJ0aGVtZV9jb2xvciI6ICIjMDA3QUZGIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjRjJGMkY3IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTXpJaUlHaGxhV2RvZEQwaU16SWlJSFpwWlhkQ2IzZzlJakFnTUNBek1pQXpNaUlnWm1sc2JEMGlibTl1WlNJZ2VHMXNibk05SW1oMGRIQTZMeTkzZDNjdWR6TXViM0puTHpJd01EQXZjM1puSWo0S1BISmxZM1FnZDJsa2RHZzlJak15SWlCb1pXbG5hSFE5SWpNeUlpQnllRDBpT0NJZ1ptbHNiRDBpSXpBd04wRkdSaUl2UGdvOGNHRjBhQ0JrUFNKTk9DQXhNa2cwVmpJd1NEaFdNVEpaSWlCbWFXeHNQU0ozYUdsMFpTSXZQZ284Y0dGMGFDQmtQU0pOTWpnZ01USkZNalJXTWpCb01qUldNVEpaSWlCbWFXeHNQU0ozYUdsMFpTSXZQZ284Y0dGMGFDQmtQU0pOTWpRZ09FZzRWakkwU0RJMFdqVmFJaUJ6ZEhKdmEyVTlJbmRvYVhSbElpQnpkSEp2YTJVdGQybGtkR2c5SWpJaUx6NEtQQzl6ZG1jKyIsCiAgICAgICJzaXplcyI6ICIzMngzMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    <!-- Web App Manifest CORREGIDO -->
+    <link rel="manifest" href="manifest.json">
 
-    <!-- Performance and Security -->
+    <!-- Performance and Security CORREGIDO -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- Removido X-Frame-Options del meta tag, debe estar en headers HTTP -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Flota">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9IiMwMDdBRkYiLz4KPHN2ZyB4PSI0NSIgeT0iNDUiIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgdmlld0JveD0iMCAwIDkwIDkwIj4KPHN2ZyB4PSIwIiB5PSIwIiB3aWR0aD0iOTAiIGhlaWdodD0iOTAiIHZpZXdCb3g9IjAgMCA5MCA5MCI+CjxwYXRoIGQ9Ik0yMCAzNUgxMFY1NUgyMFYzNVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik04MCAzNUg3MFY1NUg4MFYzNVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik03MCAyMEgyMFY3MEg3MFYyMFoiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iNCIvPgo8L3N2Zz4KPC9zdmc+Cjwvc3ZnPg==">
 </head>
 <body class="bg-gray-50 font-inter">
 <!-- Loading Screen -->
@@ -588,6 +597,9 @@
 
 <!-- Scripts -->
 <script>
+    // Tiempo de inicio de carga para medición de rendimiento CORREGIDO
+    const pageLoadStart = performance.now();
+
     // Hide loading screen when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
         const loadingScreen = document.getElementById('loading-screen');
@@ -636,7 +648,10 @@
     // Load saved theme
     if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
-        document.getElementById('theme-toggle').querySelector('i').className = 'fas fa-sun';
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.querySelector('i').className = 'fas fa-sun';
+        }
     }
 
     // Keyboard shortcuts
@@ -664,27 +679,71 @@
     // Service Worker registration for PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            // Register service worker if needed
-            // navigator.serviceWorker.register('/sw.js');
+            navigator.serviceWorker.register('sw.js')
+                .then(function(registration) {
+                    console.log('✅ ServiceWorker registrado exitosamente:', registration.scope);
+                })
+                .catch(function(err) {
+                    console.log('❌ Error al registrar ServiceWorker:', err);
+                });
         });
     }
 
-    // Error handling for uncaught errors
+    // Error handling for uncaught errors MEJORADO
     window.addEventListener('error', function(e) {
-        console.error('Global error:', e.error);
-        if (window.app) {
+        console.error('🔴 Error global:', e.error);
+
+        // Solo mostrar toast si la app está inicializada
+        if (window.app && typeof window.app.showToast === 'function') {
             window.app.showToast('Ha ocurrido un error inesperado', 'error');
         }
     });
 
-    // Performance monitoring
+    // Capturar errores de promesas rechazadas
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('🔴 Promesa rechazada:', e.reason);
+
+        if (window.app && typeof window.app.showToast === 'function') {
+            window.app.showToast('Error de conexión o servidor', 'error');
+        }
+
+        // Prevenir que el error aparezca en la consola como no manejado
+        e.preventDefault();
+    });
+
+    // Performance monitoring CORREGIDO
     window.addEventListener('load', function() {
         if ('performance' in window) {
-            const perfData = performance.getEntriesByType('navigation')[0];
-            const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
-            console.log(`Page loaded in ${loadTime}ms`);
+            // Usar el tiempo de inicio que definimos al principio
+            const loadTime = performance.now() - pageLoadStart;
+            console.log(`✅ Página cargada en ${loadTime.toFixed(2)}ms`);
+
+            // Opcional: enviar métricas a un servicio de monitoreo
+            if (loadTime > 3000) {
+                console.warn(`⚠️ Carga lenta detectada: ${loadTime.toFixed(2)}ms`);
+            }
         }
     });
+
+    // Detectar conexión lenta
+    if ('connection' in navigator) {
+        const connection = navigator.connection;
+        if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+            console.warn('⚠️ Conexión lenta detectada');
+        }
+    }
+
+    // Detectar si está ejecutándose como PWA
+    function isPWA() {
+        return window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true;
+    }
+
+    if (isPWA()) {
+        console.log('📱 Ejecutándose como PWA');
+        // Agregar clase para estilos específicos de PWA
+        document.body.classList.add('pwa-mode');
+    }
 </script>
 
 <!-- Application Scripts -->
