@@ -48,107 +48,121 @@
     @apply bg-gray-50;
 }
 
-/* ===== SISTEMA DE MODALES MEJORADO ===== */
+/* ===== SISTEMA DE MODALES MINIMALISTA ===== */
 
-/* Contenedor del modal */
-.modal-container {
-    @apply bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden;
-    animation: modalSlideIn 0.3s ease-out;
+/* Contenedor del modal minimalista */
+.modal-minimal {
+    @apply bg-white rounded-2xl shadow-2xl max-w-3xl w-full mx-4 max-h-[95vh] overflow-hidden;
+    animation: modalFadeIn 0.4s ease-out;
 }
 
-/* Header del modal */
-.modal-header {
-    @apply flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50;
+/* Header minimalista */
+.modal-header-minimal {
+    @apply px-8 py-6 border-b border-gray-100;
 }
 
-.modal-header h2 {
-    @apply text-xl font-bold text-gray-800;
+.header-content {
+    @apply flex justify-between items-center;
 }
 
-.close-btn {
-    @apply p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200;
+.modal-title {
+    @apply text-2xl font-light text-gray-800;
 }
 
-/* Body del modal */
-.modal-body {
-    @apply p-6 max-h-[60vh] overflow-y-auto;
+.close-btn-minimal {
+    @apply p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all duration-200;
 }
 
-/* Footer del modal */
-.modal-footer {
-    @apply flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50;
+/* Body minimalista */
+.modal-body-minimal {
+    @apply px-8 py-8 max-h-[70vh] overflow-y-auto;
 }
 
-/* Botones del modal */
-.btn-cancel {
-    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center;
+/* Footer minimalista */
+.modal-footer-minimal {
+    @apply flex justify-end space-x-4 px-8 py-6 border-t border-gray-100 bg-gray-50;
 }
 
-.btn-save {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center;
+/* Botones minimalistas */
+.btn-cancel-minimal {
+    @apply px-6 py-3 text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium;
 }
 
-/* ===== SISTEMA DE FORMULARIOS MEJORADO ===== */
-
-/* Campos de formulario */
-.form-field {
-    @apply mb-6;
+.btn-save-minimal {
+    @apply px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium;
 }
 
-.form-label {
-    @apply block text-sm font-semibold text-gray-700 mb-2 flex items-center;
+/* ===== SISTEMA DE FORMULARIOS MINIMALISTA ===== */
+
+/* Formulario minimalista */
+.form-minimal {
+    @apply space-y-8;
 }
 
-.form-input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
+/* Campos de formulario minimalistas */
+.form-field-minimal {
+    @apply mb-8;
 }
 
-.form-select {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
+.label-minimal {
+    @apply block text-sm font-medium text-gray-700 mb-3;
 }
 
-.form-textarea {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical;
+.input-minimal {
+    @apply w-full px-4 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800;
+}
+
+.select-minimal {
+    @apply w-full px-4 py-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800;
 }
 
 /* Texto de ayuda */
-.form-help {
-    @apply text-sm text-gray-500 mt-1;
+.help-text {
+    @apply text-sm text-gray-500 mt-2;
 }
 
-/* Secciones de formulario */
-.form-section {
-    @apply mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200;
+/* Campos requeridos */
+.required {
+    @apply text-red-500 ml-1;
 }
 
-.section-title {
-    @apply text-lg font-semibold text-gray-800 mb-4 flex items-center;
+/* Secciones de formulario minimalistas */
+.form-section-minimal {
+    @apply mb-12 p-6 bg-gray-50 rounded-xl border border-gray-100;
 }
 
-/* Grid de formulario */
-.form-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+.section-title-minimal {
+    @apply text-lg font-medium text-gray-800 mb-6 flex items-center;
 }
 
-/* Grupos de input con prefijos */
-.input-group {
+.section-title-minimal i {
+    @apply text-blue-500 mr-3;
+}
+
+/* Grid de formulario minimalista */
+.form-grid-minimal {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Grupos de input con prefijos minimalistas */
+.input-group-minimal {
     @apply relative flex items-center;
 }
 
-.input-prefix {
-    @apply absolute left-3 text-gray-500 font-medium;
+.currency-prefix {
+    @apply absolute left-4 text-gray-500 font-medium;
 }
 
-.input-group .form-input {
-    @apply pl-8;
+.input-group-minimal .input-minimal {
+    @apply pl-10;
 }
 
-/* ===== ANIMACIONES ===== */
+/* ===== ANIMACIONES MINIMALISTAS ===== */
 
-@keyframes modalSlideIn {
+@keyframes modalFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-20px) scale(0.95);
+        transform: translateY(-30px) scale(0.98);
     }
     to {
         opacity: 1;
@@ -212,30 +226,36 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .modal-container {
+    .modal-minimal {
         @apply mx-2 max-w-full;
     }
     
-    .form-grid {
+    .form-grid-minimal {
         @apply grid-cols-1;
     }
     
-    .modal-footer {
-        @apply flex-col space-y-2 space-x-0;
+    .modal-footer-minimal {
+        @apply flex-col space-y-3 space-x-0;
     }
     
-    .modal-footer button {
+    .modal-footer-minimal button {
         @apply w-full justify-center;
+    }
+    
+    .modal-header-minimal,
+    .modal-body-minimal,
+    .modal-footer-minimal {
+        @apply px-6;
     }
 }
 
 /* Estados de hover y focus mejorados */
-.form-input:hover {
-    @apply border-gray-400;
+.input-minimal:hover {
+    @apply border-gray-300;
 }
 
-.form-select:hover {
-    @apply border-gray-400;
+.select-minimal:hover {
+    @apply border-gray-300;
 }
 
 /* Loading states */
@@ -248,24 +268,53 @@
     @apply absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center;
 }
 
-/* Estilos para campos requeridos */
-.form-label.required::after {
-    content: ' *';
-    @apply text-red-500;
-}
-
 /* Mejoras en la accesibilidad */
-.form-input:focus,
-.form-select:focus {
-    @apply ring-2 ring-blue-500 ring-opacity-50;
+.input-minimal:focus,
+.select-minimal:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-30;
 }
 
 /* Estilos para errores de validación */
-.form-input.error {
+.input-minimal.error {
     @apply border-red-500 focus:ring-red-500;
 }
 
 .error-message {
     @apply text-red-500 text-sm mt-1;
+}
+
+/* Scrollbar personalizada para el modal */
+.modal-body-minimal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body-minimal::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+}
+
+.modal-body-minimal::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+}
+
+.modal-body-minimal::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+}
+
+/* Efectos sutiles */
+.form-section-minimal:hover {
+    @apply border-gray-200;
+}
+
+.input-minimal:focus {
+    @apply shadow-sm;
+}
+
+/* Espaciado adicional para mejor legibilidad */
+.form-field-minimal:last-child {
+    @apply mb-0;
+}
+
+.form-section-minimal:last-child {
+    @apply mb-0;
 }
 

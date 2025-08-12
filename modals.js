@@ -1,67 +1,61 @@
-// Sistema de Modales Mejorado
+// Sistema de Modales Minimalista
 
 // ===== MODAL DE ARRENDADORAS =====
 function getArrendadoraModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Arrendadora' : 'Nueva Arrendadora';
-    const icon = isEditing ? 'fa-edit' : 'fa-plus';
     
     return `
-        <div class="modal-container">
-            <!-- Header -->
-            <div class="modal-header">
-                <div class="flex items-center">
-                    <i class="fas ${icon} text-blue-600 mr-3"></i>
-                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+        <div class="modal-minimal">
+            <!-- Header Minimalista -->
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">${title}</h2>
+                    <button onclick="app.closeModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="app.closeModal()" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <!-- Body -->
-            <div class="modal-body">
-                <form id="arrendadora-form" class="space-y-6">
-                    <!-- Nombre -->
-                    <div class="form-field">
-                        <label for="arrendadora-nombre" class="form-label">
-                            <i class="fas fa-building mr-2"></i>Nombre de la Empresa
+            <!-- Body Minimalista -->
+            <div class="modal-body-minimal">
+                <form id="arrendadora-form" class="form-minimal">
+                    <div class="form-field-minimal">
+                        <label for="arrendadora-nombre" class="label-minimal">
+                            Nombre de la Empresa <span class="required">*</span>
                         </label>
                         <input 
                             type="text" 
                             id="arrendadora-nombre" 
-                            class="form-input" 
+                            class="input-minimal" 
                             value="${item?.nombre || ''}" 
                             placeholder="Ej: Rent a Car Costa Rica S.A."
                             required
                         >
-                        <p class="form-help">Nombre completo de la empresa arrendadora</p>
                     </div>
                     
-                    <!-- Identificación Jurídica -->
-                    <div class="form-field">
-                        <label for="arrendadora-identificacion" class="form-label">
-                            <i class="fas fa-id-card mr-2"></i>Identificación Jurídica
+                    <div class="form-field-minimal">
+                        <label for="arrendadora-identificacion" class="label-minimal">
+                            Identificación Jurídica
                         </label>
                         <input 
                             type="text" 
                             id="arrendadora-identificacion" 
-                            class="form-input" 
+                            class="input-minimal" 
                             value="${item?.identificacion_juridica || ''}" 
                             placeholder="Ej: 3-101-672906"
                         >
-                        <p class="form-help">Número de identificación legal (opcional)</p>
                     </div>
                 </form>
             </div>
             
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button onclick="app.closeModal()" class="btn-cancel">
-                    <i class="fas fa-times mr-2"></i>Cancelar
+            <!-- Footer Minimalista -->
+            <div class="modal-footer-minimal">
+                <button onclick="app.closeModal()" class="btn-cancel-minimal">
+                    Cancelar
                 </button>
-                <button onclick="saveArrendadora()" class="btn-save">
-                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                <button onclick="saveArrendadora()" class="btn-save-minimal">
+                    ${isEditing ? 'Actualizar' : 'Crear'}
                 </button>
             </div>
         </div>
@@ -72,47 +66,48 @@ function getArrendadoraModalContent(item = null) {
 function getVehiculoModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo';
-    const icon = isEditing ? 'fa-edit' : 'fa-car';
     
     return `
-        <div class="modal-container">
-            <!-- Header -->
-            <div class="modal-header">
-                <div class="flex items-center">
-                    <i class="fas ${icon} text-blue-600 mr-3"></i>
-                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+        <div class="modal-minimal">
+            <!-- Header Minimalista -->
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">${title}</h2>
+                    <button onclick="app.closeModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="app.closeModal()" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <!-- Body -->
-            <div class="modal-body">
-                <form id="vehiculo-form" class="space-y-6">
+            <!-- Body Minimalista -->
+            <div class="modal-body-minimal">
+                <form id="vehiculo-form" class="form-minimal">
                     <!-- Información Básica -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-info-circle mr-2"></i>Información Básica
+                    <div class="form-section-minimal">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-info-circle"></i>
+                            Información Básica
                         </h3>
-                        <div class="form-grid">
-                            <div class="form-field">
-                                <label for="vehiculo-placa" class="form-label">Placa *</label>
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-placa" class="label-minimal">
+                                    Placa <span class="required">*</span>
+                                </label>
                                 <input 
                                     type="text" 
                                     id="vehiculo-placa" 
-                                    class="form-input" 
+                                    class="input-minimal" 
                                     value="${item?.placa || ''}" 
                                     placeholder="ABC-123"
                                     required
                                 >
                             </div>
-                            <div class="form-field">
-                                <label for="vehiculo-vin" class="form-label">VIN</label>
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-vin" class="label-minimal">VIN</label>
                                 <input 
                                     type="text" 
                                     id="vehiculo-vin" 
-                                    class="form-input" 
+                                    class="input-minimal" 
                                     value="${item?.vin || ''}" 
                                     placeholder="1HGBH41JXMN109186"
                                 >
@@ -121,29 +116,36 @@ function getVehiculoModalContent(item = null) {
                     </div>
                     
                     <!-- Marca y Modelo -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-tags mr-2"></i>Marca y Modelo
+                    <div class="form-section-minimal">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-tags"></i>
+                            Marca y Modelo
                         </h3>
-                        <div class="form-grid">
-                            <div class="form-field">
-                                <label for="vehiculo-marca" class="form-label">Marca *</label>
-                                <select id="vehiculo-marca" class="form-select" required>
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-marca" class="label-minimal">
+                                    Marca <span class="required">*</span>
+                                </label>
+                                <select id="vehiculo-marca" class="select-minimal" required>
                                     <option value="">Seleccionar marca</option>
                                 </select>
                             </div>
-                            <div class="form-field">
-                                <label for="vehiculo-modelo" class="form-label">Modelo *</label>
-                                <select id="vehiculo-modelo" class="form-select" required>
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-modelo" class="label-minimal">
+                                    Modelo <span class="required">*</span>
+                                </label>
+                                <select id="vehiculo-modelo" class="select-minimal" required>
                                     <option value="">Seleccionar modelo</option>
                                 </select>
                             </div>
-                            <div class="form-field">
-                                <label for="vehiculo-anio" class="form-label">Año *</label>
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-anio" class="label-minimal">
+                                    Año <span class="required">*</span>
+                                </label>
                                 <input 
                                     type="number" 
                                     id="vehiculo-anio" 
-                                    class="form-input" 
+                                    class="input-minimal" 
                                     value="${item?.anio || ''}" 
                                     min="1900" 
                                     max="2030" 
@@ -154,20 +156,25 @@ function getVehiculoModalContent(item = null) {
                     </div>
                     
                     <!-- Asignación -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-link mr-2"></i>Asignación
+                    <div class="form-section-minimal">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-link"></i>
+                            Asignación
                         </h3>
-                        <div class="form-grid">
-                            <div class="form-field">
-                                <label for="vehiculo-arrendadora" class="form-label">Arrendadora *</label>
-                                <select id="vehiculo-arrendadora" class="form-select" required>
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-arrendadora" class="label-minimal">
+                                    Arrendadora <span class="required">*</span>
+                                </label>
+                                <select id="vehiculo-arrendadora" class="select-minimal" required>
                                     <option value="">Seleccionar arrendadora</option>
                                 </select>
                             </div>
-                            <div class="form-field">
-                                <label for="vehiculo-estado" class="form-label">Estado *</label>
-                                <select id="vehiculo-estado" class="form-select" required>
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-estado" class="label-minimal">
+                                    Estado <span class="required">*</span>
+                                </label>
+                                <select id="vehiculo-estado" class="select-minimal" required>
                                     <option value="">Seleccionar estado</option>
                                 </select>
                             </div>
@@ -175,19 +182,22 @@ function getVehiculoModalContent(item = null) {
                     </div>
                     
                     <!-- Información Económica -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-dollar-sign mr-2"></i>Información Económica
+                    <div class="form-section-minimal">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-dollar-sign"></i>
+                            Información Económica
                         </h3>
-                        <div class="form-grid">
-                            <div class="form-field">
-                                <label for="vehiculo-precio" class="form-label">Precio Semanal (CRC)</label>
-                                <div class="input-group">
-                                    <span class="input-prefix">₡</span>
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-precio" class="label-minimal">
+                                    Precio Semanal (CRC)
+                                </label>
+                                <div class="input-group-minimal">
+                                    <span class="currency-prefix">₡</span>
                                     <input 
                                         type="number" 
                                         id="vehiculo-precio" 
-                                        class="form-input" 
+                                        class="input-minimal" 
                                         value="${item?.precio_semanal || ''}" 
                                         min="0" 
                                         step="1000"
@@ -195,14 +205,16 @@ function getVehiculoModalContent(item = null) {
                                     >
                                 </div>
                             </div>
-                            <div class="form-field">
-                                <label for="vehiculo-gastos" class="form-label">Gastos Administrativos (CRC)</label>
-                                <div class="input-group">
-                                    <span class="input-prefix">₡</span>
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-gastos" class="label-minimal">
+                                    Gastos Administrativos (CRC)
+                                </label>
+                                <div class="input-group-minimal">
+                                    <span class="currency-prefix">₡</span>
                                     <input 
                                         type="number" 
                                         id="vehiculo-gastos" 
-                                        class="form-input" 
+                                        class="input-minimal" 
                                         value="${item?.gastos_adms || ''}" 
                                         min="0" 
                                         step="1000"
@@ -214,29 +226,30 @@ function getVehiculoModalContent(item = null) {
                     </div>
                     
                     <!-- Fotos -->
-                    <div class="form-field">
-                        <label for="vehiculo-fotos" class="form-label">
-                            <i class="fas fa-images mr-2"></i>Link de Fotos
+                    <div class="form-field-minimal">
+                        <label for="vehiculo-fotos" class="label-minimal">
+                            <i class="fas fa-images"></i>
+                            Link de Fotos
                         </label>
                         <input 
                             type="url" 
                             id="vehiculo-fotos" 
-                            class="form-input" 
+                            class="input-minimal" 
                             value="${item?.link_fotos || ''}" 
                             placeholder="https://ejemplo.com/fotos"
                         >
-                        <p class="form-help">URL donde se encuentran las fotos del vehículo</p>
+                        <p class="help-text">URL donde se encuentran las fotos del vehículo</p>
                     </div>
                 </form>
             </div>
             
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button onclick="app.closeModal()" class="btn-cancel">
-                    <i class="fas fa-times mr-2"></i>Cancelar
+            <!-- Footer Minimalista -->
+            <div class="modal-footer-minimal">
+                <button onclick="app.closeModal()" class="btn-cancel-minimal">
+                    Cancelar
                 </button>
-                <button onclick="saveVehiculo()" class="btn-save">
-                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                <button onclick="saveVehiculo()" class="btn-save-minimal">
+                    ${isEditing ? 'Actualizar' : 'Crear'}
                 </button>
             </div>
         </div>
@@ -247,48 +260,45 @@ function getVehiculoModalContent(item = null) {
 function getMarcaModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Marca' : 'Nueva Marca';
-    const icon = isEditing ? 'fa-edit' : 'fa-tag';
     
     return `
-        <div class="modal-container">
-            <!-- Header -->
-            <div class="modal-header">
-                <div class="flex items-center">
-                    <i class="fas ${icon} text-blue-600 mr-3"></i>
-                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+        <div class="modal-minimal">
+            <!-- Header Minimalista -->
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">${title}</h2>
+                    <button onclick="app.closeModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="app.closeModal()" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <!-- Body -->
-            <div class="modal-body">
-                <form id="marca-form" class="space-y-6">
-                    <div class="form-field">
-                        <label for="marca-nombre" class="form-label">
-                            <i class="fas fa-tag mr-2"></i>Nombre de la Marca
+            <!-- Body Minimalista -->
+            <div class="modal-body-minimal">
+                <form id="marca-form" class="form-minimal">
+                    <div class="form-field-minimal">
+                        <label for="marca-nombre" class="label-minimal">
+                            Nombre de la Marca <span class="required">*</span>
                         </label>
                         <input 
                             type="text" 
                             id="marca-nombre" 
-                            class="form-input" 
+                            class="input-minimal" 
                             value="${item?.nombre || ''}" 
                             placeholder="Ej: Toyota, Honda, Ford"
                             required
                         >
-                        <p class="form-help">Nombre del fabricante del vehículo</p>
                     </div>
                 </form>
             </div>
             
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button onclick="app.closeModal()" class="btn-cancel">
-                    <i class="fas fa-times mr-2"></i>Cancelar
+            <!-- Footer Minimalista -->
+            <div class="modal-footer-minimal">
+                <button onclick="app.closeModal()" class="btn-cancel-minimal">
+                    Cancelar
                 </button>
-                <button onclick="saveMarca()" class="btn-save">
-                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                <button onclick="saveMarca()" class="btn-save-minimal">
+                    ${isEditing ? 'Actualizar' : 'Crear'}
                 </button>
             </div>
         </div>
@@ -299,58 +309,55 @@ function getMarcaModalContent(item = null) {
 function getModeloModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Modelo' : 'Nuevo Modelo';
-    const icon = isEditing ? 'fa-edit' : 'fa-car-side';
     
     return `
-        <div class="modal-container">
-            <!-- Header -->
-            <div class="modal-header">
-                <div class="flex items-center">
-                    <i class="fas ${icon} text-blue-600 mr-3"></i>
-                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+        <div class="modal-minimal">
+            <!-- Header Minimalista -->
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">${title}</h2>
+                    <button onclick="app.closeModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="app.closeModal()" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <!-- Body -->
-            <div class="modal-body">
-                <form id="modelo-form" class="space-y-6">
-                    <div class="form-grid">
-                        <div class="form-field">
-                            <label for="modelo-marca" class="form-label">
-                                <i class="fas fa-tag mr-2"></i>Marca *
+            <!-- Body Minimalista -->
+            <div class="modal-body-minimal">
+                <form id="modelo-form" class="form-minimal">
+                    <div class="form-grid-minimal">
+                        <div class="form-field-minimal">
+                            <label for="modelo-marca" class="label-minimal">
+                                Marca <span class="required">*</span>
                             </label>
-                            <select id="modelo-marca" class="form-select" required>
+                            <select id="modelo-marca" class="select-minimal" required>
                                 <option value="">Seleccionar marca</option>
                             </select>
                         </div>
-                        <div class="form-field">
-                            <label for="modelo-nombre" class="form-label">
-                                <i class="fas fa-car-side mr-2"></i>Nombre del Modelo *
+                        <div class="form-field-minimal">
+                            <label for="modelo-nombre" class="label-minimal">
+                                Nombre del Modelo <span class="required">*</span>
                             </label>
                             <input 
                                 type="text" 
                                 id="modelo-nombre" 
-                                class="form-input" 
+                                class="input-minimal" 
                                 value="${item?.nombre || ''}" 
                                 placeholder="Ej: Corolla, Civic, Focus"
                                 required
                             >
                         </div>
                     </div>
-                    <p class="form-help">Selecciona la marca y especifica el nombre del modelo</p>
                 </form>
             </div>
             
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button onclick="app.closeModal()" class="btn-cancel">
-                    <i class="fas fa-times mr-2"></i>Cancelar
+            <!-- Footer Minimalista -->
+            <div class="modal-footer-minimal">
+                <button onclick="app.closeModal()" class="btn-cancel-minimal">
+                    Cancelar
                 </button>
-                <button onclick="saveModelo()" class="btn-save">
-                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                <button onclick="saveModelo()" class="btn-save-minimal">
+                    ${isEditing ? 'Actualizar' : 'Crear'}
                 </button>
             </div>
         </div>
@@ -361,48 +368,45 @@ function getModeloModalContent(item = null) {
 function getEstadoModalContent(item = null) {
     const isEditing = item !== null;
     const title = isEditing ? 'Editar Estado' : 'Nuevo Estado';
-    const icon = isEditing ? 'fa-edit' : 'fa-clipboard-list';
     
     return `
-        <div class="modal-container">
-            <!-- Header -->
-            <div class="modal-header">
-                <div class="flex items-center">
-                    <i class="fas ${icon} text-blue-600 mr-3"></i>
-                    <h2 class="text-xl font-bold text-gray-800">${title}</h2>
+        <div class="modal-minimal">
+            <!-- Header Minimalista -->
+            <div class="modal-header-minimal">
+                <div class="header-content">
+                    <h2 class="modal-title">${title}</h2>
+                    <button onclick="app.closeModal()" class="close-btn-minimal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="app.closeModal()" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <!-- Body -->
-            <div class="modal-body">
-                <form id="estado-form" class="space-y-6">
-                    <div class="form-field">
-                        <label for="estado-nombre" class="form-label">
-                            <i class="fas fa-clipboard-list mr-2"></i>Nombre del Estado
+            <!-- Body Minimalista -->
+            <div class="modal-body-minimal">
+                <form id="estado-form" class="form-minimal">
+                    <div class="form-field-minimal">
+                        <label for="estado-nombre" class="label-minimal">
+                            Nombre del Estado <span class="required">*</span>
                         </label>
                         <input 
                             type="text" 
                             id="estado-nombre" 
-                            class="form-input" 
+                            class="input-minimal" 
                             value="${item?.nombre || ''}" 
                             placeholder="Ej: Disponible, En Mantenimiento, Alquilado"
                             required
                         >
-                        <p class="form-help">Estado actual del vehículo en el inventario</p>
                     </div>
                 </form>
             </div>
             
-            <!-- Footer -->
-            <div class="modal-footer">
-                <button onclick="app.closeModal()" class="btn-cancel">
-                    <i class="fas fa-times mr-2"></i>Cancelar
+            <!-- Footer Minimalista -->
+            <div class="modal-footer-minimal">
+                <button onclick="app.closeModal()" class="btn-cancel-minimal">
+                    Cancelar
                 </button>
-                <button onclick="saveEstado()" class="btn-save">
-                    <i class="fas fa-save mr-2"></i>${isEditing ? 'Actualizar' : 'Crear'}
+                <button onclick="saveEstado()" class="btn-save-minimal">
+                    ${isEditing ? 'Actualizar' : 'Crear'}
                 </button>
             </div>
         </div>
