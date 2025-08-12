@@ -1,4 +1,4 @@
-// Sistema de Modales Mejorado
+// Sistema de Modales Mejorado - SISTEMA COMPLETO
 class ModalManager {
     constructor() {
         this.modalData = new Map();
@@ -22,6 +22,17 @@ class ModalManager {
             link_fotos: { pattern: FORM_CONSTANTS.validation.urlPattern }
         });
 
+        this.validationRules.set('colaborador', {
+            nombre: { required: true, minLength: 2 },
+            identificacion: { required: true, minLength: 5 }
+        });
+
+        this.validationRules.set('tarea', {
+            titulo: { required: true, minLength: 3 },
+            vehiculo_id: { required: true },
+            responsable_id: { required: true }
+        });
+
         this.validationRules.set('marca', {
             nombre: { required: true, minLength: 2 }
         });
@@ -42,6 +53,10 @@ class ModalManager {
                 return this.getArrendadoraModal(item);
             case 'vehiculo':
                 return this.getVehiculoModal(item);
+            case 'colaborador':
+                return this.getColaboradorModal(item);
+            case 'tarea':
+                return this.getTareaModal(item);
             case 'marca':
                 return this.getMarcaModal(item);
             case 'modelo':
@@ -57,6 +72,9 @@ class ModalManager {
         switch (type) {
             case 'vehiculo':
                 await this.loadVehiculoData(item);
+                break;
+            case 'tarea':
+                await this.loadTareaData(item);
                 break;
             case 'modelo':
                 await this.loadModeloData(item);
@@ -397,6 +415,317 @@ class ModalManager {
         }
     }
 
+    // ===== MODAL DE COLABORADORES =====
+    getColaboradorModal(item = null) {
+        const isEditing = item !== null;
+        const title = isEditing ? 'Editar Colaborador' : 'Nuevo Colaborador';
+
+        return `
+            <div class="modal-minimal">
+                ${this.getModalHeader(title)}
+                
+                <div class="modal-body-minimal">
+                    <form id="colaborador-form" class="form-minimal">
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="colaborador-nombre" class="label-minimal">
+                                    Nombre Completo <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="colaborador-nombre" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.nombre)}" 
+                                    placeholder="Juan Pérez González"
+                                    maxlength="100"
+                                    required
+                                >
+                                <div class="validation-error" id="colaborador-nombre-error"></div>
+                            </div>
+                            
+                            <div class="form-field-minimal">
+                                <label for="colaborador-identificacion" class="label-minimal">
+                                    Identificación <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="colaborador-identificacion" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.identificacion)}" 
+                                    placeholder="1-0000-0000"
+                                    maxlength="20"
+                                    required
+                                >
+                                <div class="validation-error" id="colaborador-identificacion-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="colaborador-telefono" class="label-minimal">
+                                    Teléfono
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    id="colaborador-telefono" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.telefono)}" 
+                                    placeholder="8888-8888"
+                                    maxlength="15"
+                                >
+                                <div class="validation-error" id="colaborador-telefono-error"></div>
+                            </div>
+                            
+                            <div class="form-field-minimal">
+                                <label for="colaborador-email" class="label-minimal">
+                                    Email
+                                </label>
+                                <input 
+                                    type="email" 
+                                    id="colaborador-email" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.email)}" 
+                                    placeholder="colaborador@empresa.com"
+                                    maxlength="100"
+                                >
+                                <div class="validation-error" id="colaborador-email-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid-minimal">
+                            <div class="form-field-minimal">
+                                <label for="colaborador-puesto" class="label-minimal">
+                                    Puesto
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="colaborador-puesto" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.puesto)}" 
+                                    placeholder="Mecánico, Supervisor, Admin"
+                                    maxlength="50"
+                                >
+                                <div class="validation-error" id="colaborador-puesto-error"></div>
+                            </div>
+                            
+                            <div class="form-field-minimal">
+                                <label for="colaborador-activo" class="label-minimal">
+                                    Estado
+                                </label>
+                                <select id="colaborador-activo" class="select-minimal">
+                                    <option value="true" ${(!item || item.activo !== false) ? 'selected' : ''}>Activo</option>
+                                    <option value="false" ${(item && item.activo === false) ? 'selected' : ''}>Inactivo</option>
+                                </select>
+                                <div class="validation-error" id="colaborador-activo-error"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                ${this.getModalFooter(isEditing)}
+            </div>
+        `;
+    }
+
+    // ===== MODAL DE TAREAS =====
+    getTareaModal(item = null) {
+        const isEditing = item !== null;
+        const title = isEditing ? 'Editar Tarea' : 'Nueva Tarea';
+
+        return `
+            <div class="modal-minimal modal-wide">
+                ${this.getModalHeader(title)}
+                
+                <div class="modal-body-minimal">
+                    <form id="tarea-form" class="form-minimal">
+                        <!-- Información Principal -->
+                        <div class="form-section-minimal">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-info-circle"></i>
+                                Información Principal
+                            </h3>
+                            <div class="form-field-minimal">
+                                <label for="tarea-titulo" class="label-minimal">
+                                    Título de la Tarea <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="tarea-titulo" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.titulo)}" 
+                                    placeholder="Cambio de aceite, Revisión de frenos, Limpieza general"
+                                    maxlength="200"
+                                    required
+                                >
+                                <div class="validation-error" id="tarea-titulo-error"></div>
+                            </div>
+                            
+                            <div class="form-field-minimal">
+                                <label for="tarea-descripcion" class="label-minimal">
+                                    Descripción
+                                </label>
+                                <textarea 
+                                    id="tarea-descripcion" 
+                                    class="input-minimal" 
+                                    rows="3"
+                                    placeholder="Descripción detallada de la tarea a realizar..."
+                                    maxlength="1000"
+                                >${this.escapeValue(item?.descripcion)}</textarea>
+                                <div class="validation-error" id="tarea-descripcion-error"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Asignación -->
+                        <div class="form-section-minimal">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-user-cog"></i>
+                                Asignación
+                            </h3>
+                            <div class="form-grid-minimal">
+                                <div class="form-field-minimal">
+                                    <label for="tarea-vehiculo" class="label-minimal">
+                                        Vehículo <span class="required">*</span>
+                                    </label>
+                                    <select id="tarea-vehiculo" class="select-minimal" required>
+                                        <option value="">Seleccionar vehículo</option>
+                                    </select>
+                                    <div class="validation-error" id="tarea-vehiculo-error"></div>
+                                </div>
+                                
+                                <div class="form-field-minimal">
+                                    <label for="tarea-responsable" class="label-minimal">
+                                        Responsable <span class="required">*</span>
+                                    </label>
+                                    <select id="tarea-responsable" class="select-minimal" required>
+                                        <option value="">Seleccionar responsable</option>
+                                    </select>
+                                    <div class="validation-error" id="tarea-responsable-error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado y Prioridad -->
+                        <div class="form-section-minimal">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-cogs"></i>
+                                Estado y Prioridad
+                            </h3>
+                            <div class="form-grid-minimal">
+                                <div class="form-field-minimal">
+                                    <label for="tarea-estado" class="label-minimal">
+                                        Estado
+                                    </label>
+                                    <select id="tarea-estado" class="select-minimal">
+                                        <option value="pendiente" ${(!item || item.estado === 'pendiente') ? 'selected' : ''}>Pendiente</option>
+                                        <option value="en_progreso" ${(item && item.estado === 'en_progreso') ? 'selected' : ''}>En Progreso</option>
+                                        <option value="completada" ${(item && item.estado === 'completada') ? 'selected' : ''}>Completada</option>
+                                        <option value="cancelada" ${(item && item.estado === 'cancelada') ? 'selected' : ''}>Cancelada</option>
+                                    </select>
+                                    <div class="validation-error" id="tarea-estado-error"></div>
+                                </div>
+                                
+                                <div class="form-field-minimal">
+                                    <label for="tarea-prioridad" class="label-minimal">
+                                        Prioridad
+                                    </label>
+                                    <select id="tarea-prioridad" class="select-minimal">
+                                        <option value="baja" ${(item && item.prioridad === 'baja') ? 'selected' : ''}>Baja</option>
+                                        <option value="media" ${(!item || item.prioridad === 'media') ? 'selected' : ''}>Media</option>
+                                        <option value="alta" ${(item && item.prioridad === 'alta') ? 'selected' : ''}>Alta</option>
+                                        <option value="urgente" ${(item && item.prioridad === 'urgente') ? 'selected' : ''}>Urgente</option>
+                                    </select>
+                                    <div class="validation-error" id="tarea-prioridad-error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fechas -->
+                        <div class="form-section-minimal">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-calendar"></i>
+                                Programación
+                            </h3>
+                            <div class="form-grid-minimal">
+                                <div class="form-field-minimal">
+                                    <label for="tarea-fecha-creacion" class="label-minimal">
+                                        Fecha de Creación
+                                    </label>
+                                    <input 
+                                        type="date" 
+                                        id="tarea-fecha-creacion" 
+                                        class="input-minimal" 
+                                        value="${item?.fecha_creacion || new Date().toISOString().split('T')[0]}"
+                                    >
+                                    <div class="validation-error" id="tarea-fecha-creacion-error"></div>
+                                </div>
+                                
+                                <div class="form-field-minimal">
+                                    <label for="tarea-fecha-programada" class="label-minimal">
+                                        Fecha Programada
+                                    </label>
+                                    <input 
+                                        type="date" 
+                                        id="tarea-fecha-programada" 
+                                        class="input-minimal" 
+                                        value="${item?.fecha_programada || ''}"
+                                    >
+                                    <div class="validation-error" id="tarea-fecha-programada-error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notas -->
+                        <div class="form-field-minimal">
+                            <label for="tarea-notas" class="label-minimal">
+                                <i class="fas fa-sticky-note"></i>
+                                Notas Adicionales
+                            </label>
+                            <textarea 
+                                id="tarea-notas" 
+                                class="input-minimal" 
+                                rows="3"
+                                placeholder="Notas, observaciones o instrucciones especiales..."
+                                maxlength="1000"
+                            >${this.escapeValue(item?.notas)}</textarea>
+                            <div class="validation-error" id="tarea-notas-error"></div>
+                        </div>
+                    </form>
+                </div>
+                
+                ${this.getModalFooter(isEditing)}
+            </div>
+        `;
+    }
+
+    async loadTareaData(item = null) {
+        try {
+            const [vehiculos, colaboradores] = await Promise.all([
+                api.getVehiculos(),
+                api.getColaboradores()
+            ]);
+
+            // Llenar select de vehículos
+            const vehiculoSelect = document.getElementById('tarea-vehiculo');
+            vehiculoSelect.innerHTML = '<option value="">Seleccionar vehículo</option>' +
+                vehiculos.map(v => `<option value="${v.id}">${this.escapeHtml(v.placa)} - ${this.escapeHtml(v.marcas?.nombre || 'Sin marca')} ${this.escapeHtml(v.modelos?.nombre || 'Sin modelo')}</option>`).join('');
+
+            // Llenar select de colaboradores (solo activos)
+            const responsableSelect = document.getElementById('tarea-responsable');
+            responsableSelect.innerHTML = '<option value="">Seleccionar responsable</option>' +
+                colaboradores.filter(c => c.activo).map(c => `<option value="${c.id}">${this.escapeHtml(c.nombre)}</option>`).join('');
+
+            // Si estamos editando, seleccionar valores
+            if (item) {
+                vehiculoSelect.value = item.vehiculo_id || '';
+                responsableSelect.value = item.responsable_id || '';
+            }
+
+        } catch (error) {
+            console.error('Error loading tarea modal data:', error);
+            app.showToast('Error al cargar datos del modal', 'error');
+        }
+    }
+
     // ===== MODAL DE MARCAS =====
     getMarcaModal(item = null) {
         const isEditing = item !== null;
@@ -589,6 +918,8 @@ class ModalManager {
         switch (type) {
             case 'arrendadora': return await api.createArrendadora(data);
             case 'vehiculo': return await api.createVehiculo(data);
+            case 'colaborador': return await api.createColaborador(data);
+            case 'tarea': return await api.createTarea(data);
             case 'marca': return await api.createMarca(data);
             case 'modelo': return await api.createModelo(data);
             case 'estado': return await api.createEstadoInventario(data);
@@ -600,6 +931,8 @@ class ModalManager {
         switch (type) {
             case 'arrendadora': return await api.updateArrendadora(id, data);
             case 'vehiculo': return await api.updateVehiculo(id, data);
+            case 'colaborador': return await api.updateColaborador(id, data);
+            case 'tarea': return await api.updateTarea(id, data);
             case 'marca': return await api.updateMarca(id, data);
             case 'modelo': return await api.updateModelo(id, data);
             case 'estado': return await api.updateEstadoInventario(id, data);
@@ -626,6 +959,27 @@ class ModalManager {
                     precio_semanal: parseFloat(document.getElementById('vehiculo-precio').value) || null,
                     gastos_adms: parseFloat(document.getElementById('vehiculo-gastos').value) || null,
                     link_fotos: document.getElementById('vehiculo-fotos').value.trim() || null
+                };
+            case 'colaborador':
+                return {
+                    nombre: document.getElementById('colaborador-nombre').value.trim(),
+                    identificacion: document.getElementById('colaborador-identificacion').value.trim(),
+                    telefono: document.getElementById('colaborador-telefono').value.trim() || null,
+                    email: document.getElementById('colaborador-email').value.trim() || null,
+                    puesto: document.getElementById('colaborador-puesto').value.trim() || null,
+                    activo: document.getElementById('colaborador-activo').value === 'true'
+                };
+            case 'tarea':
+                return {
+                    titulo: document.getElementById('tarea-titulo').value.trim(),
+                    descripcion: document.getElementById('tarea-descripcion').value.trim() || null,
+                    vehiculo_id: parseInt(document.getElementById('tarea-vehiculo').value),
+                    responsable_id: parseInt(document.getElementById('tarea-responsable').value),
+                    estado: document.getElementById('tarea-estado').value,
+                    prioridad: document.getElementById('tarea-prioridad').value,
+                    fecha_creacion: document.getElementById('tarea-fecha-creacion').value || null,
+                    fecha_programada: document.getElementById('tarea-fecha-programada').value || null,
+                    notas: document.getElementById('tarea-notas').value.trim() || null
                 };
             case 'marca':
                 return {
@@ -807,6 +1161,8 @@ class ModalManager {
         const names = {
             arrendadora: 'Arrendadora',
             vehiculo: 'Vehículo',
+            colaborador: 'Colaborador',
+            tarea: 'Tarea',
             marca: 'Marca',
             modelo: 'Modelo',
             estado: 'Estado'
@@ -818,6 +1174,8 @@ class ModalManager {
         const sections = {
             arrendadora: 'arrendadoras',
             vehiculo: 'vehiculos',
+            colaborador: 'colaboradores',
+            tarea: 'tareas',
             marca: 'marcas',
             modelo: 'modelos',
             estado: 'estados'

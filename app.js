@@ -1,4 +1,4 @@
-// Aplicación principal mejorada
+// Aplicación principal mejorada - SISTEMA COMPLETO
 class FlotaApp {
     constructor() {
         this.currentSection = 'dashboard';
@@ -39,6 +39,8 @@ class FlotaApp {
         const searchInputs = [
             { id: 'search-arrendadoras', callback: () => this.filterArrendadoras() },
             { id: 'search-vehiculos', callback: () => this.filterVehiculos() },
+            { id: 'search-colaboradores', callback: () => this.filterColaboradores() },
+            { id: 'search-tareas', callback: () => this.filterTareas() },
             { id: 'search-marcas', callback: () => this.filterMarcas() },
             { id: 'search-modelos', callback: () => this.filterModelos() },
             { id: 'search-estados', callback: () => this.filterEstados() }
@@ -64,7 +66,10 @@ class FlotaApp {
         const filters = [
             { id: 'filter-arrendadora', callback: () => this.filterVehiculos() },
             { id: 'filter-estado', callback: () => this.filterVehiculos() },
-            { id: 'filter-marca-modelo', callback: () => this.filterModelos() }
+            { id: 'filter-marca-modelo', callback: () => this.filterModelos() },
+            { id: 'filter-tarea-estado', callback: () => this.filterTareas() },
+            { id: 'filter-tarea-prioridad', callback: () => this.filterTareas() },
+            { id: 'filter-tarea-responsable', callback: () => this.filterTareas() }
         ];
 
         filters.forEach(({ id, callback }) => {
@@ -89,6 +94,16 @@ class FlotaApp {
             modalOverlay.addEventListener('click', (e) => {
                 if (e.target.classList.contains('modal-backdrop') || e.target.id === 'modal-overlay') {
                     this.closeModal();
+                }
+            });
+        }
+
+        // Cerrar modal de detalles de tarea
+        const tareaDetailModal = document.getElementById('tarea-detail-modal');
+        if (tareaDetailModal) {
+            tareaDetailModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-backdrop') || e.target.id === 'tarea-detail-modal') {
+                    this.closeTareaDetailModal();
                 }
             });
         }
@@ -180,6 +195,12 @@ class FlotaApp {
             case 'vehiculos':
                 await this.loadVehiculos();
                 break;
+            case 'colaboradores':
+                await this.loadColaboradores();
+                break;
+            case 'tareas':
+                await this.loadTareas();
+                break;
             case 'marcas':
                 await this.loadMarcas();
                 break;
@@ -205,10 +226,14 @@ class FlotaApp {
             // Actualizar contadores con animación
             this.animateCounter('total-arrendadoras', stats.totalArrendadoras);
             this.animateCounter('total-vehiculos', stats.totalVehiculos);
-            this.animateCounter('total-marcas', stats.totalMarcas);
-            this.animateCounter('total-modelos', stats.totalModelos);
+            this.animateCounter('total-colaboradores', stats.totalColaboradores);
+            this.animateCounter('total-tareas', stats.totalTareas);
 
-            await this.loadActividadReciente();
+            // Actualizar estado de tareas
+            this.animateCounter('tareas-pendientes', stats.tareas.pendientes);
+            this.animateCounter('tareas-en-progreso', stats.tareas.enProgreso);
+            this.animateCounter('tareas-completadas', stats.tareas.completadas);
+
         } catch (error) {
             console.error('Error loading dashboard:', error);
             this.showToast('Error al cargar el dashboard', 'error');
@@ -238,42 +263,6 @@ class FlotaApp {
         };
 
         requestAnimationFrame(animate);
-    }
-
-    async loadActividadReciente() {
-        try {
-            const vehiculos = await api.getVehiculos({ limit: 5 });
-            const container = document.getElementById('actividad-reciente');
-
-            if (!container) return;
-
-            if (vehiculos.length === 0) {
-                container.innerHTML = `
-                    <div class="activity-loading">
-                        <p class="text-gray-500">No hay actividad reciente</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = vehiculos.slice(0, 5).map(vehiculo => `
-                <div class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 transition-all cursor-pointer"
-                     onclick="app.showSection('vehiculos')">
-                    <div class="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">${vehiculo.placa}</p>
-                        <p class="text-xs text-gray-500 truncate">
-                            ${vehiculo.marcas?.nombre || 'Sin marca'} ${vehiculo.modelos?.nombre || 'Sin modelo'}
-                        </p>
-                    </div>
-                    <span class="text-xs text-gray-400 flex-shrink-0">
-                        ${api.formatDate(vehiculo.created_at)}
-                    </span>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading recent activity:', error);
-        }
     }
 
     // ===== ARRENDADORAS =====
@@ -496,6 +485,11 @@ class FlotaApp {
                         </span>
                     </div>
                     <div class="vehicle-card-actions-right">
+                        <button onclick="app.showVehiculoTareas(${vehiculo.id})" 
+                                class="vehicle-card-btn vehicle-card-btn-tasks" 
+                                title="Ver tareas del vehículo">
+                            <i class="fas fa-tasks"></i>
+                        </button>
                         <button onclick="app.editVehiculo(${vehiculo.id})" 
                                 class="vehicle-card-btn vehicle-card-btn-edit" 
                                 title="Editar vehículo">
@@ -514,6 +508,484 @@ class FlotaApp {
 
     async filterVehiculos() {
         await this.loadVehiculos();
+    }
+
+    async showVehiculoTareas(vehiculoId) {
+        try {
+            const vehiculo = await api.getVehiculo(vehiculoId);
+            if (vehiculo) {
+                // Cambiar a sección de tareas y filtrar por vehículo
+                this.showSection('tareas');
+                // Aplicar filtro después de un pequeño delay para que se cargue la sección
+                setTimeout(() => {
+                    const searchInput = document.getElementById('search-tareas');
+                    if (searchInput) {
+                        searchInput.value = vehiculo.placa;
+                        this.filterTareas();
+                    }
+                }, 200);
+            }
+        } catch (error) {
+            console.error('Error showing vehicle tasks:', error);
+            this.showToast('Error al cargar las tareas del vehículo', 'error');
+        }
+    }
+
+    // ===== COLABORADORES =====
+    async loadColaboradores() {
+        this.setLoading('colaboradores', true);
+        try {
+            const colaboradores = await api.getColaboradores();
+            this.renderColaboradoresTable(colaboradores);
+        } catch (error) {
+            console.error('Error loading colaboradores:', error);
+            this.showToast('Error al cargar colaboradores', 'error');
+        } finally {
+            this.setLoading('colaboradores', false);
+        }
+    }
+
+    renderColaboradoresTable(colaboradores) {
+        const tbody = document.getElementById('colaboradores-table');
+        if (!tbody) return;
+
+        if (colaboradores.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="table-loading">
+                        <div class="text-center py-8">
+                            <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No hay colaboradores registrados</p>
+                            <button onclick="app.openModal('colaborador')" class="mt-4 text-blue-600 hover:text-blue-800">
+                                Crear primer colaborador
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = colaboradores.map(colaborador => `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="font-mono text-sm text-gray-500">#${colaborador.id}</td>
+                <td class="font-medium">${this.escapeHtml(colaborador.nombre)}</td>
+                <td class="font-mono text-sm">${this.escapeHtml(colaborador.identificacion)}</td>
+                <td>${this.escapeHtml(colaborador.puesto || '-')}</td>
+                <td>
+                    <span class="colaborador-status ${colaborador.activo ? 'status-active' : 'status-inactive'}">
+                        ${colaborador.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td>
+                    <div class="flex space-x-2">
+                        <button onclick="app.editColaborador(${colaborador.id})" 
+                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                title="Editar colaborador">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="app.deleteColaborador(${colaborador.id})" 
+                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                title="Eliminar colaborador">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async filterColaboradores() {
+        const searchTerm = document.getElementById('search-colaboradores')?.value?.toLowerCase() || '';
+
+        try {
+            const colaboradores = await api.getColaboradores();
+            const filtered = colaboradores.filter(c =>
+                c.nombre.toLowerCase().includes(searchTerm) ||
+                c.identificacion.toLowerCase().includes(searchTerm) ||
+                (c.puesto && c.puesto.toLowerCase().includes(searchTerm))
+            );
+            this.renderColaboradoresTable(filtered);
+        } catch (error) {
+            console.error('Error filtering colaboradores:', error);
+        }
+    }
+
+    // ===== TAREAS =====
+    async loadTareas() {
+        this.setLoading('tareas', true);
+        try {
+            const filters = this.getTareasFilters();
+            const [tareas] = await Promise.all([
+                api.getTareas(filters),
+                this.loadTareasFilters()
+            ]);
+            this.renderTareasGrid(tareas);
+        } catch (error) {
+            console.error('Error loading tareas:', error);
+            this.showToast('Error al cargar tareas', 'error');
+        } finally {
+            this.setLoading('tareas', false);
+        }
+    }
+
+    getTareasFilters() {
+        return {
+            estado: document.getElementById('filter-tarea-estado')?.value || '',
+            prioridad: document.getElementById('filter-tarea-prioridad')?.value || '',
+            responsable_id: document.getElementById('filter-tarea-responsable')?.value || '',
+            search: document.getElementById('search-tareas')?.value || ''
+        };
+    }
+
+    async loadTareasFilters() {
+        try {
+            const colaboradores = await api.getColaboradores();
+
+            // Llenar filtro de responsables
+            const responsableSelect = document.getElementById('filter-tarea-responsable');
+            if (responsableSelect) {
+                const currentValue = responsableSelect.value;
+                responsableSelect.innerHTML = '<option value="">Todos los responsables</option>' +
+                    colaboradores.filter(c => c.activo).map(c =>
+                        `<option value="${c.id}" ${currentValue == c.id ? 'selected' : ''}>${this.escapeHtml(c.nombre)}</option>`
+                    ).join('');
+            }
+        } catch (error) {
+            console.error('Error loading tareas filters:', error);
+        }
+    }
+
+    renderTareasGrid(tareas) {
+        const grid = document.getElementById('tareas-grid');
+        if (!grid) return;
+
+        if (tareas.length === 0) {
+            grid.innerHTML = `
+                <div class="tarea-card-empty">
+                    <i class="fas fa-tasks tarea-card-empty-icon"></i>
+                    <div class="tarea-card-empty-text">No hay tareas registradas</div>
+                    <div class="tarea-card-empty-subtext">Crea tu primera tarea para comenzar</div>
+                    <button onclick="app.openModal('tarea')" class="mt-4 btn-primary-apple">
+                        <i class="fas fa-plus"></i>
+                        <span>Crear Tarea</span>
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = tareas.map(tarea => this.renderTareaCard(tarea)).join('');
+    }
+
+    renderTareaCard(tarea) {
+        const estadoClass = api.getTareaStatusBadgeClass(tarea.estado);
+        const prioridadClass = api.getTareaPrioridadBadgeClass(tarea.prioridad);
+
+        return `
+            <div class="tarea-card" data-tarea-id="${tarea.id}">
+                <!-- Header de la tarjeta -->
+                <div class="tarea-card-header">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="tarea-card-titulo">${this.escapeHtml(tarea.titulo)}</div>
+                            <div class="tarea-card-vehiculo">
+                                <i class="fas fa-car mr-1"></i>
+                                ${this.escapeHtml(tarea.vehiculos?.placa || 'Sin vehículo')}
+                                ${tarea.vehiculos?.marcas?.nombre ? `- ${this.escapeHtml(tarea.vehiculos.marcas.nombre)}` : ''}
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="tarea-card-badge tarea-card-badge-id">#${tarea.id}</span>
+                            <span class="tarea-card-prioridad ${prioridadClass}">
+                                ${this.escapeHtml(tarea.prioridad || 'media')}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Body de la tarjeta -->
+                <div class="tarea-card-body">
+                    <div class="space-y-4">
+                        ${tarea.descripcion ? `
+                        <div class="tarea-card-descripcion">
+                            ${this.escapeHtml(tarea.descripcion).substring(0, 100)}${tarea.descripcion.length > 100 ? '...' : ''}
+                        </div>
+                        ` : ''}
+                        
+                        <div class="tarea-card-info">
+                            <span class="tarea-card-label">Responsable</span>
+                            <span class="tarea-card-value">${this.escapeHtml(tarea.colaboradores?.nombre || 'Sin asignar')}</span>
+                        </div>
+                        
+                        <div class="tarea-card-info">
+                            <span class="tarea-card-label">Estado</span>
+                            <span class="tarea-card-status ${estadoClass}">
+                                ${this.escapeHtml(this.getEstadoDisplayName(tarea.estado))}
+                            </span>
+                        </div>
+                        
+                        ${tarea.fecha_programada ? `
+                        <div class="tarea-card-info">
+                            <span class="tarea-card-label">Programada</span>
+                            <span class="tarea-card-fecha">${api.formatDate(tarea.fecha_programada)}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${tarea.notas ? `
+                        <div class="tarea-card-info">
+                            <span class="tarea-card-label">Notas</span>
+                            <span class="tarea-card-notas">${this.escapeHtml(tarea.notas).substring(0, 50)}${tarea.notas.length > 50 ? '...' : ''}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- Acciones de la tarjeta -->
+                <div class="tarea-card-actions">
+                    <div class="tarea-card-actions-left">
+                        <span class="text-xs text-gray-500">
+                            <i class="fas fa-clock mr-1"></i>
+                            ${api.formatDate(tarea.created_at)}
+                        </span>
+                    </div>
+                    <div class="tarea-card-actions-right">
+                        <button onclick="app.showTareaDetail(${tarea.id})" 
+                                class="tarea-card-btn tarea-card-btn-view" 
+                                title="Ver detalles de la tarea">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="app.editTarea(${tarea.id})" 
+                                class="tarea-card-btn tarea-card-btn-edit" 
+                                title="Editar tarea">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="app.deleteTarea(${tarea.id})" 
+                                class="tarea-card-btn tarea-card-btn-delete" 
+                                title="Eliminar tarea">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    getEstadoDisplayName(estado) {
+        const nombres = {
+            'pendiente': 'Pendiente',
+            'en_progreso': 'En Progreso',
+            'completada': 'Completada',
+            'cancelada': 'Cancelada'
+        };
+        return nombres[estado] || estado;
+    }
+
+    async filterTareas() {
+        await this.loadTareas();
+    }
+
+    async showTareaDetail(tareaId) {
+        try {
+            const [tarea, colaboradores, comentarios, adjuntos] = await Promise.all([
+                api.getTarea(tareaId),
+                api.getTareaColaboradores(tareaId),
+                api.getTareaComentarios(tareaId),
+                api.getTareaAdjuntos(tareaId)
+            ]);
+
+            if (!tarea) {
+                this.showToast('Tarea no encontrada', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('tarea-detail-modal');
+            const content = document.getElementById('tarea-detail-content');
+
+            if (modal && content) {
+                content.innerHTML = this.getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos);
+                modal.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('Error showing tarea detail:', error);
+            this.showToast('Error al cargar los detalles de la tarea', 'error');
+        }
+    }
+
+    getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos) {
+        const estadoClass = api.getTareaStatusBadgeClass(tarea.estado);
+        const prioridadClass = api.getTareaPrioridadBadgeClass(tarea.prioridad);
+
+        return `
+            <div class="tarea-detail-modal">
+                <div class="tarea-detail-header">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="tarea-detail-title">${this.escapeHtml(tarea.titulo)}</h2>
+                            <div class="tarea-detail-meta">
+                                <span class="tarea-detail-vehiculo">
+                                    <i class="fas fa-car mr-1"></i>
+                                    ${this.escapeHtml(tarea.vehiculos?.placa || 'Sin vehículo')}
+                                </span>
+                                <span class="tarea-detail-responsable">
+                                    <i class="fas fa-user mr-1"></i>
+                                    ${this.escapeHtml(tarea.colaboradores?.nombre || 'Sin responsable')}
+                                </span>
+                            </div>
+                        </div>
+                        <button onclick="app.closeTareaDetailModal()" class="close-btn-minimal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tarea-detail-body">
+                    <div class="tarea-detail-grid">
+                        <!-- Información Principal -->
+                        <div class="tarea-detail-section">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-info-circle"></i>
+                                Información General
+                            </h3>
+                            <div class="tarea-detail-info-grid">
+                                <div class="tarea-detail-field">
+                                    <label>Estado</label>
+                                    <span class="tarea-card-status ${estadoClass}">
+                                        ${this.escapeHtml(this.getEstadoDisplayName(tarea.estado))}
+                                    </span>
+                                </div>
+                                <div class="tarea-detail-field">
+                                    <label>Prioridad</label>
+                                    <span class="tarea-card-prioridad ${prioridadClass}">
+                                        ${this.escapeHtml(tarea.prioridad || 'media')}
+                                    </span>
+                                </div>
+                                <div class="tarea-detail-field">
+                                    <label>Fecha Creación</label>
+                                    <span>${api.formatDate(tarea.fecha_creacion)}</span>
+                                </div>
+                                <div class="tarea-detail-field">
+                                    <label>Fecha Programada</label>
+                                    <span>${tarea.fecha_programada ? api.formatDate(tarea.fecha_programada) : 'No programada'}</span>
+                                </div>
+                            </div>
+                            
+                            ${tarea.descripcion ? `
+                            <div class="tarea-detail-field">
+                                <label>Descripción</label>
+                                <div class="tarea-detail-descripcion">${this.escapeHtml(tarea.descripcion)}</div>
+                            </div>
+                            ` : ''}
+                            
+                            ${tarea.notas ? `
+                            <div class="tarea-detail-field">
+                                <label>Notas</label>
+                                <div class="tarea-detail-notas">${this.escapeHtml(tarea.notas)}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Colaboradores Asignados -->
+                        <div class="tarea-detail-section">
+                            <h3 class="section-title-minimal">
+                                <i class="fas fa-users"></i>
+                                Colaboradores Asignados
+                            </h3>
+                            <div class="tarea-colaboradores-list">
+                                ${colaboradores.length > 0 ? colaboradores.map(col => `
+                                    <div class="tarea-colaborador-item">
+                                        <div class="colaborador-info">
+                                            <span class="colaborador-nombre">${this.escapeHtml(col.colaboradores.nombre)}</span>
+                                            <span class="colaborador-rol rol-${col.rol}">${this.escapeHtml(col.rol)}</span>
+                                        </div>
+                                        <small class="colaborador-fecha">Asignado: ${api.formatDate(col.asignado_at)}</small>
+                                    </div>
+                                `).join('') : '<p class="text-gray-500">No hay colaboradores asignados</p>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comentarios -->
+                    <div class="tarea-detail-section">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-comments"></i>
+                            Comentarios (${comentarios.length})
+                        </h3>
+                        <div class="tarea-comentarios-list">
+                            ${comentarios.length > 0 ? comentarios.map(com => `
+                                <div class="tarea-comentario-item">
+                                    <div class="comentario-header">
+                                        <span class="comentario-autor">${this.escapeHtml(com.colaboradores.nombre)}</span>
+                                        <span class="comentario-fecha">${api.formatDateTime(com.created_at)}</span>
+                                    </div>
+                                    <div class="comentario-texto">${this.escapeHtml(com.comentario)}</div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500">No hay comentarios</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Adjuntos -->
+                    <div class="tarea-detail-section">
+                        <h3 class="section-title-minimal">
+                            <i class="fas fa-paperclip"></i>
+                            Adjuntos (${adjuntos.length})
+                        </h3>
+                        <div class="tarea-adjuntos-list">
+                            ${adjuntos.length > 0 ? adjuntos.map(adj => `
+                                <div class="tarea-adjunto-item">
+                                    <div class="adjunto-icon">
+                                        <i class="fas fa-${this.getFileIcon(adj.tipo_archivo)}"></i>
+                                    </div>
+                                    <div class="adjunto-info">
+                                        <div class="adjunto-nombre">${this.escapeHtml(adj.nombre_archivo)}</div>
+                                        <div class="adjunto-meta">
+                                            <span>${this.escapeHtml(adj.tipo_archivo)}</span>
+                                            <span>•</span>
+                                            <span>Subido por ${this.escapeHtml(adj.colaboradores?.nombre || 'Desconocido')}</span>
+                                            <span>•</span>
+                                            <span>${api.formatDate(adj.created_at)}</span>
+                                        </div>
+                                    </div>
+                                    <a href="${this.escapeHtml(adj.ruta_archivo)}" target="_blank" class="adjunto-download">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            `).join('') : '<p class="text-gray-500">No hay archivos adjuntos</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarea-detail-footer">
+                    <button onclick="app.editTarea(${tarea.id})" class="btn-secondary-apple">
+                        <i class="fas fa-edit"></i>
+                        Editar Tarea
+                    </button>
+                    <button onclick="app.closeTareaDetailModal()" class="btn-primary-apple">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    getFileIcon(tipoArchivo) {
+        const icons = {
+            'foto': 'image',
+            'documento': 'file-alt',
+            'pdf': 'file-pdf',
+            'excel': 'file-excel',
+            'video': 'file-video',
+            'otro': 'file'
+        };
+        return icons[tipoArchivo] || 'file';
+    }
+
+    closeTareaDetailModal() {
+        const modal = document.getElementById('tarea-detail-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
     }
 
     // ===== MARCAS =====
@@ -830,6 +1302,56 @@ class FlotaApp {
         } catch (error) {
             console.error('Error deleting vehiculo:', error);
             this.showToast('Error al eliminar el vehículo', 'error');
+        }
+    }
+
+    async editColaborador(id) {
+        try {
+            const colaborador = await api.getColaborador(id);
+            if (colaborador) {
+                await this.openModal('colaborador', colaborador);
+            }
+        } catch (error) {
+            console.error('Error loading colaborador:', error);
+            this.showToast('Error al cargar el colaborador', 'error');
+        }
+    }
+
+    async deleteColaborador(id) {
+        if (!await this.confirmDelete('este colaborador')) return;
+
+        try {
+            await api.deleteColaborador(id);
+            this.showToast('Colaborador eliminado correctamente', 'success');
+            await this.loadColaboradores();
+        } catch (error) {
+            console.error('Error deleting colaborador:', error);
+            this.showToast('Error al eliminar el colaborador', 'error');
+        }
+    }
+
+    async editTarea(id) {
+        try {
+            const tarea = await api.getTarea(id);
+            if (tarea) {
+                await this.openModal('tarea', tarea);
+            }
+        } catch (error) {
+            console.error('Error loading tarea:', error);
+            this.showToast('Error al cargar la tarea', 'error');
+        }
+    }
+
+    async deleteTarea(id) {
+        if (!await this.confirmDelete('esta tarea')) return;
+
+        try {
+            await api.deleteTarea(id);
+            this.showToast('Tarea eliminada correctamente', 'success');
+            await this.loadTareas();
+        } catch (error) {
+            console.error('Error deleting tarea:', error);
+            this.showToast('Error al eliminar la tarea', 'error');
         }
     }
 

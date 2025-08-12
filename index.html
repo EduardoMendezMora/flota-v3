@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistema de Administración de Flota de Vehículos - Gestiona tu flota de manera eficiente">
-    <meta name="keywords" content="flota, vehículos, administración, arrendadoras, gestión">
+    <meta name="keywords" content="flota, vehículos, administración, arrendadoras, gestión, tareas">
     <meta name="author" content="Sistema Flota">
 
     <title>Flota • Sistema de Administración</title>
@@ -92,6 +92,18 @@
                 </div>
                 <span class="nav-label">Vehículos</span>
             </button>
+            <button onclick="showSection('colaboradores')" class="nav-item" data-section="colaboradores" aria-label="Gestión de colaboradores">
+                <div class="nav-icon">
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                </div>
+                <span class="nav-label">Colaboradores</span>
+            </button>
+            <button onclick="showSection('tareas')" class="nav-item" data-section="tareas" aria-label="Gestión de tareas">
+                <div class="nav-icon">
+                    <i class="fas fa-tasks" aria-hidden="true"></i>
+                </div>
+                <span class="nav-label">Tareas</span>
+            </button>
             <button onclick="showSection('marcas')" class="nav-item" data-section="marcas" aria-label="Gestión de marcas">
                 <div class="nav-icon">
                     <i class="fas fa-tag" aria-hidden="true"></i>
@@ -150,20 +162,20 @@
             </div>
             <div class="stat-card stat-card-purple">
                 <div class="stat-icon">
-                    <i class="fas fa-tag" aria-hidden="true"></i>
+                    <i class="fas fa-users" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-marcas" aria-live="polite">0</div>
-                    <div class="stat-label">Marcas</div>
+                    <div class="stat-number" id="total-colaboradores" aria-live="polite">0</div>
+                    <div class="stat-label">Colaboradores</div>
                 </div>
             </div>
             <div class="stat-card stat-card-orange">
                 <div class="stat-icon">
-                    <i class="fas fa-cogs" aria-hidden="true"></i>
+                    <i class="fas fa-tasks" aria-hidden="true"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number" id="total-modelos" aria-live="polite">0</div>
-                    <div class="stat-label">Modelos</div>
+                    <div class="stat-number" id="total-tareas" aria-live="polite">0</div>
+                    <div class="stat-label">Tareas</div>
                 </div>
             </div>
         </div>
@@ -185,16 +197,24 @@
             </div>
             <div class="dashboard-card">
                 <div class="card-header">
-                    <h3 class="card-title">Actividad Reciente</h3>
-                    <button class="card-action" title="Ver toda la actividad">
-                        <i class="fas fa-clock" aria-hidden="true"></i>
+                    <h3 class="card-title">Estado de Tareas</h3>
+                    <button class="card-action" title="Ver todas las tareas">
+                        <i class="fas fa-tasks" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="card-content">
-                    <div id="actividad-reciente" class="activity-list" aria-live="polite">
-                        <div class="activity-loading">
-                            <div class="loading-spinner"></div>
-                            <span>Cargando actividad...</span>
+                    <div id="tareas-estado" class="tareas-estado-grid" aria-live="polite">
+                        <div class="tarea-estado-item">
+                            <div class="tarea-estado-number" id="tareas-pendientes">0</div>
+                            <div class="tarea-estado-label">Pendientes</div>
+                        </div>
+                        <div class="tarea-estado-item">
+                            <div class="tarea-estado-number" id="tareas-en-progreso">0</div>
+                            <div class="tarea-estado-label">En Progreso</div>
+                        </div>
+                        <div class="tarea-estado-item">
+                            <div class="tarea-estado-number" id="tareas-completadas">0</div>
+                            <div class="tarea-estado-label">Completadas</div>
                         </div>
                     </div>
                 </div>
@@ -285,6 +305,107 @@
                 <div class="grid-loading">
                     <div class="loading-spinner"></div>
                     <span>Cargando vehículos...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Colaboradores Section -->
+    <section id="colaboradores" class="section" data-loading="colaboradores">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Colaboradores</h2>
+                <p class="section-subtitle">Gestiona el equipo de trabajo</p>
+            </div>
+            <button onclick="openModal('colaborador')" class="btn-primary-apple">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                <span>Nuevo Colaborador</span>
+            </button>
+        </div>
+
+        <div class="content-card">
+            <div class="card-tools">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                    <input type="text"
+                           id="search-colaboradores"
+                           placeholder="Buscar colaboradores..."
+                           class="search-input"
+                           aria-label="Buscar colaboradores">
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table-apple" role="table" aria-label="Lista de colaboradores">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Identificación</th>
+                        <th scope="col">Puesto</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="colaboradores-table">
+                    <tr>
+                        <td colspan="6" class="table-loading">
+                            <div class="loading-spinner"></div>
+                            <span>Cargando datos...</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tareas Section -->
+    <section id="tareas" class="section" data-loading="tareas">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Gestión de Tareas</h2>
+                <p class="section-subtitle">Administra las tareas de mantenimiento</p>
+            </div>
+            <button onclick="openModal('tarea')" class="btn-primary-apple">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                <span>Nueva Tarea</span>
+            </button>
+        </div>
+
+        <div class="content-card">
+            <div class="card-tools">
+                <div class="filters-grid-tareas">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                        <input type="text"
+                               id="search-tareas"
+                               placeholder="Buscar tareas..."
+                               class="search-input"
+                               aria-label="Buscar tareas">
+                    </div>
+                    <select id="filter-tarea-estado" class="filter-select" aria-label="Filtrar por estado">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                    <select id="filter-tarea-prioridad" class="filter-select" aria-label="Filtrar por prioridad">
+                        <option value="">Todas las prioridades</option>
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                    <select id="filter-tarea-responsable" class="filter-select" aria-label="Filtrar por responsable">
+                        <option value="">Todos los responsables</option>
+                    </select>
+                </div>
+            </div>
+            <div id="tareas-grid" class="tareas-grid" role="grid" aria-label="Cuadrícula de tareas">
+                <div class="grid-loading">
+                    <div class="loading-spinner"></div>
+                    <span>Cargando tareas...</span>
                 </div>
             </div>
         </div>
@@ -446,6 +567,16 @@
     </div>
 </div>
 
+<!-- Modal para Detalles de Tarea -->
+<div id="tarea-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content modal-wide">
+        <div id="tarea-detail-content">
+            <!-- Tarea detail content will be inserted here -->
+        </div>
+    </div>
+</div>
+
 <!-- Toast Container -->
 <div id="toast-container" class="toast-container" role="region" aria-live="assertive" aria-label="Notificaciones"></div>
 
@@ -520,9 +651,9 @@
         }
 
         // Number keys for quick navigation
-        if (e.altKey && e.key >= '1' && e.key <= '6') {
+        if (e.altKey && e.key >= '1' && e.key <= '8') {
             e.preventDefault();
-            const sections = ['dashboard', 'arrendadoras', 'vehiculos', 'marcas', 'modelos', 'estados'];
+            const sections = ['dashboard', 'arrendadoras', 'vehiculos', 'colaboradores', 'tareas', 'marcas', 'modelos', 'estados'];
             const sectionIndex = parseInt(e.key) - 1;
             if (sections[sectionIndex]) {
                 showSection(sections[sectionIndex]);

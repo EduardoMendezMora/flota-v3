@@ -1,4 +1,4 @@
-// API Service mejorado para Supabase
+// API Service mejorado para Supabase - SISTEMA COMPLETO
 class ApiService {
     constructor() {
         this.baseUrl = SUPABASE_CONFIG.url + '/rest/v1';
@@ -130,6 +130,228 @@ class ApiService {
             key.includes(pattern)
         );
         keysToDelete.forEach(key => this.cache.delete(key));
+    }
+
+    // ===== COLABORADORES =====
+    async getColaboradores() {
+        return this.request('/colaboradores?select=*&order=nombre.asc');
+    }
+
+    async getColaborador(id) {
+        const result = await this.request(`/colaboradores?id=eq.${id}&select=*`);
+        return result?.[0] || null;
+    }
+
+    async createColaborador(data) {
+        const result = await this.request('/colaboradores', {
+            method: 'POST',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(this.sanitizeData(data))
+        });
+        this.invalidateCache('colaboradores');
+        return result;
+    }
+
+    async updateColaborador(id, data) {
+        const result = await this.request(`/colaboradores?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(this.sanitizeData(data))
+        });
+        this.invalidateCache('colaboradores');
+        return result;
+    }
+
+    async deleteColaborador(id) {
+        const result = await this.request(`/colaboradores?id=eq.${id}`, {
+            method: 'DELETE'
+        });
+        this.invalidateCache('colaboradores');
+        return result;
+    }
+
+    // ===== TAREAS =====
+    async getTareas(filters = {}) {
+        let query = '/tareas?select=*,vehiculos(placa,marcas(nombre),modelos(nombre)),colaboradores!tareas_responsable_id_fkey(nombre)&order=id.desc';
+
+        // Aplicar filtros
+        const params = [];
+        if (filters.vehiculo_id) {
+            params.push(`vehiculo_id=eq.${filters.vehiculo_id}`);
+        }
+        if (filters.responsable_id) {
+            params.push(`responsable_id=eq.${filters.responsable_id}`);
+        }
+        if (filters.estado) {
+            params.push(`estado=eq.${filters.estado}`);
+        }
+        if (filters.prioridad) {
+            params.push(`prioridad=eq.${filters.prioridad}`);
+        }
+        if (filters.search) {
+            params.push(`or=(titulo.ilike.*${filters.search}*,descripcion.ilike.*${filters.search}*)`);
+        }
+        if (filters.limit) {
+            params.push(`limit=${filters.limit}`);
+        }
+
+        if (params.length > 0) {
+            query += '&' + params.join('&');
+        }
+
+        return this.request(query);
+    }
+
+    async getTarea(id) {
+        const result = await this.request(`/tareas?id=eq.${id}&select=*,vehiculos(placa,marcas(nombre),modelos(nombre)),colaboradores!tareas_responsable_id_fkey(nombre)`);
+        return result?.[0] || null;
+    }
+
+    async createTarea(data) {
+        const result = await this.request('/tareas', {
+            method: 'POST',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(this.sanitizeTareaData(data))
+        });
+        this.invalidateCache('tareas');
+        return result;
+    }
+
+    async updateTarea(id, data) {
+        const result = await this.request(`/tareas?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(this.sanitizeTareaData(data))
+        });
+        this.invalidateCache('tareas');
+        return result;
+    }
+
+    async deleteTarea(id) {
+        const result = await this.request(`/tareas?id=eq.${id}`, {
+            method: 'DELETE'
+        });
+        this.invalidateCache('tareas');
+        return result;
+    }
+
+    // ===== TAREA COLABORADORES =====
+    async getTareaColaboradores(tareaId) {
+        return this.request(`/tarea_colaboradores?tarea_id=eq.${tareaId}&select=*,colaboradores(nombre)`);
+    }
+
+    async addColaboradorToTarea(tareaId, colaboradorId, rol = 'ejecutor') {
+        const result = await this.request('/tarea_colaboradores', {
+            method: 'POST',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                tarea_id: tareaId,
+                colaborador_id: colaboradorId,
+                rol: rol
+            })
+        });
+        this.invalidateCache('tarea_colaboradores');
+        return result;
+    }
+
+    async removeColaboradorFromTarea(tareaId, colaboradorId) {
+        const result = await this.request(`/tarea_colaboradores?tarea_id=eq.${tareaId}&colaborador_id=eq.${colaboradorId}`, {
+            method: 'DELETE'
+        });
+        this.invalidateCache('tarea_colaboradores');
+        return result;
+    }
+
+    async updateColaboradorRol(tareaId, colaboradorId, rol) {
+        const result = await this.request(`/tarea_colaboradores?tarea_id=eq.${tareaId}&colaborador_id=eq.${colaboradorId}`, {
+            method: 'PATCH',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({ rol: rol })
+        });
+        this.invalidateCache('tarea_colaboradores');
+        return result;
+    }
+
+    // ===== TAREA COMENTARIOS =====
+    async getTareaComentarios(tareaId) {
+        return this.request(`/tarea_comentarios?tarea_id=eq.${tareaId}&select=*,colaboradores(nombre)&order=created_at.desc`);
+    }
+
+    async createTareaComentario(tareaId, colaboradorId, comentario) {
+        const result = await this.request('/tarea_comentarios', {
+            method: 'POST',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                tarea_id: tareaId,
+                colaborador_id: colaboradorId,
+                comentario: comentario
+            })
+        });
+        this.invalidateCache('tarea_comentarios');
+        return result;
+    }
+
+    async deleteTareaComentario(id) {
+        const result = await this.request(`/tarea_comentarios?id=eq.${id}`, {
+            method: 'DELETE'
+        });
+        this.invalidateCache('tarea_comentarios');
+        return result;
+    }
+
+    // ===== TAREA ADJUNTOS =====
+    async getTareaAdjuntos(tareaId) {
+        return this.request(`/tarea_adjuntos?tarea_id=eq.${tareaId}&select=*,colaboradores!tarea_adjuntos_subido_por_id_fkey(nombre)&order=created_at.desc`);
+    }
+
+    async createTareaAdjunto(data) {
+        const result = await this.request('/tarea_adjuntos', {
+            method: 'POST',
+            headers: {
+                ...this.headers,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(this.sanitizeData(data))
+        });
+        this.invalidateCache('tarea_adjuntos');
+        return result;
+    }
+
+    async deleteTareaAdjunto(id) {
+        const result = await this.request(`/tarea_adjuntos?id=eq.${id}`, {
+            method: 'DELETE'
+        });
+        this.invalidateCache('tarea_adjuntos');
+        return result;
     }
 
     // ===== ARRENDADORAS =====
@@ -400,18 +622,22 @@ class ApiService {
     // ===== ESTADÍSTICAS MEJORADAS =====
     async getEstadisticas() {
         try {
-            const [arrendadoras, vehiculos, marcas, modelos, estados] = await Promise.all([
+            const [arrendadoras, vehiculos, marcas, modelos, estados, colaboradores, tareas] = await Promise.all([
                 this.getArrendadoras(),
                 this.getVehiculos({ limit: 1000 }),
                 this.getMarcas(),
                 this.getModelos(),
-                this.getEstadosInventario()
+                this.getEstadosInventario(),
+                this.getColaboradores(),
+                this.getTareas({ limit: 1000 })
             ]);
 
             // Calcular estadísticas adicionales
             const vehiculosPorEstado = this.groupByProperty(vehiculos, 'estado_inventario_id');
             const vehiculosPorArrendadora = this.groupByProperty(vehiculos, 'arrendadora_id');
             const vehiculosPorMarca = this.groupByProperty(vehiculos, 'marca_id');
+            const tareasPorEstado = this.groupByProperty(tareas, 'estado');
+            const tareasPorPrioridad = this.groupByProperty(tareas, 'prioridad');
 
             return {
                 totalArrendadoras: arrendadoras.length,
@@ -419,10 +645,19 @@ class ApiService {
                 totalMarcas: marcas.length,
                 totalModelos: modelos.length,
                 totalEstados: estados.length,
+                totalColaboradores: colaboradores.length,
+                totalTareas: tareas.length,
                 distribuciones: {
                     porEstado: vehiculosPorEstado,
                     porArrendadora: vehiculosPorArrendadora,
                     porMarca: vehiculosPorMarca
+                },
+                tareas: {
+                    porEstado: tareasPorEstado,
+                    porPrioridad: tareasPorPrioridad,
+                    pendientes: tareas.filter(t => t.estado === 'pendiente').length,
+                    enProgreso: tareas.filter(t => t.estado === 'en_progreso').length,
+                    completadas: tareas.filter(t => t.estado === 'completada').length
                 }
             };
         } catch (error) {
@@ -433,10 +668,19 @@ class ApiService {
                 totalMarcas: 0,
                 totalModelos: 0,
                 totalEstados: 0,
+                totalColaboradores: 0,
+                totalTareas: 0,
                 distribuciones: {
                     porEstado: {},
                     porArrendadora: {},
                     porMarca: {}
+                },
+                tareas: {
+                    porEstado: {},
+                    porPrioridad: {},
+                    pendientes: 0,
+                    enProgreso: 0,
+                    completadas: 0
                 }
             };
         }
@@ -471,6 +715,20 @@ class ApiService {
         }
         if (sanitized.anio) {
             sanitized.anio = parseInt(sanitized.anio);
+        }
+
+        return sanitized;
+    }
+
+    sanitizeTareaData(data) {
+        const sanitized = this.sanitizeData(data);
+
+        // Validaciones específicas para tareas
+        if (sanitized.vehiculo_id) {
+            sanitized.vehiculo_id = parseInt(sanitized.vehiculo_id);
+        }
+        if (sanitized.responsable_id) {
+            sanitized.responsable_id = parseInt(sanitized.responsable_id);
         }
 
         return sanitized;
@@ -536,6 +794,26 @@ class ApiService {
     getStatusText(estadoId) {
         const estado = ESTADOS_VEHICULO.find(s => s.id === estadoId);
         return estado ? estado.nombre : 'Desconocido';
+    }
+
+    getTareaStatusBadgeClass(estado) {
+        const clases = {
+            'pendiente': 'status-pending',
+            'en_progreso': 'status-in-progress',
+            'completada': 'status-completed',
+            'cancelada': 'status-cancelled'
+        };
+        return clases[estado] || 'status-pending';
+    }
+
+    getTareaPrioridadBadgeClass(prioridad) {
+        const clases = {
+            'baja': 'priority-low',
+            'media': 'priority-medium',
+            'alta': 'priority-high',
+            'urgente': 'priority-urgent'
+        };
+        return clases[prioridad] || 'priority-medium';
     }
 
     // ===== VALIDACIONES =====
