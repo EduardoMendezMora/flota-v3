@@ -13,6 +13,7 @@
     --apple-black: #1C1C1E;
     --apple-white: #FFFFFF;
     --apple-green: #34C759;
+    --apple-green-dark: #28A745;
     --apple-red: #FF3B30;
     --apple-orange: #FF9500;
     --apple-purple: #AF52DE;
@@ -410,6 +411,77 @@ body {
 .btn-secondary-apple:hover {
     background: var(--apple-gray-light);
     transform: translateY(-1px);
+}
+
+/* ===== BOTÓN COMPLETAR TAREA ===== */
+.btn-complete-task {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--apple-green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-complete-task:hover {
+    background: var(--apple-green-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-complete-task:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-complete-task:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.btn-complete-task:hover:before {
+    left: 100%;
+}
+
+.btn-complete-task i {
+    font-size: 16px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Variante disabled del botón completar */
+.btn-complete-task:disabled {
+    background: var(--apple-gray-medium);
+    color: var(--apple-gray);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-complete-task:disabled:hover {
+    background: var(--apple-gray-medium);
+    transform: none;
+    box-shadow: none;
 }
 
 /* ===== TARJETAS DE ESTADÍSTICAS ===== */
@@ -1590,6 +1662,7 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: var(--spacing-md);
+    flex-wrap: wrap;
 }
 
 /* ===== ACTIVITY LIST ===== */
@@ -2112,12 +2185,14 @@ select:disabled {
         grid-template-columns: 1fr;
     }
 
-    .modal-footer-minimal {
+    .modal-footer-minimal,
+    .tarea-detail-footer {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
 
-    .modal-footer-minimal button {
+    .modal-footer-minimal button,
+    .tarea-detail-footer button {
         width: 100%;
     }
 
@@ -2246,6 +2321,18 @@ select:disabled {
         align-items: flex-start;
         gap: var(--spacing-xs);
     }
+
+    /* Ajustar botones en footer del modal en móvil */
+    .tarea-detail-footer {
+        flex-direction: column;
+    }
+
+    .btn-complete-task,
+    .btn-secondary-apple,
+    .btn-primary-apple {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* ===== MEJORAS DE ACCESIBILIDAD ===== */
@@ -2258,7 +2345,7 @@ select:disabled {
 }
 
 @media (prefers-color-scheme: dark) {
-    /* Modo oscuro básico - se puede expandir */
+    /* Modo oscuro básico - se puede expandar */
     :root {
         --apple-black: #FFFFFF;
         --apple-white: #1C1C1E;

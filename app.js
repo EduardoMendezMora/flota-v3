@@ -1,4 +1,4 @@
-// Aplicación principal mejorada - SISTEMA COMPLETO CON COMENTARIOS Y ADJUNTOS
+// Aplicación principal mejorada - SISTEMA COMPLETO CON COMENTARIOS Y ADJUNTOS + COMPLETAR TAREA
 class FlotaApp {
     constructor() {
         this.currentSection = 'dashboard';
@@ -1080,6 +1080,43 @@ class FlotaApp {
         }
     }
 
+    // ===== FUNCIÓN PARA COMPLETAR TAREA =====
+    async completeTarea(tareaId) {
+        if (!confirm('¿Estás seguro de que quieres marcar esta tarea como completada?')) return;
+
+        try {
+            // Obtener la tarea actual
+            const tarea = await api.getTarea(tareaId);
+            if (!tarea) {
+                this.showToast('Tarea no encontrada', 'error');
+                return;
+            }
+
+            // Actualizar solo el estado a completada
+            const dataToUpdate = {
+                estado: 'completada'
+            };
+
+            await api.updateTarea(tareaId, dataToUpdate);
+            this.showToast('Tarea marcada como completada', 'success');
+
+            // Cerrar modal de detalle
+            this.closeTareaDetailModal();
+
+            // Refrescar la vista de tareas
+            await this.loadTareas();
+
+            // También refrescar el dashboard para actualizar contadores
+            if (this.currentSection === 'dashboard') {
+                await this.loadDashboard();
+            }
+
+        } catch (error) {
+            console.error('Error completing tarea:', error);
+            this.showToast('Error al completar la tarea', 'error');
+        }
+    }
+
     // ===== RENDER FUNCTIONS PARA DETALLE DE TAREA =====
     getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos, todosColaboradores) {
         const estadoClass = api.getTareaStatusBadgeClass(tarea.estado);
@@ -1090,6 +1127,9 @@ class FlotaApp {
             .filter(c => c.activo)
             .map(c => `<option value="${c.id}">${this.escapeHtml(c.nombre)}</option>`)
             .join('');
+
+        // Determinar si mostrar botón de completar
+        const showCompleteButton = tarea.estado !== 'completada' && tarea.estado !== 'cancelada';
 
         return `
             <div class="tarea-detail-modal">
@@ -1249,6 +1289,12 @@ class FlotaApp {
                 </div>
 
                 <div class="tarea-detail-footer">
+                    ${showCompleteButton ? `
+                    <button onclick="app.completeTarea(${tarea.id})" class="btn-complete-task">
+                        <i class="fas fa-check-circle"></i>
+                        Completar Tarea
+                    </button>
+                    ` : ''}
                     <button onclick="app.editTarea(${tarea.id})" class="btn-secondary-apple">
                         <i class="fas fa-edit"></i>
                         Editar Tarea
