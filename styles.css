@@ -1283,9 +1283,8 @@ body {
     box-shadow: var(--shadow-2xl);
     overflow: hidden;
     border: 1px solid var(--apple-gray-medium);
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .tarea-detail-header {
@@ -1318,9 +1317,6 @@ body {
 
 .tarea-detail-body {
     padding: var(--spacing-xl);
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
 }
 
 .tarea-detail-grid {
@@ -1328,6 +1324,7 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
+    width: 100%;
 }
 
 .tarea-detail-section {
@@ -1342,6 +1339,7 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    width: 100%;
 }
 
 .tarea-detail-field {
@@ -1633,12 +1631,11 @@ body {
     inset: 0;
     z-index: var(--z-modal);
     display: none;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     padding: var(--spacing-md);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    overflow-y: auto;
 }
 
 .modal-overlay:not(.hidden) {
@@ -1646,7 +1643,7 @@ body {
 }
 
 .modal-backdrop {
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     animation: backdropFadeIn 0.2s ease-out;
@@ -1662,15 +1659,13 @@ body {
     z-index: 10;
     width: 100%;
     max-width: 600px;
-    max-height: calc(100vh - 2rem);
-    margin: auto 0;
+    max-height: 90vh;
+    overflow-y: auto;
     animation: modalFadeIn 0.3s ease-out;
-    display: flex;
-    flex-direction: column;
 }
 
 .modal-wide {
-    max-width: 800px;
+    max-width: 900px;
 }
 
 @keyframes modalFadeIn {
@@ -1690,9 +1685,6 @@ body {
     box-shadow: var(--shadow-2xl);
     overflow: hidden;
     border: 1px solid var(--apple-gray-medium);
-    display: flex;
-    flex-direction: column;
-    max-height: 100%;
 }
 
 .modal-header-minimal {
@@ -1737,9 +1729,8 @@ body {
 
 .modal-body-minimal {
     padding: var(--spacing-xl);
+    max-height: 60vh;
     overflow-y: auto;
-    flex: 1;
-    min-height: 0;
 }
 
 .modal-footer-minimal {
@@ -1817,6 +1808,8 @@ body {
     background: var(--apple-white);
     transition: all var(--transition-normal);
     font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .input-minimal:focus {
@@ -1839,6 +1832,8 @@ body {
     cursor: pointer;
     transition: all var(--transition-normal);
     font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .select-minimal:focus {
@@ -1863,6 +1858,8 @@ body {
     background: var(--apple-gray-light);
     border-radius: var(--radius-lg);
     border: 1px solid var(--apple-gray-medium);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .section-title-minimal {
@@ -1879,6 +1876,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-lg);
+    width: 100%;
 }
 
 .input-group-minimal {
@@ -2037,6 +2035,13 @@ select:disabled {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1200px) {
+    /* Ajustar modales anchos en pantallas medianas-grandes */
+    .modal-wide {
+        max-width: 90vw;
+    }
+}
+
 @media (max-width: 1024px) {
     .main-content {
         padding: var(--spacing-lg) var(--spacing-md);
@@ -2060,6 +2065,15 @@ select:disabled {
 
     .tarea-detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Ajustar ancho de modales en tablets */
+    .modal-content {
+        max-width: 95vw;
+    }
+
+    .modal-wide {
+        max-width: 95vw;
     }
 }
 
@@ -2108,13 +2122,13 @@ select:disabled {
     }
 
     .modal-content {
-        margin: var(--spacing-xs);
-        max-height: calc(100vh - 1rem);
-        max-width: none;
+        margin: var(--spacing-sm);
+        max-height: 95vh;
+        max-width: calc(100vw - 2rem);
     }
 
     .modal-wide {
-        max-width: none;
+        max-width: calc(100vw - 2rem);
     }
 
     .toast-container {
@@ -2141,6 +2155,23 @@ select:disabled {
     .assign-collaborator-form .flex {
         flex-direction: column;
         gap: var(--spacing-sm);
+    }
+}
+
+@media (max-width: 600px) {
+    /* Forzar una columna en pantallas pequeñas para evitar overflow horizontal */
+    .form-grid-minimal,
+    .tarea-detail-grid,
+    .tarea-detail-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .modal-content {
+        max-width: calc(100vw - 1rem);
+    }
+
+    .modal-wide {
+        max-width: calc(100vw - 1rem);
     }
 }
 
@@ -2176,19 +2207,17 @@ select:disabled {
 
     .modal-overlay {
         padding: var(--spacing-xs);
-        align-items: stretch;
     }
 
     .modal-content {
         margin: 0;
-        max-height: 100vh;
-        border-radius: 0;
+        max-height: calc(100vh - 1rem);
+        max-width: calc(100vw - 1rem);
     }
 
     .modal-minimal,
     .tarea-detail-modal {
-        border-radius: 0;
-        height: 100vh;
+        border-radius: var(--radius-md);
     }
 
     .modal-header-minimal,
