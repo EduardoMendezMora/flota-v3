@@ -1283,8 +1283,9 @@ body {
     box-shadow: var(--shadow-2xl);
     overflow: hidden;
     border: 1px solid var(--apple-gray-medium);
-    max-height: 90vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
 }
 
 .tarea-detail-header {
@@ -1317,6 +1318,9 @@ body {
 
 .tarea-detail-body {
     padding: var(--spacing-xl);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .tarea-detail-grid {
@@ -1629,11 +1633,12 @@ body {
     inset: 0;
     z-index: var(--z-modal);
     display: none;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    overflow-y: auto;
 }
 
 .modal-overlay:not(.hidden) {
@@ -1641,7 +1646,7 @@ body {
 }
 
 .modal-backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     animation: backdropFadeIn 0.2s ease-out;
@@ -1657,9 +1662,11 @@ body {
     z-index: 10;
     width: 100%;
     max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: calc(100vh - 2rem);
+    margin: auto 0;
     animation: modalFadeIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-wide {
@@ -1683,6 +1690,9 @@ body {
     box-shadow: var(--shadow-2xl);
     overflow: hidden;
     border: 1px solid var(--apple-gray-medium);
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
 }
 
 .modal-header-minimal {
@@ -1727,8 +1737,9 @@ body {
 
 .modal-body-minimal {
     padding: var(--spacing-xl);
-    max-height: 60vh;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .modal-footer-minimal {
@@ -2097,8 +2108,9 @@ select:disabled {
     }
 
     .modal-content {
-        margin: var(--spacing-sm);
-        max-height: 95vh;
+        margin: var(--spacing-xs);
+        max-height: calc(100vh - 1rem);
+        max-width: none;
     }
 
     .modal-wide {
@@ -2160,6 +2172,23 @@ select:disabled {
     .vehicle-card-placa,
     .tarea-card-titulo {
         font-size: var(--font-size-xl);
+    }
+
+    .modal-overlay {
+        padding: var(--spacing-xs);
+        align-items: stretch;
+    }
+
+    .modal-content {
+        margin: 0;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .modal-minimal,
+    .tarea-detail-modal {
+        border-radius: 0;
+        height: 100vh;
     }
 
     .modal-header-minimal,
