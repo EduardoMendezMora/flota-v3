@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bootstrap - Flota</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Header Test -->
+    <header class="header-apple">
+        <div class="container">
+            <div class="row align-items-center py-3">
+                <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                        <div class="app-icon me-3">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div>
+                            <h1 class="app-title mb-0">Flota</h1>
+                            <p class="app-subtitle mb-0">Sistema de Administración</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto ms-auto">
+                    <div class="header-actions">
+                        <button class="header-btn me-2" title="Notificaciones">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="header-btn me-2" title="Perfil de usuario">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <button class="header-btn" title="Cambiar tema">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Test -->
+    <nav class="nav-apple">
+        <div class="container">
+            <div class="nav-container d-flex justify-content-center">
+                <button class="nav-item active me-3">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <span class="nav-label">Panel</span>
+                </button>
+                <button class="nav-item me-3">
+                    <div class="nav-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span class="nav-label">Empresas</span>
+                </button>
+                <button class="nav-item me-3">
+                    <div class="nav-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <span class="nav-label">Vehículos</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Test -->
+    <main class="main-content">
+        <div class="container">
+            <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="section-title mb-1">Test Bootstrap</h2>
+                    <p class="section-subtitle mb-0">Verificando que Bootstrap funcione correctamente</p>
+                </div>
+                <button class="btn-primary-apple">
+                    <i class="fas fa-plus me-2"></i>
+                    <span>Botón Test</span>
+                </button>
+            </div>
+
+            <!-- Stats Cards Test -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card stat-card-blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Empresas</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card stat-card-green">
+                        <div class="stat-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">25</div>
+                            <div class="stat-label">Vehículos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card stat-card-purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Colaboradores</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card stat-card-orange">
+                        <div class="stat-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Tareas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards Test -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="dashboard-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="card-title mb-0">Test Card 1</h3>
+                            <button class="card-action" title="Ver más detalles">
+                                <i class="fas fa-chart-pie"></i>
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <div class="chart-container">
+                                <i class="fas fa-chart-pie text-4xl mb-2 opacity-50"></i>
+                                <p>Contenido de prueba</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="dashboard-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="card-title mb-0">Test Card 2</h3>
+                            <button class="card-action" title="Ver más detalles">
+                                <i class="fas fa-tasks"></i>
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <div class="tareas-estado-grid">
+                                <div class="tarea-estado-item">
+                                    <div class="tarea-estado-number">3</div>
+                                    <div class="tarea-estado-label">Pendientes</div>
+                                </div>
+                                <div class="tarea-estado-item">
+                                    <div class="tarea-estado-number">2</div>
+                                    <div class="tarea-estado-label">En Progreso</div>
+                                </div>
+                                <div class="tarea-estado-item">
+                                    <div class="tarea-estado-number">3</div>
+                                    <div class="tarea-estado-label">Completadas</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Test -->
+            <div class="content-card mt-5">
+                <div class="card-tools mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" placeholder="Buscar...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Test Item 1</td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Test Item 2</td>
+                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

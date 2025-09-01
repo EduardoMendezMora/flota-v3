@@ -158,3 +158,4 @@ SELECT COUNT(*) as total_combustibles FROM public.combustibles;
 ---
 
 **📞 Soporte**: Si encuentras problemas durante la ejecución, revisa los logs de Supabase y verifica que todos los pasos se ejecutaron correctamente.
+
