@@ -19,7 +19,22 @@ class ModalManager {
             arrendadora_id: { required: true },
             estado_inventario_id: { required: true },
             vin: { pattern: FORM_CONSTANTS.validation.vinPattern },
-            link_fotos: { pattern: FORM_CONSTANTS.validation.urlPattern }
+            link_fotos: { pattern: FORM_CONSTANTS.validation.urlPattern },
+            color: { required: true, minLength: 2 },
+            carroceria: { required: true, minLength: 2 },
+            combustible: { required: true },
+            transmision: { required: true },
+            traccion: { required: true },
+            cilindrada: { required: true, min: 1 },
+            cilindros: { required: true, min: 1 },
+            ubicacion: { minLength: 2 },
+            renta_semanal: { min: 0 },
+            gastos_adms: { min: 0 },
+            plazo_semanas: { min: 0 },
+            cliente_actual: { minLength: 2 },
+            valor_adquisicion: { min: 0 },
+            fecha_adquisicion: { pattern: FORM_CONSTANTS.validation.datePattern },
+            grupo_whatsapp: { minLength: 2 }
         });
 
         this.validationRules.set('colaborador', {
@@ -137,21 +152,131 @@ class ModalManager {
         const title = isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo';
 
         return `
-            <div class="modal-minimal modal-wide">
+            <div class="modal-minimal modal-extra-wide">
                 ${this.getModalHeader(title)}
                 
                 <div class="modal-body-minimal">
                     <form id="vehiculo-form" class="form-minimal">
-                        <!-- Información Básica -->
-                        <div class="form-section-minimal">
-                            <h3 class="section-title-minimal">
-                                <i class="fas fa-info-circle"></i>
-                                Información Básica
-                            </h3>
-                            <div class="form-grid-minimal">
+                        <div class="form-three-columns">
+                            <!-- COLUMNA 1: Estatus y Comercial -->
+                            <div class="form-column">
+                                <h3 class="section-title-minimal">
+                                    <i class="fas fa-chart-line"></i>
+                                    Estatus y Comercial
+                                </h3>
+                                
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-estatus" class="label-minimal">
+                                        Estatus <span class="required">*</span>
+                                    </label>
+                                    <select id="vehiculo-estatus" class="select-minimal" required>
+                                        <option value="">Seleccionar estatus</option>
+                                        <option value="colocado" ${item?.estatus === 'colocado' ? 'selected' : ''}>Colocado</option>
+                                        <option value="disponible" ${item?.estatus === 'disponible' ? 'selected' : ''}>Disponible</option>
+                                        <option value="rentado" ${item?.estatus === 'rentado' ? 'selected' : ''}>Rentado</option>
+                                        <option value="mantenimiento" ${item?.estatus === 'mantenimiento' ? 'selected' : ''}>En Mantenimiento</option>
+                                        <option value="fuera_servicio" ${item?.estatus === 'fuera_servicio' ? 'selected' : ''}>Fuera de Servicio</option>
+                                    </select>
+                                    <div class="validation-error" id="vehiculo-estatus-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-estatus-inventario" class="label-minimal">
+                                        Estatus Inventario <span class="required">*</span>
+                                    </label>
+                                    <select id="vehiculo-estatus-inventario" class="select-minimal" required>
+                                        <option value="">Seleccionar estatus</option>
+                                    </select>
+                                    <div class="validation-error" id="vehiculo-estatus-inventario-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-ubicacion" class="label-minimal">Ubicación</label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-ubicacion" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.ubicacion)}" 
+                                        placeholder="Ubicación del vehículo"
+                                    >
+                                    <div class="validation-error" id="vehiculo-ubicacion-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-renta-semanal" class="label-minimal">
+                                        Renta Semanal (CRC) <span class="required">*</span>
+                                    </label>
+                                    <div class="input-group-minimal">
+                                        <span class="currency-prefix">₡</span>
+                                        <input 
+                                            type="number" 
+                                            id="vehiculo-renta-semanal" 
+                                            class="input-minimal" 
+                                            value="${item?.renta_semanal || ''}" 
+                                            min="0" 
+                                            step="1000"
+                                            placeholder="0"
+                                            required
+                                        >
+                                    </div>
+                                    <div class="validation-error" id="vehiculo-renta-semanal-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-gastos-adms" class="label-minimal">
+                                        Gastos Administrativos (CRC)
+                                    </label>
+                                    <div class="input-group-minimal">
+                                        <span class="currency-prefix">₡</span>
+                                        <input 
+                                            type="number" 
+                                            id="vehiculo-gastos-adms" 
+                                            class="input-minimal" 
+                                            value="${item?.gastos_adms || ''}" 
+                                            min="0" 
+                                            step="1000"
+                                            placeholder="0"
+                                        >
+                                    </div>
+                                    <div class="validation-error" id="vehiculo-gastos-adms-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-plazo-semanas" class="label-minimal">Plazo en Semanas</label>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-plazo-semanas" 
+                                        class="input-minimal" 
+                                        value="${item?.plazo_semanas || ''}" 
+                                        min="0" 
+                                        placeholder="0"
+                                    >
+                                    <div class="validation-error" id="vehiculo-plazo-semanas-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-cliente-actual" class="label-minimal">Cliente Actual</label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-cliente-actual" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.cliente_actual)}" 
+                                        placeholder="Cliente actual del vehículo"
+                                    >
+                                    <div class="validation-error" id="vehiculo-cliente-actual-error"></div>
+                                </div>
+                            </div>
+
+                            <!-- COLUMNA 2: Especificaciones -->
+                            <div class="form-column">
+                                <h3 class="section-title-minimal">
+                                    <i class="fas fa-cogs"></i>
+                                    Especificaciones
+                                </h3>
+                                
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-placa" class="label-minimal">
-                                        Placa <span class="required">*</span>
+                                        Placas <span class="required">*</span>
                                     </label>
                                     <input 
                                         type="text" 
@@ -161,11 +286,15 @@ class ModalManager {
                                         placeholder="${FORM_CONSTANTS.placeholders.placa}"
                                         maxlength="10"
                                         required
+                                        style="text-transform: uppercase;"
                                     >
                                     <div class="validation-error" id="vehiculo-placa-error"></div>
                                 </div>
+
                                 <div class="form-field-minimal">
-                                    <label for="vehiculo-vin" class="label-minimal">VIN</label>
+                                    <label for="vehiculo-vin" class="label-minimal">
+                                        VIN / Serie <span class="required">*</span>
+                                    </label>
                                     <input 
                                         type="text" 
                                         id="vehiculo-vin" 
@@ -174,9 +303,11 @@ class ModalManager {
                                         placeholder="${FORM_CONSTANTS.placeholders.vin}"
                                         maxlength="17"
                                         style="text-transform: uppercase;"
+                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-vin-error"></div>
                                 </div>
+
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-anio" class="label-minimal">
                                         Año <span class="required">*</span>
@@ -192,16 +323,116 @@ class ModalManager {
                                     >
                                     <div class="validation-error" id="vehiculo-anio-error"></div>
                                 </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-color" class="label-minimal">
+                                        Color <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-color" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.color)}" 
+                                        placeholder="Color del vehículo"
+                                        required
+                                    >
+                                    <div class="validation-error" id="vehiculo-color-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-carroceria" class="label-minimal">
+                                        Carrocería <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-carroceria" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.carroceria)}" 
+                                        placeholder="Ej: Sedan, 4 Puertas Hatchback"
+                                        required
+                                    >
+                                    <div class="validation-error" id="vehiculo-carroceria-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-combustible" class="label-minimal">
+                                        Combustible <span class="required">*</span>
+                                    </label>
+                                    <select id="vehiculo-combustible" class="select-minimal" required>
+                                        <option value="">Seleccionar combustible</option>
+                                        <option value="gasolina" ${item?.combustible === 'gasolina' ? 'selected' : ''}>Gasolina</option>
+                                        <option value="diesel" ${item?.combustible === 'diesel' ? 'selected' : ''}>Diesel</option>
+                                        <option value="electrico" ${item?.combustible === 'electrico' ? 'selected' : ''}>Eléctrico</option>
+                                        <option value="hibrido" ${item?.combustible === 'hibrido' ? 'selected' : ''}>Híbrido</option>
+                                    </select>
+                                    <div class="validation-error" id="vehiculo-combustible-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-transmision" class="label-minimal">
+                                        Transmisión <span class="required">*</span>
+                                    </label>
+                                    <select id="vehiculo-transmision" class="select-minimal" required>
+                                        <option value="">Seleccionar transmisión</option>
+                                        <option value="manual" ${item?.transmision === 'manual' ? 'selected' : ''}>Manual</option>
+                                        <option value="automatica" ${item?.transmision === 'automatica' ? 'selected' : ''}>Automática</option>
+                                    </select>
+                                    <div class="validation-error" id="vehiculo-transmision-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-traccion" class="label-minimal">
+                                        Tracción <span class="required">*</span>
+                                    </label>
+                                    <select id="vehiculo-traccion" class="select-minimal" required>
+                                        <option value="">Seleccionar tracción</option>
+                                        <option value="4x2" ${item?.traccion === '4x2' ? 'selected' : ''}>4X2</option>
+                                        <option value="4x4" ${item?.traccion === '4x4' ? 'selected' : ''}>4X4</option>
+                                        <option value="awd" ${item?.traccion === 'awd' ? 'selected' : ''}>AWD</option>
+                                    </select>
+                                    <div class="validation-error" id="vehiculo-traccion-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-cilindrada" class="label-minimal">
+                                        Cilindrada <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-cilindrada" 
+                                        class="input-minimal" 
+                                        value="${item?.cilindrada || ''}" 
+                                        min="1" 
+                                        placeholder="1300"
+                                        required
+                                    >
+                                    <div class="validation-error" id="vehiculo-cilindrada-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-cilindros" class="label-minimal">
+                                        Cilindros <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-cilindros" 
+                                        class="input-minimal" 
+                                        value="${item?.cilindros || ''}" 
+                                        min="1" 
+                                        placeholder="4"
+                                        required
+                                    >
+                                    <div class="validation-error" id="vehiculo-cilindros-error"></div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- Marca y Modelo -->
-                        <div class="form-section-minimal">
-                            <h3 class="section-title-minimal">
-                                <i class="fas fa-tags"></i>
-                                Marca y Modelo
-                            </h3>
-                            <div class="form-grid-minimal">
+
+                            <!-- COLUMNA 3: Arrendadora -->
+                            <div class="form-column">
+                                <h3 class="section-title-minimal">
+                                    <i class="fas fa-building"></i>
+                                    Arrendadora
+                                </h3>
+                                
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-marca" class="label-minimal">
                                         Marca <span class="required">*</span>
@@ -217,6 +448,7 @@ class ModalManager {
                                     </div>
                                     <div class="validation-error" id="vehiculo-marca-error"></div>
                                 </div>
+
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-modelo" class="label-minimal">
                                         Modelo <span class="required">*</span>
@@ -232,98 +464,116 @@ class ModalManager {
                                     </div>
                                     <div class="validation-error" id="vehiculo-modelo-error"></div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Asignación -->
-                        <div class="form-section-minimal">
-                            <h3 class="section-title-minimal">
-                                <i class="fas fa-link"></i>
-                                Asignación
-                            </h3>
-                            <div class="form-grid-minimal">
+
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-arrendadora" class="label-minimal">
-                                        Arrendadora <span class="required">*</span>
+                                        Empresa <span class="required">*</span>
                                     </label>
                                     <select id="vehiculo-arrendadora" class="select-minimal" required>
                                         <option value="">Seleccionar arrendadora</option>
                                     </select>
                                     <div class="validation-error" id="vehiculo-arrendadora-error"></div>
                                 </div>
+
                                 <div class="form-field-minimal">
-                                    <label for="vehiculo-estado" class="label-minimal">
-                                        Estado <span class="required">*</span>
-                                    </label>
-                                    <select id="vehiculo-estado" class="select-minimal" required>
-                                        <option value="">Seleccionar estado</option>
-                                    </select>
-                                    <div class="validation-error" id="vehiculo-estado-error"></div>
+                                    <label for="vehiculo-cedula-juridica" class="label-minimal">Cédula Jurídica</label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-cedula-juridica" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.cedula_juridica)}" 
+                                        placeholder="3101672906"
+                                        readonly
+                                    >
+                                    <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Información Económica -->
-                        <div class="form-section-minimal">
-                            <h3 class="section-title-minimal">
-                                <i class="fas fa-dollar-sign"></i>
-                                Información Económica
-                            </h3>
-                            <div class="form-grid-minimal">
+
                                 <div class="form-field-minimal">
-                                    <label for="vehiculo-precio" class="label-minimal">
-                                        Precio Semanal (CRC)
-                                    </label>
+                                    <label for="vehiculo-apoderado" class="label-minimal">Apoderado</label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-apoderado" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.apoderado)}" 
+                                        placeholder="Eduardo Estivie Méndez Mora"
+                                        readonly
+                                    >
+                                    <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-cedula-apoderado" class="label-minimal">Cédula Apoderado</label>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-cedula-apoderado" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.cedula_apoderado)}" 
+                                        placeholder="112220831"
+                                        readonly
+                                    >
+                                    <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-valor-adquisicion" class="label-minimal">Valor Adquisición (CRC)</label>
                                     <div class="input-group-minimal">
                                         <span class="currency-prefix">₡</span>
                                         <input 
                                             type="number" 
-                                            id="vehiculo-precio" 
+                                            id="vehiculo-valor-adquisicion" 
                                             class="input-minimal" 
-                                            value="${item?.precio_semanal || ''}" 
+                                            value="${item?.valor_adquisicion || ''}" 
                                             min="0" 
                                             step="1000"
                                             placeholder="0"
                                         >
                                     </div>
-                                    <div class="validation-error" id="vehiculo-precio-error"></div>
+                                    <div class="validation-error" id="vehiculo-valor-adquisicion-error"></div>
                                 </div>
+
                                 <div class="form-field-minimal">
-                                    <label for="vehiculo-gastos" class="label-minimal">
-                                        Gastos Administrativos (CRC)
+                                    <label for="vehiculo-fecha-adquisicion" class="label-minimal">Fecha Adquisición</label>
+                                    <input 
+                                        type="date" 
+                                        id="vehiculo-fecha-adquisicion" 
+                                        class="input-minimal" 
+                                        value="${item?.fecha_adquisicion || ''}" 
+                                    >
+                                    <div class="validation-error" id="vehiculo-fecha-adquisicion-error"></div>
+                                </div>
+
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-grupo-whatsapp" class="label-minimal">
+                                        <i class="fab fa-whatsapp"></i>
+                                        Grupo WhatsApp
                                     </label>
-                                    <div class="input-group-minimal">
-                                        <span class="currency-prefix">₡</span>
-                                        <input 
-                                            type="number" 
-                                            id="vehiculo-gastos" 
-                                            class="input-minimal" 
-                                            value="${item?.gastos_adms || ''}" 
-                                            min="0" 
-                                            step="1000"
-                                            placeholder="0"
-                                        >
-                                    </div>
-                                    <div class="validation-error" id="vehiculo-gastos-error"></div>
+                                    <input 
+                                        type="text" 
+                                        id="vehiculo-grupo-whatsapp" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.grupo_whatsapp)}" 
+                                        placeholder="Mante / BHV852"
+                                    >
+                                    <div class="validation-error" id="vehiculo-grupo-whatsapp-error"></div>
+                                </div>
+
+                                <!-- Fotos -->
+                                <div class="form-field-minimal">
+                                    <label for="vehiculo-fotos" class="label-minimal">
+                                        <i class="fas fa-images"></i>
+                                        Link de Fotos
+                                    </label>
+                                    <input 
+                                        type="url" 
+                                        id="vehiculo-fotos" 
+                                        class="input-minimal" 
+                                        value="${this.escapeValue(item?.link_fotos)}" 
+                                        placeholder="${FORM_CONSTANTS.placeholders.fotos}"
+                                    >
+                                    <p class="help-text">URL donde se encuentran las fotos del vehículo</p>
+                                    <div class="validation-error" id="vehiculo-fotos-error"></div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Fotos -->
-                        <div class="form-field-minimal">
-                            <label for="vehiculo-fotos" class="label-minimal">
-                                <i class="fas fa-images"></i>
-                                Link de Fotos
-                            </label>
-                            <input 
-                                type="url" 
-                                id="vehiculo-fotos" 
-                                class="input-minimal" 
-                                value="${this.escapeValue(item?.link_fotos)}" 
-                                placeholder="${FORM_CONSTANTS.placeholders.fotos}"
-                            >
-                            <p class="help-text">URL donde se encuentran las fotos del vehículo</p>
-                            <div class="validation-error" id="vehiculo-fotos-error"></div>
                         </div>
                     </form>
                 </div>
@@ -351,9 +601,9 @@ class ModalManager {
             arrendadoraSelect.innerHTML = '<option value="">Seleccionar arrendadora</option>' +
                 arrendadoras.map(a => `<option value="${a.id}">${this.escapeHtml(a.nombre)}</option>`).join('');
 
-            // Llenar select de estados
-            const estadoSelect = document.getElementById('vehiculo-estado');
-            estadoSelect.innerHTML = '<option value="">Seleccionar estado</option>' +
+            // Llenar select de estados de inventario
+            const estadoInventarioSelect = document.getElementById('vehiculo-estatus-inventario');
+            estadoInventarioSelect.innerHTML = '<option value="">Seleccionar estatus</option>' +
                 estados.map(e => `<option value="${e.id}">${this.escapeHtml(e.nombre)}</option>`).join('');
 
             // Configurar event listeners
@@ -362,16 +612,92 @@ class ModalManager {
                 this.toggleModeloButton();
             });
 
+            // Event listener para arrendadora (llenar campos automáticamente)
+            arrendadoraSelect.addEventListener('change', async (e) => {
+                if (e.target.value) {
+                    const arrendadora = arrendadoras.find(a => a.id == e.target.value);
+                    if (arrendadora) {
+                        document.getElementById('vehiculo-cedula-juridica').value = arrendadora.cedula_juridica || '';
+                        document.getElementById('vehiculo-apoderado').value = arrendadora.apoderado || '';
+                        document.getElementById('vehiculo-cedula-apoderado').value = arrendadora.cedula_apoderado || '';
+                    }
+                } else {
+                    document.getElementById('vehiculo-cedula-juridica').value = '';
+                    document.getElementById('vehiculo-apoderado').value = '';
+                    document.getElementById('vehiculo-cedula-apoderado').value = '';
+                }
+            });
+
             // Si estamos editando, seleccionar valores
             if (item) {
                 marcaSelect.value = item.marca_id || '';
                 arrendadoraSelect.value = item.arrendadora_id || '';
-                estadoSelect.value = item.estado_inventario_id || '';
+                estadoInventarioSelect.value = item.estado_inventario_id || '';
+                
+                // Llenar campos de estatus
+                if (item.estatus) {
+                    document.getElementById('vehiculo-estatus').value = item.estatus;
+                }
+                if (item.ubicacion) {
+                    document.getElementById('vehiculo-ubicacion').value = item.ubicacion;
+                }
+                if (item.renta_semanal) {
+                    document.getElementById('vehiculo-renta-semanal').value = item.renta_semanal;
+                }
+                if (item.gastos_adms) {
+                    document.getElementById('vehiculo-gastos-adms').value = item.gastos_adms;
+                }
+                if (item.plazo_semanas) {
+                    document.getElementById('vehiculo-plazo-semanas').value = item.plazo_semanas;
+                }
+                if (item.cliente_actual) {
+                    document.getElementById('vehiculo-cliente-actual').value = item.cliente_actual;
+                }
+                if (item.color) {
+                    document.getElementById('vehiculo-color').value = item.color;
+                }
+                if (item.carroceria) {
+                    document.getElementById('vehiculo-carroceria').value = item.carroceria;
+                }
+                if (item.combustible) {
+                    document.getElementById('vehiculo-combustible').value = item.combustible;
+                }
+                if (item.transmision) {
+                    document.getElementById('vehiculo-transmision').value = item.transmision;
+                }
+                if (item.traccion) {
+                    document.getElementById('vehiculo-traccion').value = item.traccion;
+                }
+                if (item.cilindrada) {
+                    document.getElementById('vehiculo-cilindrada').value = item.cilindrada;
+                }
+                if (item.cilindros) {
+                    document.getElementById('vehiculo-cilindros').value = item.cilindros;
+                }
+                if (item.valor_adquisicion) {
+                    document.getElementById('vehiculo-valor-adquisicion').value = item.valor_adquisicion;
+                }
+                if (item.fecha_adquisicion) {
+                    document.getElementById('vehiculo-fecha-adquisicion').value = item.fecha_adquisicion;
+                }
+                if (item.grupo_whatsapp) {
+                    document.getElementById('vehiculo-grupo-whatsapp').value = item.grupo_whatsapp;
+                }
 
                 // Cargar modelos de la marca seleccionada
                 if (item.marca_id) {
                     await this.loadModelosForMarca(item.marca_id);
                     document.getElementById('vehiculo-modelo').value = item.modelo_id || '';
+                }
+
+                // Llenar campos de arrendadora si existe
+                if (item.arrendadora_id) {
+                    const arrendadora = arrendadoras.find(a => a.id == item.arrendadora_id);
+                    if (arrendadora) {
+                        document.getElementById('vehiculo-cedula-juridica').value = arrendadora.cedula_juridica || '';
+                        document.getElementById('vehiculo-apoderado').value = arrendadora.apoderado || '';
+                        document.getElementById('vehiculo-cedula-apoderado').value = arrendadora.cedula_apoderado || '';
+                    }
                 }
             }
 
@@ -950,14 +1276,28 @@ class ModalManager {
             case 'vehiculo':
                 return {
                     placa: document.getElementById('vehiculo-placa').value.trim().toUpperCase(),
-                    vin: document.getElementById('vehiculo-vin').value.trim().toUpperCase() || null,
+                    vin: document.getElementById('vehiculo-vin').value.trim().toUpperCase(),
                     marca_id: parseInt(document.getElementById('vehiculo-marca').value),
                     modelo_id: parseInt(document.getElementById('vehiculo-modelo').value),
                     anio: parseInt(document.getElementById('vehiculo-anio').value),
                     arrendadora_id: parseInt(document.getElementById('vehiculo-arrendadora').value),
-                    estado_inventario_id: parseInt(document.getElementById('vehiculo-estado').value),
-                    precio_semanal: parseFloat(document.getElementById('vehiculo-precio').value) || null,
-                    gastos_adms: parseFloat(document.getElementById('vehiculo-gastos').value) || null,
+                    estado_inventario_id: parseInt(document.getElementById('vehiculo-estatus-inventario').value),
+                    estatus: document.getElementById('vehiculo-estatus').value,
+                    ubicacion: document.getElementById('vehiculo-ubicacion').value.trim() || null,
+                    renta_semanal: parseFloat(document.getElementById('vehiculo-renta-semanal').value) || null,
+                    gastos_adms: parseFloat(document.getElementById('vehiculo-gastos-adms').value) || null,
+                    plazo_semanas: parseInt(document.getElementById('vehiculo-plazo-semanas').value) || null,
+                    cliente_actual: document.getElementById('vehiculo-cliente-actual').value.trim() || null,
+                    color: document.getElementById('vehiculo-color').value.trim(),
+                    carroceria: document.getElementById('vehiculo-carroceria').value.trim(),
+                    combustible: document.getElementById('vehiculo-combustible').value,
+                    transmision: document.getElementById('vehiculo-transmision').value,
+                    traccion: document.getElementById('vehiculo-traccion').value,
+                    cilindrada: parseInt(document.getElementById('vehiculo-cilindrada').value),
+                    cilindros: parseInt(document.getElementById('vehiculo-cilindros').value),
+                    valor_adquisicion: parseFloat(document.getElementById('vehiculo-valor-adquisicion').value) || null,
+                    fecha_adquisicion: document.getElementById('vehiculo-fecha-adquisicion').value || null,
+                    grupo_whatsapp: document.getElementById('vehiculo-grupo-whatsapp').value.trim() || null,
                     link_fotos: document.getElementById('vehiculo-fotos').value.trim() || null
                 };
             case 'colaborador':

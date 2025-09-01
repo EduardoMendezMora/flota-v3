@@ -1021,14 +1021,26 @@ class ApiService {
         const sanitized = this.sanitizeData(data);
 
         // Validaciones específicas para vehículos
-        if (sanitized.precio_semanal) {
-            sanitized.precio_semanal = parseFloat(sanitized.precio_semanal);
+        if (sanitized.renta_semanal) {
+            sanitized.renta_semanal = parseFloat(sanitized.renta_semanal);
         }
         if (sanitized.gastos_adms) {
             sanitized.gastos_adms = parseFloat(sanitized.gastos_adms);
         }
         if (sanitized.anio) {
             sanitized.anio = parseInt(sanitized.anio);
+        }
+        if (sanitized.plazo_semanas) {
+            sanitized.plazo_semanas = parseInt(sanitized.plazo_semanas);
+        }
+        if (sanitized.cilindrada) {
+            sanitized.cilindrada = parseInt(sanitized.cilindrada);
+        }
+        if (sanitized.cilindros) {
+            sanitized.cilindros = parseInt(sanitized.cilindros);
+        }
+        if (sanitized.valor_adquisicion) {
+            sanitized.valor_adquisicion = parseFloat(sanitized.valor_adquisicion);
         }
 
         return sanitized;

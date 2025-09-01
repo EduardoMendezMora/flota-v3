@@ -120,7 +120,8 @@ const FORM_CONSTANTS = {
         urlPattern: /^https?:\/\/.+/,
         emailPattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         phonePattern: /^[\d\-\(\)\s\+]+$/,
-        identificacionPattern: /^[\d\-]+$/
+        identificacionPattern: /^[\d\-]+$/,
+        datePattern: /^\d{4}-\d{2}-\d{2}$/
     },
     limits: {
         maxFileSize: 10 * 1024 * 1024, // 10MB
