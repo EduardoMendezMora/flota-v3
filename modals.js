@@ -1568,42 +1568,42 @@ class ModalManager {
                         <!-- Contenido de las Pestañas -->
                         <div class="tab-content">
                             <!-- Pestaña: Información General -->
-                            <div class="tab-pane active" id="tab-general">
+                            <div class="tab-pane active" data-tab-pane="general">
                                 ${this.getVehiculoGeneralTab(item)}
                             </div>
 
                             <!-- Pestaña: Galería -->
-                            <div class="tab-pane" id="tab-galeria">
+                            <div class="tab-pane" data-tab-pane="galeria">
                                 ${this.getVehiculoGaleriaTab(item)}
                             </div>
 
                             <!-- Pestaña: Tareas -->
-                            <div class="tab-pane" id="tab-tareas">
+                            <div class="tab-pane" data-tab-pane="tareas">
                                 ${this.getVehiculoTareasTab(item)}
                             </div>
 
                             <!-- Pestaña: Inspecciones -->
-                            <div class="tab-pane" id="tab-inspecciones">
+                            <div class="tab-pane" data-tab-pane="inspecciones">
                                 ${this.getVehiculoInspeccionesTab(item)}
                             </div>
 
                             <!-- Pestaña: Bitácora -->
-                            <div class="tab-pane" id="tab-bitacora">
+                            <div class="tab-pane" data-tab-pane="bitacora">
                                 ${this.getVehiculoBitacoraTab(item)}
                             </div>
 
                             <!-- Pestaña: Kilometraje -->
-                            <div class="tab-pane" id="tab-kilometraje">
+                            <div class="tab-pane" data-tab-pane="kilometraje">
                                 ${this.getVehiculoKilometrajeTab(item)}
                             </div>
 
                             <!-- Pestaña: GPS -->
-                            <div class="tab-pane" id="tab-gps">
+                            <div class="tab-pane" data-tab-pane="gps">
                                 ${this.getVehiculoGPSTab(item)}
                             </div>
 
                             <!-- Pestaña: Repuestos -->
-                            <div class="tab-pane" id="tab-repuestos">
+                            <div class="tab-pane" data-tab-pane="repuestos">
                                 ${this.getVehiculoRepuestosTab(item)}
                             </div>
                         </div>

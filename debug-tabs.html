@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Pestañas de Vehículos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        .debug-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .debug-button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .debug-button.primary { background: #007bff; color: white; }
+        .debug-button.success { background: #28a745; color: white; }
+        .debug-button.warning { background: #ffc107; color: black; }
+        .debug-button.danger { background: #dc3545; color: white; }
+        
+        .debug-output {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">🐛 Debug de Pestañas de Vehículos</h1>
+        
+        <div class="debug-container">
+            <h4>1. Verificar Componentes</h4>
+            <button class="debug-button primary" onclick="checkComponents()">Verificar Componentes</button>
+            <div id="components-output" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-container">
+            <h4>2. Generar HTML del Modal</h4>
+            <button class="debug-button success" onclick="generateModalHTML()">Generar HTML</button>
+            <div id="html-output" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-container">
+            <h4>3. Mostrar Modal Simple</h4>
+            <button class="debug-button warning" onclick="showSimpleModal()">Mostrar Modal</button>
+            <div id="modal-output" class="debug-output"></div>
+        </div>
+        
+        <div class="debug-container">
+            <h4>4. Probar Navegación de Pestañas</h4>
+            <button class="debug-button danger" onclick="testTabNavigation()">Probar Navegación</button>
+            <div id="navigation-output" class="debug-output"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+
+    <script>
+        function log(message, outputId) {
+            const output = document.getElementById(outputId);
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function checkComponents() {
+            const output = document.getElementById('components-output');
+            output.textContent = '';
+            
+            log('🔍 Verificando componentes del sistema...', 'components-output');
+            
+            // Verificar API
+            if (window.api) {
+                log('✅ API disponible', 'components-output');
+                log(`   - Tipo: ${typeof window.api}`, 'components-output');
+                log(`   - Métodos: ${Object.keys(window.api).length}`, 'components-output');
+            } else {
+                log('❌ API NO disponible', 'components-output');
+            }
+            
+            // Verificar App
+            if (window.app) {
+                log('✅ App disponible', 'components-output');
+                log(`   - Tipo: ${typeof window.app}`, 'components-output');
+                log(`   - Métodos: ${Object.keys(window.app).length}`, 'components-output');
+            } else {
+                log('❌ App NO disponible', 'components-output');
+            }
+            
+            // Verificar ModalManager
+            if (window.modalManager) {
+                log('✅ ModalManager disponible', 'components-output');
+                log(`   - Tipo: ${typeof window.modalManager}`, 'components-output');
+                log(`   - Métodos: ${Object.keys(window.modalManager).length}`, 'components-output');
+            } else {
+                log('❌ ModalManager NO disponible', 'components-output');
+            }
+            
+            // Verificar VehiculoTabsManager
+            if (window.vehiculoTabsManager) {
+                log('✅ VehiculoTabsManager disponible', 'components-output');
+                log(`   - Tipo: ${typeof window.vehiculoTabsManager}`, 'components-output');
+                log(`   - Pestaña actual: ${window.vehiculoTabsManager.currentTab}`, 'components-output');
+            } else {
+                log('❌ VehiculoTabsManager NO disponible', 'components-output');
+            }
+        }
+
+        function generateModalHTML() {
+            const output = document.getElementById('html-output');
+            output.textContent = '';
+            
+            log('📋 Generando HTML del modal...', 'html-output');
+            
+            if (!window.modalManager) {
+                log('❌ ModalManager no disponible', 'html-output');
+                return;
+            }
+            
+            const vehiculoTest = {
+                id: 'test-vehiculo-id',
+                placas: 'ABC-123',
+                numero_economico: '001',
+                marca: 'Toyota',
+                modelo: 'Corolla',
+                anio: 2020,
+                color: 'Blanco',
+                kilometraje_actual: 50000
+            };
+            
+            try {
+                const modalHTML = window.modalManager.getVehiculoModalWithTabs(vehiculoTest);
+                log('✅ HTML generado exitosamente', 'html-output');
+                log(`   - Longitud: ${modalHTML.length} caracteres`, 'html-output');
+                log(`   - Contiene pestañas: ${modalHTML.includes('tab-navigation') ? 'SÍ' : 'NO'}`, 'html-output');
+                log(`   - Contiene tab-content: ${modalHTML.includes('tab-content') ? 'SÍ' : 'NO'}`, 'html-output');
+                log(`   - Contiene tab-pane: ${modalHTML.includes('tab-pane') ? 'SÍ' : 'NO'}`, 'html-output');
+                
+                // Mostrar una parte del HTML
+                const preview = modalHTML.substring(0, 500) + '...';
+                log('📄 Vista previa del HTML:', 'html-output');
+                log(preview, 'html-output');
+                
+            } catch (error) {
+                log(`❌ Error generando HTML: ${error.message}`, 'html-output');
+                log(`   - Stack: ${error.stack}`, 'html-output');
+            }
+        }
+
+        function showSimpleModal() {
+            const output = document.getElementById('modal-output');
+            output.textContent = '';
+            
+            log('🚗 Mostrando modal simple...', 'modal-output');
+            
+            if (!window.modalManager) {
+                log('❌ ModalManager no disponible', 'modal-output');
+                return;
+            }
+            
+            const vehiculoTest = {
+                id: 'test-vehiculo-id',
+                placas: 'ABC-123',
+                numero_economico: '001',
+                marca: 'Toyota',
+                modelo: 'Corolla',
+                anio: 2020,
+                color: 'Blanco',
+                kilometraje_actual: 50000
+            };
+            
+            try {
+                // Crear modal overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'debug-modal-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 16px;
+                    padding: 20px;
+                    max-width: 90vw;
+                    max-height: 90vh;
+                    overflow: auto;
+                `;
+                
+                modalContent.innerHTML = window.modalManager.getVehiculoModalWithTabs(vehiculoTest);
+                
+                overlay.appendChild(modalContent);
+                document.body.appendChild(overlay);
+                
+                log('✅ Modal mostrado exitosamente', 'modal-output');
+                log('   - Haz clic fuera del modal para cerrarlo', 'modal-output');
+                
+                // Cerrar modal al hacer clic en el overlay
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        log('🔒 Modal cerrado', 'modal-output');
+                    }
+                });
+                
+            } catch (error) {
+                log(`❌ Error mostrando modal: ${error.message}`, 'modal-output');
+            }
+        }
+
+        function testTabNavigation() {
+            const output = document.getElementById('navigation-output');
+            output.textContent = '';
+            
+            log('🧪 Probando navegación de pestañas...', 'navigation-output');
+            
+            if (!window.vehiculoTabsManager) {
+                log('❌ VehiculoTabsManager no disponible', 'navigation-output');
+                return;
+            }
+            
+            // Configurar ID del vehículo
+            window.vehiculoTabsManager.setVehiculoId('test-vehiculo-id');
+            log('✅ ID del vehículo configurado', 'navigation-output');
+            
+            // Probar cambio de pestañas
+            const tabs = ['galeria', 'tareas', 'inspecciones', 'bitacora', 'kilometraje', 'gps', 'repuestos'];
+            
+            tabs.forEach((tab, index) => {
+                setTimeout(() => {
+                    log(`🔄 Cambiando a pestaña: ${tab}`, 'navigation-output');
+                    window.vehiculoTabsManager.switchTab(tab);
+                    
+                    setTimeout(() => {
+                        const currentTab = window.vehiculoTabsManager.currentTab;
+                        log(`   - Pestaña actual: ${currentTab}`, 'navigation-output');
+                        
+                        if (currentTab === tab) {
+                            log(`   ✅ Pestaña ${tab} activada correctamente`, 'navigation-output');
+                        } else {
+                            log(`   ❌ Error: pestaña actual es ${currentTab}, esperada ${tab}`, 'navigation-output');
+                        }
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // Verificar componentes al cargar
+        window.addEventListener('load', function() {
+            setTimeout(checkComponents, 500);
+        });
+    </script>
+</body>
+</html>

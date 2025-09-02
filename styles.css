@@ -1028,3 +1028,129 @@ textarea:focus {
         min-width: auto;
     }
 }
+
+/* ========================================
+   MODAL OVERLAY Y CONTENIDO
+   ======================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--apple-white);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-extra-wide {
+    width: 95vw;
+    max-width: 1400px;
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95vw;
+        max-height: 95vh;
+        margin: 10px;
+    }
+    
+    .modal-extra-wide {
+        width: 95vw;
+        max-width: none;
+    }
+    
+    .tab-navigation {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .tab-button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .galeria-controls,
+    .tareas-controls,
+    .inspecciones-controls,
+    .bitacora-controls,
+    .kilometraje-controls,
+    .gps-controls,
+    .repuestos-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .tareas-filtros,
+    .inspecciones-filtros,
+    .kilometraje-filtros,
+    .gps-filtros,
+    .repuestos-filtros {
+        flex-direction: column;
+    }
+    
+    .form-select {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-navigation {
+        gap: var(--spacing-xs);
+    }
+    
+    .tab-button {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .tab-content {
+        padding: var(--spacing-md);
+    }
+}

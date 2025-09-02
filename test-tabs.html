@@ -27,6 +27,13 @@
                         <button class="btn btn-primary" onclick="testVehiculoTabs()">
                             <i class="fas fa-car"></i> Abrir Modal de Vehículo
                         </button>
+                        
+                        <div class="mt-3">
+                            <h6>Estado del Sistema:</h6>
+                            <div id="system-status">
+                                <p>Verificando componentes...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -41,6 +48,47 @@
     <script src="vehiculo-tabs.js"></script>
 
     <script>
+        // Verificar estado del sistema al cargar
+        window.addEventListener('load', function() {
+            checkSystemStatus();
+        });
+
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            let status = '<ul class="list-unstyled">';
+            
+            // Verificar API
+            if (window.api) {
+                status += '<li><i class="fas fa-check text-success"></i> API disponible</li>';
+            } else {
+                status += '<li><i class="fas fa-times text-danger"></i> API NO disponible</li>';
+            }
+            
+            // Verificar App
+            if (window.app) {
+                status += '<li><i class="fas fa-check text-success"></i> App disponible</li>';
+            } else {
+                status += '<li><i class="fas fa-times text-danger"></i> App NO disponible</li>';
+            }
+            
+            // Verificar ModalManager
+            if (window.modalManager) {
+                status += '<li><i class="fas fa-check text-success"></i> ModalManager disponible</li>';
+            } else {
+                status += '<li><i class="fas fa-times text-danger"></i> ModalManager NO disponible</li>';
+            }
+            
+            // Verificar VehiculoTabsManager
+            if (window.vehiculoTabsManager) {
+                status += '<li><i class="fas fa-check text-success"></i> VehiculoTabsManager disponible</li>';
+            } else {
+                status += '<li><i class="fas fa-times text-danger"></i> VehiculoTabsManager NO disponible</li>';
+            }
+            
+            status += '</ul>';
+            statusDiv.innerHTML = status;
+        }
+
         // Mock de la API para testing
         window.api = {
             currentUser: {
@@ -65,6 +113,46 @@
             showToast: (message, type) => {
                 console.log(`Toast [${type}]:`, message);
                 alert(`${type.toUpperCase()}: ${message}`);
+            },
+            openModal: function(type, item) {
+                console.log('🚗 Abriendo modal:', type, item);
+                
+                if (type === 'vehiculo' && item) {
+                    // Crear modal con pestañas
+                    const modalHTML = window.modalManager.getVehiculoModalWithTabs(item);
+                    console.log('📋 HTML del modal:', modalHTML);
+                    
+                    // Crear modal overlay
+                    const overlay = document.createElement('div');
+                    overlay.id = 'modal-overlay';
+                    overlay.className = 'modal-overlay';
+                    overlay.innerHTML = `
+                        <div class="modal-content modal-extra-wide">
+                            ${modalHTML}
+                        </div>
+                    `;
+                    
+                    // Agregar al body
+                    document.body.appendChild(overlay);
+                    
+                    // Mostrar modal
+                    setTimeout(() => {
+                        overlay.classList.add('show');
+                    }, 100);
+                    
+                    // Configurar tabs manager
+                    if (window.vehiculoTabsManager) {
+                        window.vehiculoTabsManager.setVehiculoId(item.id);
+                        console.log('✅ VehiculoTabsManager configurado para:', item.id);
+                    }
+                    
+                    // Cerrar modal al hacer clic en el overlay
+                    overlay.addEventListener('click', function(e) {
+                        if (e.target === overlay) {
+                            overlay.remove();
+                        }
+                    });
+                }
             }
         };
 
