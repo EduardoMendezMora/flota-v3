@@ -290,11 +290,11 @@ class FlotaApp {
         if (arrendadoras.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="table-loading">
-                        <div class="text-center py-8">
-                            <i class="fas fa-building text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">No hay empresas registradas</p>
-                            <button onclick="app.openModal('arrendadora')" class="mt-4 text-blue-600 hover:text-blue-800">
+                    <td colspan="4">
+                        <div class="text-center py-5">
+                            <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay empresas registradas</p>
+                            <button onclick="app.openModal('arrendadora')" class="btn btn-primary mt-3">
                                 Crear primera empresa
                             </button>
                         </div>
@@ -305,19 +305,19 @@ class FlotaApp {
         }
 
         tbody.innerHTML = arrendadoras.map(arrendadora => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="font-mono text-sm text-gray-500">#${arrendadora.id}</td>
-                <td class="font-medium">${this.escapeHtml(arrendadora.nombre)}</td>
-                <td class="font-mono text-sm">${arrendadora.identificacion_juridica || '-'}</td>
+            <tr>
+                <td class="text-muted small">#${arrendadora.id}</td>
+                <td class="fw-medium">${this.escapeHtml(arrendadora.nombre)}</td>
+                <td class="text-muted small">${arrendadora.identificacion_juridica || '-'}</td>
                 <td>
-                    <div class="flex space-x-2">
+                    <div class="d-flex gap-2">
                         <button onclick="app.editArrendadora(${arrendadora.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-primary"
                                 title="Editar arrendadora">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="app.deleteArrendadora(${arrendadora.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-danger"
                                 title="Eliminar arrendadora">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -401,12 +401,12 @@ class FlotaApp {
 
         if (vehiculos.length === 0) {
             grid.innerHTML = `
-                <div class="vehicle-card-empty">
-                    <i class="fas fa-car vehicle-card-empty-icon"></i>
-                    <div class="vehicle-card-empty-text">No hay vehículos registrados</div>
-                    <div class="vehicle-card-empty-subtext">Crea tu primer vehículo para comenzar</div>
-                    <button onclick="app.openModal('vehiculo')" class="mt-4 btn-primary-apple">
-                        <i class="fas fa-plus"></i>
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                    <div class="h5 mb-2">No hay vehículos registrados</div>
+                    <div class="text-muted mb-3">Crea tu primer vehículo para comenzar</div>
+                    <button onclick="app.openModal('vehiculo')" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
                         <span>Crear Vehículo</span>
                     </button>
                 </div>
@@ -421,89 +421,91 @@ class FlotaApp {
         const estadoClass = api.getStatusBadgeClass(vehiculo.estado_inventario_id);
 
         return `
-            <div class="vehicle-card" data-vehicle-id="${vehiculo.id}">
-                <!-- Header de la tarjeta -->
-                <div class="vehicle-card-header">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="vehicle-card-placa">${this.escapeHtml(vehiculo.placa)}</div>
-                            <div class="vehicle-card-modelo">
-                                ${this.escapeHtml(vehiculo.marcas?.nombre || 'Sin marca')} 
-                                ${this.escapeHtml(vehiculo.modelos?.nombre || 'Sin modelo')}
+            <div class="col-lg-4 col-md-6 mb-4" data-vehicle-id="${vehiculo.id}">
+                <div class="card h-100">
+                    <!-- Header de la tarjeta -->
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="h5 mb-1">${this.escapeHtml(vehiculo.placa)}</div>
+                                <div class="text-muted small">
+                                    ${this.escapeHtml(vehiculo.marcas?.nombre || 'Sin marca')} 
+                                    ${this.escapeHtml(vehiculo.modelos?.nombre || 'Sin modelo')}
+                                </div>
+                                ${vehiculo.vin ? `<div class="text-muted small">VIN: ${this.escapeHtml(vehiculo.vin)}</div>` : ''}
                             </div>
-                            ${vehiculo.vin ? `<div class="vehicle-card-vin">VIN: ${this.escapeHtml(vehiculo.vin)}</div>` : ''}
-                        </div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="vehicle-card-badge vehicle-card-badge-id">#${vehiculo.id}</span>
-                            <span class="vehicle-card-badge vehicle-card-badge-year">${vehiculo.anio || 'N/A'}</span>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span class="badge bg-secondary small">#${vehiculo.id}</span>
+                                <span class="badge bg-info small">${vehiculo.anio || 'N/A'}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Body de la tarjeta -->
-                <div class="vehicle-card-body">
-                    <div class="space-y-4">
-                        <div class="vehicle-card-info">
-                            <span class="vehicle-card-label">Arrendadora</span>
-                            <span class="vehicle-card-value">${this.escapeHtml(vehiculo.arrendadoras?.nombre || 'Sin asignar')}</span>
-                        </div>
-                        
-                        <div class="vehicle-card-info">
-                            <span class="vehicle-card-label">Estado</span>
-                            <span class="vehicle-card-status ${estadoClass}">
-                                ${this.escapeHtml(vehiculo.estados_inventario?.nombre || 'Sin estado')}
-                            </span>
-                        </div>
-                        
-                        ${vehiculo.precio_semanal ? `
-                        <div class="vehicle-card-info">
-                            <span class="vehicle-card-label">Precio Semanal</span>
-                            <span class="vehicle-card-price">${api.formatCurrency(vehiculo.precio_semanal)}</span>
-                        </div>
-                        ` : ''}
-                        
-                        ${vehiculo.gastos_adms ? `
-                        <div class="vehicle-card-info">
-                            <span class="vehicle-card-label">Gastos Admin</span>
-                            <span class="vehicle-card-gastos">${api.formatCurrency(vehiculo.gastos_adms)}</span>
-                        </div>
-                        ` : ''}
+                    
+                    <!-- Body de la tarjeta -->
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Arrendadora</span>
+                                <span class="fw-medium">${this.escapeHtml(vehiculo.arrendadoras?.nombre || 'Sin asignar')}</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="vehicle-card-label">Estado</span>
+                                <span class="badge ${estadoClass}">
+                                    ${this.escapeHtml(vehiculo.estados_inventario?.nombre || 'Sin estado')}
+                                </span>
+                            </div>
+                            
+                            ${vehiculo.precio_semanal ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Precio Semanal</span>
+                                <span class="fw-medium">${api.formatCurrency(vehiculo.precio_semanal)}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${vehiculo.gastos_adms ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Gastos Admin</span>
+                                <span class="fw-medium">${api.formatCurrency(vehiculo.gastos_adms)}</span>
+                            </div>
+                            ` : ''}
 
-                        ${vehiculo.link_fotos ? `
-                        <div class="vehicle-card-info">
-                            <span class="vehicle-card-label">Fotos</span>
-                            <a href="${this.escapeHtml(vehiculo.link_fotos)}" target="_blank" class="vehicle-card-fotos-link">
-                                <i class="fas fa-images mr-1"></i>Ver galería
-                            </a>
+                            ${vehiculo.link_fotos ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Fotos</span>
+                                <a href="${this.escapeHtml(vehiculo.link_fotos)}" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-images me-1"></i>Ver galería
+                                </a>
+                            </div>
+                            ` : ''}
                         </div>
-                        ` : ''}
                     </div>
-                </div>
-                
-                <!-- Acciones de la tarjeta -->
-                <div class="vehicle-card-actions">
-                    <div class="vehicle-card-actions-left">
-                        <span class="text-xs text-gray-500">
-                            <i class="fas fa-clock mr-1"></i>
-                            ${api.formatDate(vehiculo.created_at)}
-                        </span>
-                    </div>
-                    <div class="vehicle-card-actions-right">
-                        <button onclick="app.showVehiculoTareas(${vehiculo.id})" 
-                                class="vehicle-card-btn vehicle-card-btn-tasks" 
-                                title="Ver tareas del vehículo">
-                            <i class="fas fa-tasks"></i>
-                        </button>
-                        <button onclick="app.editVehiculo(${vehiculo.id})" 
-                                class="vehicle-card-btn vehicle-card-btn-edit" 
-                                title="Editar vehículo">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="app.deleteVehiculo(${vehiculo.id})" 
-                                class="vehicle-card-btn vehicle-card-btn-delete" 
-                                title="Eliminar vehículo">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    
+                    <!-- Acciones de la tarjeta -->
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                ${api.formatDate(vehiculo.created_at)}
+                            </small>
+                            <div class="btn-group btn-group-sm">
+                                <button onclick="app.showVehiculoTareas(${vehiculo.id})" 
+                                        class="btn btn-outline-info" 
+                                        title="Ver tareas del vehículo">
+                                    <i class="fas fa-tasks"></i>
+                                </button>
+                                <button onclick="app.editVehiculo(${vehiculo.id})" 
+                                        class="btn btn-outline-primary" 
+                                        title="Editar vehículo">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="app.deleteVehiculo(${vehiculo.id})" 
+                                        class="btn btn-outline-danger" 
+                                        title="Eliminar vehículo">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -556,11 +558,11 @@ class FlotaApp {
         if (colaboradores.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="table-loading">
-                        <div class="text-center py-8">
-                            <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">No hay colaboradores registrados</p>
-                            <button onclick="app.openModal('colaborador')" class="mt-4 text-blue-600 hover:text-blue-800">
+                    <td colspan="6">
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay colaboradores registrados</p>
+                            <button onclick="app.openModal('colaborador')" class="btn btn-primary mt-3">
                                 Crear primer colaborador
                             </button>
                         </div>
@@ -571,25 +573,25 @@ class FlotaApp {
         }
 
         tbody.innerHTML = colaboradores.map(colaborador => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="font-mono text-sm text-gray-500">#${colaborador.id}</td>
-                <td class="font-medium">${this.escapeHtml(colaborador.nombre)}</td>
-                <td class="font-mono text-sm">${this.escapeHtml(colaborador.identificacion)}</td>
+            <tr>
+                <td class="text-muted small">#${colaborador.id}</td>
+                <td class="fw-medium">${this.escapeHtml(colaborador.nombre)}</td>
+                <td class="text-muted small">${this.escapeHtml(colaborador.identificacion)}</td>
                 <td>${this.escapeHtml(colaborador.puesto || '-')}</td>
                 <td>
-                    <span class="colaborador-status ${colaborador.activo ? 'status-active' : 'status-inactive'}">
+                    <span class="badge ${colaborador.activo ? 'bg-success' : 'bg-secondary'}">
                         ${colaborador.activo ? 'Activo' : 'Inactivo'}
                     </span>
                 </td>
                 <td>
-                    <div class="flex space-x-2">
+                    <div class="d-flex gap-2">
                         <button onclick="app.editColaborador(${colaborador.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-primary"
                                 title="Editar colaborador">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="app.deleteColaborador(${colaborador.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-danger"
                                 title="Eliminar colaborador">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -666,12 +668,12 @@ class FlotaApp {
 
         if (tareas.length === 0) {
             grid.innerHTML = `
-                <div class="tarea-card-empty">
-                    <i class="fas fa-tasks tarea-card-empty-icon"></i>
-                    <div class="tarea-card-empty-text">No hay tareas registradas</div>
-                    <div class="tarea-card-empty-subtext">Crea tu primera tarea para comenzar</div>
-                    <button onclick="app.openModal('tarea')" class="mt-4 btn-primary-apple">
-                        <i class="fas fa-plus"></i>
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                    <div class="h5 mb-2">No hay tareas registradas</div>
+                    <div class="text-muted mb-3">Crea tu primera tarea para comenzar</div>
+                    <button onclick="app.openModal('tarea')" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
                         <span>Crear Tarea</span>
                     </button>
                 </div>
@@ -687,88 +689,90 @@ class FlotaApp {
         const prioridadClass = api.getTareaPrioridadBadgeClass(tarea.prioridad);
 
         return `
-            <div class="tarea-card" data-tarea-id="${tarea.id}">
-                <!-- Header de la tarjeta -->
-                <div class="tarea-card-header">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="tarea-card-titulo">${this.escapeHtml(tarea.titulo)}</div>
-                            <div class="tarea-card-vehiculo">
-                                <i class="fas fa-car mr-1"></i>
-                                ${this.escapeHtml(tarea.vehiculos?.placa || 'Sin vehículo')}
-                                ${tarea.vehiculos?.marcas?.nombre ? `- ${this.escapeHtml(tarea.vehiculos.marcas.nombre)}` : ''}
+            <div class="col-lg-4 col-md-6 mb-4" data-tarea-id="${tarea.id}">
+                <div class="card h-100">
+                    <!-- Header de la tarjeta -->
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="h6 mb-1">${this.escapeHtml(tarea.titulo)}</div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-car me-1"></i>
+                                    ${this.escapeHtml(tarea.vehiculos?.placa || 'Sin vehículo')}
+                                    ${tarea.vehiculos?.marcas?.nombre ? `- ${this.escapeHtml(tarea.vehiculos.marcas.nombre)}` : ''}
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                <span class="badge bg-secondary small">#${tarea.id}</span>
+                                <span class="badge ${prioridadClass}">
+                                    ${this.escapeHtml(tarea.prioridad || 'media')}
+                                </span>
                             </div>
                         </div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="tarea-card-badge tarea-card-badge-id">#${tarea.id}</span>
-                            <span class="tarea-card-prioridad ${prioridadClass}">
-                                ${this.escapeHtml(tarea.prioridad || 'media')}
-                            </span>
+                    </div>
+                    
+                    <!-- Body de la tarjeta -->
+                    <div class="card-body">
+                        <div class="mb-3">
+                            ${tarea.descripcion ? `
+                            <div class="mb-3">
+                                <p class="text-muted small">${this.escapeHtml(tarea.descripcion).substring(0, 100)}${tarea.descripcion.length > 100 ? '...' : ''}</p>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Responsable</span>
+                                <span class="fw-medium">${this.escapeHtml(tarea.colaboradores?.nombre || 'Sin asignar')}</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Estado</span>
+                                <span class="badge ${estadoClass}">
+                                    ${this.escapeHtml(this.getEstadoDisplayName(tarea.estado))}
+                                </span>
+                            </div>
+                            
+                            ${tarea.fecha_programada ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Programada</span>
+                                <span class="fw-medium">${api.formatDate(tarea.fecha_programada)}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${tarea.notas ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted small">Notas</span>
+                                <span class="fw-medium">${this.escapeHtml(tarea.notas).substring(0, 50)}${tarea.notas.length > 50 ? '...' : ''}</span>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
-                </div>
-                
-                <!-- Body de la tarjeta -->
-                <div class="tarea-card-body">
-                    <div class="space-y-4">
-                        ${tarea.descripcion ? `
-                        <div class="tarea-card-descripcion">
-                            ${this.escapeHtml(tarea.descripcion).substring(0, 100)}${tarea.descripcion.length > 100 ? '...' : ''}
+                    
+                    <!-- Acciones de la tarjeta -->
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                ${api.formatDate(tarea.created_at)}
+                            </small>
+                            <div class="btn-group btn-group-sm">
+                                <button onclick="app.showTareaDetail(${tarea.id})" 
+                                        class="btn btn-outline-info" 
+                                        title="Ver detalles de la tarea">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="app.editTarea(${tarea.id})" 
+                                        class="btn btn-outline-primary" 
+                                        title="Editar tarea">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="app.deleteTarea(${tarea.id})" 
+                                        class="btn btn-outline-danger" 
+                                        title="Eliminar tarea">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        ` : ''}
-                        
-                        <div class="tarea-card-info">
-                            <span class="tarea-card-label">Responsable</span>
-                            <span class="tarea-card-value">${this.escapeHtml(tarea.colaboradores?.nombre || 'Sin asignar')}</span>
-                        </div>
-                        
-                        <div class="tarea-card-info">
-                            <span class="tarea-card-label">Estado</span>
-                            <span class="tarea-card-status ${estadoClass}">
-                                ${this.escapeHtml(this.getEstadoDisplayName(tarea.estado))}
-                            </span>
-                        </div>
-                        
-                        ${tarea.fecha_programada ? `
-                        <div class="tarea-card-info">
-                            <span class="tarea-card-label">Programada</span>
-                            <span class="tarea-card-fecha">${api.formatDate(tarea.fecha_programada)}</span>
-                        </div>
-                        ` : ''}
-                        
-                        ${tarea.notas ? `
-                        <div class="tarea-card-info">
-                            <span class="tarea-card-label">Notas</span>
-                            <span class="tarea-card-notas">${this.escapeHtml(tarea.notas).substring(0, 50)}${tarea.notas.length > 50 ? '...' : ''}</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-                
-                <!-- Acciones de la tarjeta -->
-                <div class="tarea-card-actions">
-                    <div class="tarea-card-actions-left">
-                        <span class="text-xs text-gray-500">
-                            <i class="fas fa-clock mr-1"></i>
-                            ${api.formatDate(tarea.created_at)}
-                        </span>
-                    </div>
-                    <div class="tarea-card-actions-right">
-                        <button onclick="app.showTareaDetail(${tarea.id})" 
-                                class="tarea-card-btn tarea-card-btn-view" 
-                                title="Ver detalles de la tarea">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button onclick="app.editTarea(${tarea.id})" 
-                                class="tarea-card-btn tarea-card-btn-edit" 
-                                title="Editar tarea">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="app.deleteTarea(${tarea.id})" 
-                                class="tarea-card-btn tarea-card-btn-delete" 
-                                title="Eliminar tarea">
-                            <i class="fas fa-trash"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -811,7 +815,7 @@ class FlotaApp {
 
             if (modal && content) {
                 content.innerHTML = this.getTareaDetailContent(tarea, colaboradores, comentarios, adjuntos, todosColaboradores);
-                modal.classList.remove('hidden');
+                modal.classList.remove('d-none');
 
                 // Configurar event listeners para comentarios y adjuntos
                 this.setupTareaDetailListeners();
@@ -1402,7 +1406,7 @@ class FlotaApp {
     closeTareaDetailModal() {
         const modal = document.getElementById('tarea-detail-modal');
         if (modal) {
-            modal.classList.add('hidden');
+            modal.classList.add('d-none');
         }
         this.currentTareaId = null;
     }
@@ -1428,11 +1432,11 @@ class FlotaApp {
         if (marcas.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="table-loading">
-                        <div class="text-center py-8">
-                            <i class="fas fa-tag text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">No hay marcas registradas</p>
-                            <button onclick="app.openModal('marca')" class="mt-4 text-blue-600 hover:text-blue-800">
+                    <td colspan="4">
+                        <div class="text-center py-5">
+                            <i class="fas fa-tag fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay marcas registradas</p>
+                            <button onclick="app.openModal('marca')" class="btn btn-primary mt-3">
                                 Crear primera marca
                             </button>
                         </div>
@@ -1443,19 +1447,19 @@ class FlotaApp {
         }
 
         tbody.innerHTML = marcas.map(marca => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="font-mono text-sm text-gray-500">#${marca.id}</td>
-                <td class="font-medium">${this.escapeHtml(marca.nombre)}</td>
-                <td class="text-gray-500">-</td>
+            <tr>
+                <td class="text-muted small">#${marca.id}</td>
+                <td class="fw-medium">${this.escapeHtml(marca.nombre)}</td>
+                <td class="text-muted">-</td>
                 <td>
-                    <div class="flex space-x-2">
+                    <div class="d-flex gap-2">
                         <button onclick="app.editMarca(${marca.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-primary"
                                 title="Editar marca">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="app.deleteMarca(${marca.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-danger"
                                 title="Eliminar marca">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -1523,11 +1527,11 @@ class FlotaApp {
         if (modelos.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="table-loading">
-                        <div class="text-center py-8">
-                            <i class="fas fa-cogs text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">No hay modelos registrados</p>
-                            <button onclick="app.openModal('modelo')" class="mt-4 text-blue-600 hover:text-blue-800">
+                    <td colspan="5">
+                        <div class="text-center py-5">
+                            <i class="fas fa-cogs fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay modelos registrados</p>
+                            <button onclick="app.openModal('modelo')" class="btn btn-primary mt-3">
                                 Crear primer modelo
                             </button>
                         </div>
@@ -1538,20 +1542,20 @@ class FlotaApp {
         }
 
         tbody.innerHTML = modelos.map(modelo => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="font-mono text-sm text-gray-500">#${modelo.id}</td>
-                <td class="font-medium">${this.escapeHtml(modelo.nombre)}</td>
+            <tr>
+                <td class="text-muted small">#${modelo.id}</td>
+                <td class="fw-medium">${this.escapeHtml(modelo.nombre)}</td>
                 <td>${this.escapeHtml(modelo.marcas?.nombre || 'Sin marca')}</td>
-                <td class="text-gray-500">-</td>
+                <td class="text-muted">-</td>
                 <td>
-                    <div class="flex space-x-2">
+                    <div class="d-flex gap-2">
                         <button onclick="app.editModelo(${modelo.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-primary"
                                 title="Editar modelo">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="app.deleteModelo(${modelo.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-danger"
                                 title="Eliminar modelo">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -1586,11 +1590,11 @@ class FlotaApp {
         if (estados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="table-loading">
-                        <div class="text-center py-8">
-                            <i class="fas fa-list-check text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">No hay estados registrados</p>
-                            <button onclick="app.openModal('estado')" class="mt-4 text-blue-600 hover:text-blue-800">
+                    <td colspan="4">
+                        <div class="text-center py-5">
+                            <i class="fas fa-list-check fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay estados registrados</p>
+                            <button onclick="app.openModal('estado')" class="btn btn-primary mt-3">
                                 Crear primer estado
                             </button>
                         </div>
@@ -1601,19 +1605,19 @@ class FlotaApp {
         }
 
         tbody.innerHTML = estados.map(estado => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="font-mono text-sm text-gray-500">#${estado.id}</td>
-                <td class="font-medium">${this.escapeHtml(estado.nombre)}</td>
-                <td class="text-gray-500">-</td>
+            <tr>
+                <td class="text-muted small">#${estado.id}</td>
+                <td class="fw-medium">${this.escapeHtml(estado.nombre)}</td>
+                <td class="text-muted">-</td>
                 <td>
-                    <div class="flex space-x-2">
+                    <div class="d-flex gap-2">
                         <button onclick="app.editEstado(${estado.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-primary"
                                 title="Editar estado">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="app.deleteEstado(${estado.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded transition-colors"
+                                class="btn btn-sm btn-outline-danger"
                                 title="Eliminar estado">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -1647,7 +1651,7 @@ class FlotaApp {
 
             if (modalContent && modalOverlay) {
                 modalContent.innerHTML = content;
-                modalOverlay.classList.remove('hidden');
+                modalOverlay.classList.remove('d-none');
 
                 // Cargar datos específicos del modal después de renderizar
                 await this.modalManager.loadModalData(type, item);
@@ -1667,7 +1671,7 @@ class FlotaApp {
     closeModal() {
         const modalOverlay = document.getElementById('modal-overlay');
         if (modalOverlay) {
-            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.add('d-none');
         }
         this.currentModal = null;
         this.editingItem = null;
@@ -1877,16 +1881,16 @@ class FlotaApp {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.innerHTML = `
-            <div class="flex items-center">
+            <div class="d-flex align-items-center">
                 <div class="flex-shrink-0">
                     <i class="fas fa-${this.getToastIcon(type)}"></i>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-900">${this.escapeHtml(message)}</p>
+                <div class="ms-3">
+                    <p class="small fw-medium mb-0">${this.escapeHtml(message)}</p>
                 </div>
-                <div class="ml-auto pl-3">
+                <div class="ms-auto ps-3">
                     <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                            class="text-gray-400 hover:text-gray-600">
+                            class="btn btn-link text-muted p-0">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
