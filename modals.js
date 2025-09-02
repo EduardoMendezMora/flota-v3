@@ -13,20 +13,20 @@ class ModalManager {
 
         this.validationRules.set('vehiculo', {
             placa: { required: true, customValidation: 'placa' },
-            marca_id: { required: true },
-            modelo_id: { required: true },
-            anio: { required: true, min: FORM_CONSTANTS.minYear, max: FORM_CONSTANTS.maxYear },
-            arrendadora_id: { required: true },
-            estado_inventario_id: { required: true },
+            marca_id: { minLength: 1 },
+            modelo_id: { minLength: 1 },
+            anio: { min: FORM_CONSTANTS.minYear, max: FORM_CONSTANTS.maxYear },
+            arrendadora_id: { minLength: 1 },
+            estado_inventario_id: { minLength: 1 },
             vin: { pattern: FORM_CONSTANTS.validation.vinPattern },
             link_fotos: { pattern: FORM_CONSTANTS.validation.urlPattern },
-            color: { required: true, minLength: 2 },
-            carroceria: { required: true, minLength: 2 },
-            combustible: { required: true },
-            transmision: { required: true },
-            traccion: { required: true },
-            cilindrada: { required: true, min: 1 },
-            cilindros: { required: true, min: 1 },
+            color: { minLength: 2 },
+            carroceria: { minLength: 2 },
+            combustible: { minLength: 1 },
+            transmision: { minLength: 1 },
+            traccion: { minLength: 1 },
+            cilindrada: { min: 1 },
+            cilindros: { min: 1 },
             ubicacion: { minLength: 2 },
             renta_semanal: { min: 0 },
             gastos_adms: { min: 0 },
@@ -167,9 +167,9 @@ class ModalManager {
                                 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-estatus" class="label-minimal">
-                                        Estatus <span class="required">*</span>
+                                        Estatus
                                     </label>
-                                    <select id="vehiculo-estatus" class="select-minimal" required>
+                                    <select id="vehiculo-estatus" class="select-minimal">
                                         <option value="">Seleccionar estatus</option>
                                         <option value="colocado" ${item?.estatus === 'colocado' ? 'selected' : ''}>Colocado</option>
                                         <option value="disponible" ${item?.estatus === 'disponible' ? 'selected' : ''}>Disponible</option>
@@ -182,9 +182,9 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-estatus-inventario" class="label-minimal">
-                                        Estatus Inventario <span class="required">*</span>
+                                        Estatus Inventario
                                     </label>
-                                    <select id="vehiculo-estatus-inventario" class="select-minimal" required>
+                                    <select id="vehiculo-estatus-inventario" class="select-minimal">
                                         <option value="">Seleccionar estatus</option>
                                     </select>
                                     <div class="validation-error" id="vehiculo-estatus-inventario-error"></div>
@@ -204,7 +204,7 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-renta-semanal" class="label-minimal">
-                                        Renta Semanal (CRC) <span class="required">*</span>
+                                        Renta Semanal (CRC)
                                     </label>
                                     <div class="input-group-minimal">
                                         <span class="currency-prefix">₡</span>
@@ -216,7 +216,6 @@ class ModalManager {
                                             min="0" 
                                             step="1000"
                                             placeholder="0"
-                                            required
                                         >
                                     </div>
                                     <div class="validation-error" id="vehiculo-renta-semanal-error"></div>
@@ -293,7 +292,7 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-vin" class="label-minimal">
-                                        VIN / Serie <span class="required">*</span>
+                                        VIN / Serie
                                     </label>
                                     <input 
                                         type="text" 
@@ -303,14 +302,13 @@ class ModalManager {
                                         placeholder="${FORM_CONSTANTS.placeholders.vin}"
                                         maxlength="17"
                                         style="text-transform: uppercase;"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-vin-error"></div>
                                 </div>
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-anio" class="label-minimal">
-                                        Año <span class="required">*</span>
+                                        Año
                                     </label>
                                     <input 
                                         type="number" 
@@ -319,14 +317,13 @@ class ModalManager {
                                         value="${item?.anio || ''}" 
                                         min="${FORM_CONSTANTS.minYear}" 
                                         max="${FORM_CONSTANTS.maxYear}"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-anio-error"></div>
                                 </div>
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-color" class="label-minimal">
-                                        Color <span class="required">*</span>
+                                        Color
                                     </label>
                                     <input 
                                         type="text" 
@@ -334,14 +331,13 @@ class ModalManager {
                                         class="input-minimal" 
                                         value="${this.escapeValue(item?.color)}" 
                                         placeholder="Color del vehículo"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-color-error"></div>
                                 </div>
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-carroceria" class="label-minimal">
-                                        Carrocería <span class="required">*</span>
+                                        Carrocería
                                     </label>
                                     <input 
                                         type="text" 
@@ -349,16 +345,15 @@ class ModalManager {
                                         class="input-minimal" 
                                         value="${this.escapeValue(item?.carroceria)}" 
                                         placeholder="Ej: Sedan, 4 Puertas Hatchback"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-carroceria-error"></div>
                                 </div>
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-combustible" class="label-minimal">
-                                        Combustible <span class="required">*</span>
+                                        Combustible
                                     </label>
-                                    <select id="vehiculo-combustible" class="select-minimal" required>
+                                    <select id="vehiculo-combustible" class="select-minimal">
                                         <option value="">Seleccionar combustible</option>
                                         <option value="gasolina" ${item?.combustible === 'gasolina' ? 'selected' : ''}>Gasolina</option>
                                         <option value="diesel" ${item?.combustible === 'diesel' ? 'selected' : ''}>Diesel</option>
@@ -370,9 +365,9 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-transmision" class="label-minimal">
-                                        Transmisión <span class="required">*</span>
+                                        Transmisión
                                     </label>
-                                    <select id="vehiculo-transmision" class="select-minimal" required>
+                                    <select id="vehiculo-transmision" class="select-minimal">
                                         <option value="">Seleccionar transmisión</option>
                                         <option value="manual" ${item?.transmision === 'manual' ? 'selected' : ''}>Manual</option>
                                         <option value="automatica" ${item?.transmision === 'automatica' ? 'selected' : ''}>Automática</option>
@@ -382,9 +377,9 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-traccion" class="label-minimal">
-                                        Tracción <span class="required">*</span>
+                                        Tracción
                                     </label>
-                                    <select id="vehiculo-traccion" class="select-minimal" required>
+                                    <select id="vehiculo-traccion" class="select-minimal">
                                         <option value="">Seleccionar tracción</option>
                                         <option value="4x2" ${item?.traccion === '4x2' ? 'selected' : ''}>4X2</option>
                                         <option value="4x4" ${item?.traccion === '4x4' ? 'selected' : ''}>4X4</option>
@@ -395,7 +390,7 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-cilindrada" class="label-minimal">
-                                        Cilindrada <span class="required">*</span>
+                                        Cilindrada
                                     </label>
                                     <input 
                                         type="number" 
@@ -404,14 +399,13 @@ class ModalManager {
                                         value="${item?.cilindrada || ''}" 
                                         min="1" 
                                         placeholder="1300"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-cilindrada-error"></div>
                                 </div>
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-cilindros" class="label-minimal">
-                                        Cilindros <span class="required">*</span>
+                                        Cilindros
                                     </label>
                                     <input 
                                         type="number" 
@@ -420,7 +414,6 @@ class ModalManager {
                                         value="${item?.cilindros || ''}" 
                                         min="1" 
                                         placeholder="4"
-                                        required
                                     >
                                     <div class="validation-error" id="vehiculo-cilindros-error"></div>
                                 </div>
@@ -435,10 +428,10 @@ class ModalManager {
                                 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-marca" class="label-minimal">
-                                        Marca <span class="required">*</span>
+                                        Marca
                                     </label>
                                     <div class="flex space-x-2">
-                                        <select id="vehiculo-marca" class="select-minimal flex-1" required>
+                                        <select id="vehiculo-marca" class="select-minimal flex-1">
                                             <option value="">Seleccionar marca</option>
                                         </select>
                                         <button type="button" onclick="modalManager.createMarcaQuick()" 
@@ -451,10 +444,10 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-modelo" class="label-minimal">
-                                        Modelo <span class="required">*</span>
+                                        Modelo
                                     </label>
                                     <div class="flex space-x-2">
-                                        <select id="vehiculo-modelo" class="select-minimal flex-1" required disabled>
+                                        <select id="vehiculo-modelo" class="select-minimal flex-1" disabled>
                                             <option value="">Primero selecciona una marca</option>
                                         </select>
                                         <button type="button" onclick="modalManager.createModeloQuick()" 
@@ -467,9 +460,9 @@ class ModalManager {
 
                                 <div class="form-field-minimal">
                                     <label for="vehiculo-arrendadora" class="label-minimal">
-                                        Empresa <span class="required">*</span>
+                                        Empresa
                                     </label>
-                                    <select id="vehiculo-arrendadora" class="select-minimal" required>
+                                    <select id="vehiculo-arrendadora" class="select-minimal">
                                         <option value="">Seleccionar arrendadora</option>
                                     </select>
                                     <div class="validation-error" id="vehiculo-arrendadora-error"></div>

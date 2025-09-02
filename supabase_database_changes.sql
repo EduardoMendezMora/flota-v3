@@ -227,3 +227,67 @@ FROM information_schema.columns
 WHERE table_schema = 'public' 
 AND table_name = 'vehiculos'
 ORDER BY ordinal_position;
+
+-- =====================================================
+-- 7. DIAGNÓSTICO - ESTRUCTURA REAL DE LA TABLA VEHICULOS
+-- =====================================================
+
+-- Verificar qué columnas existen realmente en vehiculos
+SELECT 
+    column_name,
+    data_type,
+    is_nullable,
+    column_default,
+    CASE 
+        WHEN is_nullable = 'NO' THEN 'REQUERIDO'
+        ELSE 'OPCIONAL'
+    END as estado
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+AND table_name = 'vehiculos'
+ORDER BY ordinal_position;
+
+-- Verificar restricciones NOT NULL existentes
+SELECT 
+    tc.table_name,
+    kcu.column_name,
+    tc.constraint_type
+FROM information_schema.table_constraints tc
+JOIN information_schema.key_column_usage kcu 
+    ON tc.constraint_name = kcu.constraint_name
+WHERE tc.table_schema = 'public' 
+AND tc.table_name = 'vehiculos'
+AND tc.constraint_type = 'CHECK';
+
+-- =====================================================
+-- 8. SCRIPT CORREGIDO PARA HACER CAMPOS OPCIONALES
+-- =====================================================
+-- EJECUTAR ESTE SCRIPT DESPUÉS DE VER EL DIAGNÓSTICO
+
+-- Script para hacer campos opcionales (AJUSTAR SEGÚN LAS COLUMNAS REALES)
+/*
+-- Ejemplo de cómo hacer campos opcionales (descomenta y ajusta según tu estructura)
+DO $$
+DECLARE
+    col_record RECORD;
+BEGIN
+    -- Lista de columnas que quieres hacer opcionales (ajusta según tu tabla)
+    FOR col_record IN 
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'vehiculos'
+        AND column_name IN (
+            'marca_id', 'modelo_id', 'arrendadora_id', 'estado_inventario_id',
+            'color', 'carroceria', 'combustible', 'transmision', 'traccion',
+            'cilindrada', 'cilindros', 'vin', 'renta_semanal', 'ubicacion'
+        )
+        AND is_nullable = 'NO'
+    LOOP
+        EXECUTE format('ALTER TABLE public.vehiculos ALTER COLUMN %I DROP NOT NULL', col_record.column_name);
+        RAISE NOTICE 'Columna % hecha opcional', col_record.column_name;
+    END LOOP;
+    
+    RAISE NOTICE 'Proceso completado';
+END $$;
+*/
