@@ -151,6 +151,11 @@ class ModalManager {
         const isEditing = item !== null;
         const title = isEditing ? 'Editar Vehículo' : 'Nuevo Vehículo';
 
+        // Si es edición, mostrar pestañas; si es nuevo, mostrar solo formulario
+        if (isEditing) {
+            return this.getVehiculoModalWithTabs(item);
+        }
+
         return `
             <div class="modal-minimal modal-extra-wide">
                 ${this.getModalHeader(title)}
@@ -1514,6 +1519,834 @@ class ModalManager {
             estado: 'estados'
         };
         return sections[type] || type;
+    }
+
+    // ===== MODAL DE VEHÍCULO CON PESTAÑAS =====
+    getVehiculoModalWithTabs(item) {
+        return `
+            <div class="modal-minimal modal-extra-wide modal-with-tabs">
+                ${this.getModalHeader('Editar Vehículo - ' + (item?.placas || 'Sin Placa'))}
+                
+                <div class="modal-body-minimal">
+                    <!-- Sistema de Pestañas -->
+                    <div class="vehiculo-tabs">
+                        <div class="tab-navigation">
+                            <button class="tab-button active" data-tab="general">
+                                <i class="fas fa-info-circle"></i>
+                                Información General
+                            </button>
+                            <button class="tab-button" data-tab="galeria">
+                                <i class="fas fa-images"></i>
+                                Galería
+                            </button>
+                            <button class="tab-button" data-tab="tareas">
+                                <i class="fas fa-tasks"></i>
+                                Tareas
+                            </button>
+                            <button class="tab-button" data-tab="inspecciones">
+                                <i class="fas fa-clipboard-check"></i>
+                                Inspecciones
+                            </button>
+                            <button class="tab-button" data-tab="bitacora">
+                                <i class="fas fa-comments"></i>
+                                Bitácora / Comentarios
+                            </button>
+                            <button class="tab-button" data-tab="kilometraje">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Kilometraje
+                            </button>
+                            <button class="tab-button" data-tab="gps">
+                                <i class="fas fa-satellite-dish"></i>
+                                Dispositivos GPS
+                            </button>
+                            <button class="tab-button" data-tab="repuestos">
+                                <i class="fas fa-tools"></i>
+                                Solicitudes de Repuestos
+                            </button>
+                        </div>
+
+                        <!-- Contenido de las Pestañas -->
+                        <div class="tab-content">
+                            <!-- Pestaña: Información General -->
+                            <div class="tab-pane active" id="tab-general">
+                                ${this.getVehiculoGeneralTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Galería -->
+                            <div class="tab-pane" id="tab-galeria">
+                                ${this.getVehiculoGaleriaTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Tareas -->
+                            <div class="tab-pane" id="tab-tareas">
+                                ${this.getVehiculoTareasTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Inspecciones -->
+                            <div class="tab-pane" id="tab-inspecciones">
+                                ${this.getVehiculoInspeccionesTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Bitácora -->
+                            <div class="tab-pane" id="tab-bitacora">
+                                ${this.getVehiculoBitacoraTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Kilometraje -->
+                            <div class="tab-pane" id="tab-kilometraje">
+                                ${this.getVehiculoKilometrajeTab(item)}
+                            </div>
+
+                            <!-- Pestaña: GPS -->
+                            <div class="tab-pane" id="tab-gps">
+                                ${this.getVehiculoGPSTab(item)}
+                            </div>
+
+                            <!-- Pestaña: Repuestos -->
+                            <div class="tab-pane" id="tab-repuestos">
+                                ${this.getVehiculoRepuestosTab(item)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                ${this.getModalFooter(true)}
+            </div>
+        `;
+    }
+
+    // ===== CONTENIDO DE LAS PESTAÑAS =====
+    
+    // Pestaña: Información General
+    getVehiculoGeneralTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-info-circle"></i>
+                    Información General del Vehículo
+                </h3>
+                <form id="vehiculo-form" class="form-minimal">
+                    <div class="form-three-columns">
+                        <!-- COLUMNA 1: Estatus y Comercial -->
+                        <div class="form-column">
+                            <h4 class="section-title-minimal">
+                                <i class="fas fa-chart-line"></i>
+                                Estatus y Comercial
+                            </h4>
+                            
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-estatus" class="label-minimal">
+                                    Estatus
+                                </label>
+                                <select id="vehiculo-estatus" class="select-minimal">
+                                    <option value="">Seleccionar estatus</option>
+                                    <option value="colocado" ${item?.estatus === 'colocado' ? 'selected' : ''}>Colocado</option>
+                                    <option value="disponible" ${item?.estatus === 'disponible' ? 'selected' : ''}>Disponible</option>
+                                    <option value="rentado" ${item?.estatus === 'rentado' ? 'selected' : ''}>Rentado</option>
+                                    <option value="mantenimiento" ${item?.estatus === 'mantenimiento' ? 'selected' : ''}>En Mantenimiento</option>
+                                    <option value="fuera_servicio" ${item?.estatus === 'fuera_servicio' ? 'selected' : ''}>Fuera de Servicio</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-estatus-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-estatus-inventario" class="label-minimal">
+                                    Estatus Inventario
+                                </label>
+                                <select id="vehiculo-estatus-inventario" class="select-minimal">
+                                    <option value="">Seleccionar estatus</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-estatus-inventario-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-ubicacion" class="label-minimal">Ubicación</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-ubicacion" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.ubicacion)}" 
+                                    placeholder="Ubicación del vehículo"
+                                >
+                                <div class="validation-error" id="vehiculo-ubicacion-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-renta-semanal" class="label-minimal">
+                                    Renta Semanal (CRC)
+                                </label>
+                                <div class="input-group-minimal">
+                                    <span class="currency-prefix">₡</span>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-renta-semanal" 
+                                        class="input-minimal" 
+                                        value="${item?.renta_semanal || ''}" 
+                                        min="0" 
+                                        step="1000"
+                                        placeholder="0"
+                                    >
+                                </div>
+                                <div class="validation-error" id="vehiculo-renta-semanal-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-gastos-adms" class="label-minimal">
+                                    Gastos Administrativos (CRC)
+                                </label>
+                                <div class="input-group-minimal">
+                                    <span class="currency-prefix">₡</span>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-gastos-adms" 
+                                        class="input-minimal" 
+                                        value="${item?.gastos_adms || ''}" 
+                                        min="0" 
+                                        step="1000"
+                                        placeholder="0"
+                                    >
+                                </div>
+                                <div class="validation-error" id="vehiculo-gastos-adms-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-plazo-semanas" class="label-minimal">Plazo en Semanas</label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-plazo-semanas" 
+                                    class="input-minimal" 
+                                    value="${item?.plazo_semanas || ''}" 
+                                    min="0" 
+                                    placeholder="0"
+                                >
+                                <div class="validation-error" id="vehiculo-plazo-semanas-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-cliente-actual" class="label-minimal">Cliente Actual</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-cliente-actual" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.cliente_actual)}" 
+                                    placeholder="Cliente actual del vehículo"
+                                >
+                                <div class="validation-error" id="vehiculo-cliente-actual-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA 2: Especificaciones -->
+                        <div class="form-column">
+                            <h4 class="section-title-minimal">
+                                <i class="fas fa-cogs"></i>
+                                Especificaciones
+                            </h4>
+                            
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-placa" class="label-minimal">
+                                    Placas <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-placa" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.placas)}" 
+                                    placeholder="${FORM_CONSTANTS.placeholders.placa}"
+                                    maxlength="10"
+                                    required
+                                    style="text-transform: uppercase;"
+                                >
+                                <div class="validation-error" id="vehiculo-placa-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-vin" class="label-minimal">
+                                    VIN / Serie
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-vin" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.numero_serie)}" 
+                                    placeholder="${FORM_CONSTANTS.placeholders.vin}"
+                                    maxlength="17"
+                                    style="text-transform: uppercase;"
+                                >
+                                <div class="validation-error" id="vehiculo-vin-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-anio" class="label-minimal">
+                                    Año
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-anio" 
+                                    class="input-minimal" 
+                                    value="${item?.año || ''}" 
+                                    min="${FORM_CONSTANTS.minYear}" 
+                                    max="${FORM_CONSTANTS.maxYear}"
+                                >
+                                <div class="validation-error" id="vehiculo-anio-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-color" class="label-minimal">
+                                    Color
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-color" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.color)}" 
+                                    placeholder="Color del vehículo"
+                                >
+                                <div class="validation-error" id="vehiculo-color-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-carroceria" class="label-minimal">
+                                    Carrocería
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-carroceria" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.carroceria)}" 
+                                    placeholder="Ej: Sedan, 4 Puertas Hatchback"
+                                >
+                                <div class="validation-error" id="vehiculo-carroceria-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-combustible" class="label-minimal">
+                                    Combustible
+                                </label>
+                                <select id="vehiculo-combustible" class="select-minimal">
+                                    <option value="">Seleccionar combustible</option>
+                                    <option value="gasolina" ${item?.combustible === 'gasolina' ? 'selected' : ''}>Gasolina</option>
+                                    <option value="diesel" ${item?.combustible === 'diesel' ? 'selected' : ''}>Diesel</option>
+                                    <option value="electrico" ${item?.combustible === 'electrico' ? 'selected' : ''}>Eléctrico</option>
+                                    <option value="hibrido" ${item?.combustible === 'hibrido' ? 'selected' : ''}>Híbrido</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-combustible-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-transmision" class="label-minimal">
+                                    Transmisión
+                                </label>
+                                <select id="vehiculo-transmision" class="select-minimal">
+                                    <option value="">Seleccionar transmisión</option>
+                                    <option value="manual" ${item?.transmision === 'manual' ? 'selected' : ''}>Manual</option>
+                                    <option value="automatica" ${item?.transmision === 'automatica' ? 'selected' : ''}>Automática</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-transmision-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-traccion" class="label-minimal">
+                                    Tracción
+                                </label>
+                                <select id="vehiculo-traccion" class="select-minimal">
+                                    <option value="">Seleccionar tracción</option>
+                                    <option value="4x2" ${item?.traccion === '4x2' ? 'selected' : ''}>4X2</option>
+                                    <option value="4x4" ${item?.traccion === '4x4' ? 'selected' : ''}>4X4</option>
+                                    <option value="awd" ${item?.traccion === 'awd' ? 'selected' : ''}>AWD</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-traccion-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-cilindrada" class="label-minimal">
+                                    Cilindrada
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-cilindrada" 
+                                    class="input-minimal" 
+                                    value="${item?.cilindrada || ''}" 
+                                    min="1" 
+                                    placeholder="1300"
+                                >
+                                <div class="validation-error" id="vehiculo-cilindrada-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-cilindros" class="label-minimal">
+                                    Cilindros
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-cilindros" 
+                                    class="input-minimal" 
+                                    value="${item?.cilindros || ''}" 
+                                    min="1" 
+                                    placeholder="4"
+                                >
+                                <div class="validation-error" id="vehiculo-cilindros-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA 3: Arrendadora -->
+                        <div class="form-column">
+                            <h4 class="section-title-minimal">
+                                <i class="fas fa-building"></i>
+                                Arrendadora
+                            </h4>
+                            
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-marca" class="label-minimal">
+                                    Marca
+                                </label>
+                                <div class="flex space-x-2">
+                                    <select id="vehiculo-marca" class="select-minimal flex-1">
+                                        <option value="">Seleccionar marca</option>
+                                    </select>
+                                    <button type="button" onclick="modalManager.createMarcaQuick()" 
+                                            class="btn-secondary-small" title="Crear nueva marca">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="validation-error" id="vehiculo-marca-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-modelo" class="label-minimal">
+                                    Modelo
+                                </label>
+                                <div class="flex space-x-2">
+                                    <select id="vehiculo-modelo" class="select-minimal flex-1" disabled>
+                                        <option value="">Primero selecciona una marca</option>
+                                    </select>
+                                    <button type="button" onclick="modalManager.createModeloQuick()" 
+                                            class="btn-secondary-small" title="Crear nuevo modelo" disabled>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="validation-error" id="vehiculo-modelo-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-arrendadora" class="label-minimal">
+                                    Empresa
+                                </label>
+                                <select id="vehiculo-arrendadora" class="select-minimal">
+                                    <option value="">Seleccionar arrendadora</option>
+                                </select>
+                                <div class="validation-error" id="vehiculo-arrendadora-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-cedula-juridica" class="label-minimal">Cédula Jurídica</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-cedula-juridica" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.arrendadora_id_juridica)}" 
+                                    placeholder="3101672906"
+                                    readonly
+                                >
+                                <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-apoderado" class="label-minimal">Apoderado</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-apoderado" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.arrendadora_apoderado)}" 
+                                    placeholder="Eduardo Estivie Méndez Mora"
+                                    readonly
+                                >
+                                <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-cedula-apoderado" class="label-minimal">Cédula Apoderado</label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-cedula-apoderado" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.arrendadora_id_apoderado)}" 
+                                    placeholder="112220831"
+                                    readonly
+                                >
+                                <p class="help-text">Se llena automáticamente al seleccionar la arrendadora</p>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-valor-adquisicion" class="label-minimal">Valor Adquisición (CRC)</label>
+                                <div class="input-group-minimal">
+                                    <span class="currency-prefix">₡</span>
+                                    <input 
+                                        type="number" 
+                                        id="vehiculo-valor-adquisicion" 
+                                        class="input-minimal" 
+                                        value="${item?.valor_adquisicion || ''}" 
+                                        min="0" 
+                                        step="1000"
+                                        placeholder="0"
+                                    >
+                                </div>
+                                <div class="validation-error" id="vehiculo-valor-adquisicion-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-fecha-adquisicion" class="label-minimal">Fecha Adquisición</label>
+                                <input 
+                                    type="date" 
+                                    id="vehiculo-fecha-adquisicion" 
+                                    class="input-minimal" 
+                                    value="${item?.fecha_adquisicion || ''}" 
+                                >
+                                <div class="validation-error" id="vehiculo-fecha-adquisicion-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-grupo-whatsapp" class="label-minimal">
+                                    <i class="fab fa-whatsapp"></i>
+                                    Grupo WhatsApp
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-grupo-whatsapp" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.whatsapp_grupo_nombre)}" 
+                                    placeholder="Mante / BHV852"
+                                >
+                                <div class="validation-error" id="vehiculo-grupo-whatsapp-error"></div>
+                            </div>
+
+                            <!-- Fotos -->
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-fotos" class="label-minimal">
+                                    <i class="fas fa-images"></i>
+                                    Link de Fotos
+                                </label>
+                                <input 
+                                    type="url" 
+                                    id="vehiculo-fotos" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.fotos_url)}" 
+                                    placeholder="${FORM_CONSTANTS.placeholders.fotos}"
+                                >
+                                <p class="help-text">URL donde se encuentran las fotos del vehículo</p>
+                                <div class="validation-error" id="vehiculo-fotos-error"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    // Pestaña: Galería
+    getVehiculoGaleriaTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-images"></i>
+                    Galería de Fotos del Vehículo
+                </h3>
+                
+                <div class="galeria-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.uploadFoto(${item.id})">
+                        <i class="fas fa-upload"></i>
+                        Subir Nueva Foto
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshGaleria(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="galeria-grid" id="galeria-vehiculo-${item.id}">
+                    <div class="galeria-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando galería...</p>
+                    </div>
+                </div>
+
+                <div class="galeria-info">
+                    <p><strong>Máximo:</strong> 30 fotos por vehículo</p>
+                    <p><strong>Formatos:</strong> JPG, PNG, GIF (máx. 5MB por foto)</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: Tareas
+    getVehiculoTareasTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-tasks"></i>
+                    Tareas Relacionadas al Vehículo
+                </h3>
+                
+                <div class="tareas-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.crearTareaVehiculo(${item.id})">
+                        <i class="fas fa-plus"></i>
+                        Nueva Tarea
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshTareasVehiculo(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="tareas-filtros">
+                    <select class="form-select" id="filtro-estado-tareas">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                    
+                    <select class="form-select" id="filtro-prioridad-tareas">
+                        <option value="">Todas las prioridades</option>
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+
+                <div class="tareas-list" id="tareas-vehiculo-${item.id}">
+                    <div class="tareas-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando tareas...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: Inspecciones
+    getVehiculoInspeccionesTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Inspecciones del Vehículo
+                </h3>
+                
+                <div class="inspecciones-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevaInspeccion(${item.id})">
+                        <i class="fas fa-plus"></i>
+                        Nueva Inspección
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.manageMachotes()">
+                        <i class="fas fa-cog"></i>
+                        Gestionar Machotes
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshInspecciones(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="inspecciones-filtros">
+                    <select class="form-select" id="filtro-estado-inspecciones">
+                        <option value="">Todos los estados</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                    
+                    <select class="form-select" id="filtro-machote-inspecciones">
+                        <option value="">Todos los machotes</option>
+                    </select>
+                </div>
+
+                <div class="inspecciones-list" id="inspecciones-vehiculo-${item.id}">
+                    <div class="inspecciones-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando inspecciones...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: Bitácora
+    getVehiculoBitacoraTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-comments"></i>
+                    Bitácora y Comentarios del Vehículo
+                </h3>
+                
+                <div class="bitacora-controls">
+                    <div class="bitacora-input-group">
+                        <input type="text" class="form-control" id="mensaje-bitacora" 
+                               placeholder="Escribe un comentario..." maxlength="500">
+                        <button type="button" class="btn btn-primary" onclick="modalManager.enviarMensajeBitacora(${item.id})">
+                            <i class="fas fa-paper-plane"></i>
+                            Enviar
+                        </button>
+                    </div>
+                    
+                    <div class="bitacora-actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="modalManager.adjuntarArchivoBitacora(${item.id})">
+                            <i class="fas fa-paperclip"></i>
+                            Adjuntar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshBitacora(${item.id})">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bitacora-chat" id="bitacora-vehiculo-${item.id}">
+                    <div class="bitacora-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando bitácora...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: Kilometraje
+    getVehiculoKilometrajeTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Registro de Kilometraje del Vehículo
+                </h3>
+                
+                <div class="kilometraje-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevoRegistroKilometraje(${item.id})">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Registro
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshKilometraje(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="kilometraje-info">
+                    <div class="kilometraje-current">
+                        <h4>Kilometraje Actual</h4>
+                        <div class="kilometraje-value">
+                            <span class="kilometraje-number">${item?.kilometraje_actual || 0}</span>
+                            <span class="kilometraje-unit">km</span>
+                        </div>
+                        <small>Último registro: ${item?.updated_at ? new Date(item.updated_at).toLocaleDateString() : 'No disponible'}</small>
+                    </div>
+                </div>
+
+                <div class="kilometraje-filtros">
+                    <select class="form-select" id="filtro-periodo-kilometraje">
+                        <option value="30">Últimos 30 días</option>
+                        <option value="90">Últimos 3 meses</option>
+                        <option value="365">Último año</option>
+                        <option value="all">Todo el historial</option>
+                    </select>
+                </div>
+
+                <div class="kilometraje-list" id="kilometraje-vehiculo-${item.id}">
+                    <div class="kilometraje-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando historial...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: GPS
+    getVehiculoGPSTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-satellite-dish"></i>
+                    Dispositivos GPS del Vehículo
+                </h3>
+                
+                <div class="gps-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevoDispositivoGPS(${item.id})">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Dispositivo
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshGPS(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="gps-filtros">
+                    <select class="form-select" id="filtro-estado-gps">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                    </select>
+                </div>
+
+                <div class="gps-list" id="gps-vehiculo-${item.id}">
+                    <div class="gps-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando dispositivos GPS...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Pestaña: Repuestos
+    getVehiculoRepuestosTab(item) {
+        return `
+            <div class="tab-content-inner">
+                <h3 class="tab-title">
+                    <i class="fas fa-tools"></i>
+                    Solicitudes de Repuestos del Vehículo
+                </h3>
+                
+                <div class="repuestos-controls">
+                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevaSolicitudRepuesto(${item.id})">
+                        <i class="fas fa-plus"></i>
+                        Nueva Solicitud
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshRepuestos(${item.id})">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="repuestos-filtros">
+                    <select class="form-select" id="filtro-estado-repuestos">
+                        <option value="">Todos los estados</option>
+                        <option value="nueva">Nueva</option>
+                        <option value="en_proceso">En Proceso</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                    
+                    <select class="form-select" id="filtro-prioridad-repuestos">
+                        <option value="">Todas las prioridades</option>
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+
+                <div class="repuestos-list" id="repuestos-vehiculo-${item.id}">
+                    <div class="repuestos-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando solicitudes...</p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 }
 

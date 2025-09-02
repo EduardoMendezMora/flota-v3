@@ -756,3 +756,275 @@ textarea:focus {
         color: black !important;
     }
 }
+
+/* ===== SISTEMA DE PESTAÑAS PARA VEHÍCULOS ===== */
+
+/* Modal con pestañas */
+.modal-with-tabs {
+    max-width: 95vw !important;
+    width: 95vw !important;
+}
+
+.vehiculo-tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Navegación de pestañas */
+.tab-navigation {
+    display: flex;
+    background: var(--apple-white);
+    border-bottom: 1px solid var(--apple-gray-medium);
+    overflow-x: auto;
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-xs);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--apple-gray);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+.tab-button:hover {
+    color: var(--apple-blue);
+    background: rgba(0, 122, 255, 0.05);
+}
+
+.tab-button.active {
+    color: var(--apple-blue);
+    border-bottom-color: var(--apple-blue);
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.tab-button i {
+    font-size: var(--font-size-base);
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tab-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--apple-black);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.tab-title i {
+    color: var(--apple-blue);
+}
+
+/* Controles de cada pestaña */
+.galeria-controls,
+.tareas-controls,
+.inspecciones-controls,
+.bitacora-controls,
+.kilometraje-controls,
+.gps-controls,
+.repuestos-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+/* Filtros */
+.tareas-filtros,
+.inspecciones-filtros,
+.kilometraje-filtros,
+.gps-filtros,
+.repuestos-filtros {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.form-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-sm);
+    background: var(--apple-white);
+    color: var(--apple-black);
+    font-size: var(--font-size-sm);
+    min-width: 150px;
+}
+
+.form-select:focus {
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* Estados de carga */
+.galeria-loading,
+.tareas-loading,
+.inspecciones-loading,
+.bitacora-loading,
+.kilometraje-loading,
+.gps-loading,
+.repuestos-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    color: var(--apple-gray);
+    gap: var(--spacing-md);
+}
+
+/* Bitácora específica */
+.bitacora-input-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex: 1;
+    max-width: 500px;
+}
+
+.bitacora-input-group input {
+    flex: 1;
+    padding: var(--spacing-md);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+}
+
+.bitacora-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.bitacora-chat {
+    background: var(--apple-white);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-md);
+    min-height: 400px;
+    padding: var(--spacing-md);
+}
+
+/* Kilometraje específico */
+.kilometraje-info {
+    background: var(--apple-white);
+    border: 1px solid var(--apple-gray-medium);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.kilometraje-current h4 {
+    color: var(--apple-gray);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+}
+
+.kilometraje-value {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+}
+
+.kilometraje-number {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--apple-blue);
+}
+
+.kilometraje-unit {
+    font-size: var(--font-size-lg);
+    color: var(--apple-gray);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-with-tabs {
+        max-width: 100vw !important;
+        width: 100vw !important;
+    }
+    
+    .tab-navigation {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .tab-button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-xs);
+    }
+    
+    .tab-button i {
+        display: none;
+    }
+    
+    .tab-pane {
+        padding: var(--spacing-md);
+    }
+    
+    .galeria-controls,
+    .tareas-controls,
+    .inspecciones-controls,
+    .bitacora-controls,
+    .kilometraje-controls,
+    .gps-controls,
+    .repuestos-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .bitacora-input-group {
+        max-width: none;
+    }
+    
+    .tareas-filtros,
+    .inspecciones-filtros,
+    .kilometraje-filtros,
+    .gps-filtros,
+    .repuestos-filtros {
+        flex-direction: column;
+    }
+    
+    .form-select {
+        min-width: auto;
+    }
+}

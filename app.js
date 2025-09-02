@@ -1656,6 +1656,13 @@ class FlotaApp {
                 // Cargar datos específicos del modal después de renderizar
                 await this.modalManager.loadModalData(type, item);
 
+                // Configurar pestañas de vehículo si es necesario
+                if (type === 'vehiculo' && item) {
+                    if (window.vehiculoTabsManager) {
+                        window.vehiculoTabsManager.setVehiculoId(item.id);
+                    }
+                }
+
                 // Enfocar el primer input
                 setTimeout(() => {
                     const firstInput = modalContent.querySelector('input, select, textarea');

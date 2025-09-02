@@ -229,65 +229,447 @@ AND table_name = 'vehiculos'
 ORDER BY ordinal_position;
 
 -- =====================================================
--- 7. DIAGNÓSTICO - ESTRUCTURA REAL DE LA TABLA VEHICULOS
+-- 9. SISTEMA COMPLETO DE PESTAÑAS PARA VEHÍCULOS
 -- =====================================================
 
--- Verificar qué columnas existen realmente en vehiculos
-SELECT 
-    column_name,
-    data_type,
-    is_nullable,
-    column_default,
-    CASE 
-        WHEN is_nullable = 'NO' THEN 'REQUERIDO'
-        ELSE 'OPCIONAL'
-    END as estado
-FROM information_schema.columns 
-WHERE table_schema = 'public' 
-AND table_name = 'vehiculos'
-ORDER BY ordinal_position;
+-- =====================================================
+-- 9.1 GALERÍA DE FOTOS (Hasta 30 fotos por vehículo)
+-- =====================================================
 
--- Verificar restricciones NOT NULL existentes
-SELECT 
-    tc.table_name,
-    kcu.column_name,
-    tc.constraint_type
-FROM information_schema.table_constraints tc
-JOIN information_schema.key_column_usage kcu 
-    ON tc.constraint_name = kcu.constraint_name
-WHERE tc.table_schema = 'public' 
-AND tc.table_name = 'vehiculos'
-AND tc.constraint_type = 'CHECK';
+CREATE TABLE IF NOT EXISTS public.vehiculo_fotos (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    nombre_archivo text NOT NULL,
+    url_archivo text NOT NULL,
+    descripcion text,
+    orden integer NOT NULL DEFAULT 0,
+    fecha_subida timestamp with time zone DEFAULT now(),
+    subido_por_id uuid REFERENCES auth.users(id),
+    subido_por_nombre text,
+    activo boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Índice para optimizar búsquedas por vehículo
+CREATE INDEX IF NOT EXISTS idx_vehiculo_fotos_vehiculo_id ON public.vehiculo_fotos(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_fotos_orden ON public.vehiculo_fotos(orden);
 
 -- =====================================================
--- 8. SCRIPT CORREGIDO PARA HACER CAMPOS OPCIONALES
+-- 9.2 INSPECCIONES CON MACHOTES EDITABLES
 -- =====================================================
--- EJECUTAR ESTE SCRIPT DESPUÉS DE VER EL DIAGNÓSTICO
 
--- Script para hacer campos opcionales (AJUSTAR SEGÚN LAS COLUMNAS REALES)
-/*
--- Ejemplo de cómo hacer campos opcionales (descomenta y ajusta según tu estructura)
-DO $$
-DECLARE
-    col_record RECORD;
+-- Tabla de machotes de inspección
+CREATE TABLE IF NOT EXISTS public.inspeccion_machotes (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    nombre text NOT NULL,
+    descripcion text,
+    categoria text NOT NULL, -- 'preventiva', 'correctiva', 'especial'
+    activo boolean DEFAULT true,
+    creado_por_id uuid REFERENCES auth.users(id),
+    creado_por_nombre text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de pruebas dentro de cada machote
+CREATE TABLE IF NOT EXISTS public.inspeccion_pruebas (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    machote_id uuid NOT NULL REFERENCES public.inspeccion_machotes(id) ON DELETE CASCADE,
+    nombre text NOT NULL,
+    descripcion text,
+    tipo text NOT NULL, -- 'visual', 'medicion', 'prueba', 'documento'
+    criterio_aceptacion text,
+    orden integer NOT NULL DEFAULT 0,
+    activo boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de inspecciones realizadas
+CREATE TABLE IF NOT EXISTS public.vehiculo_inspecciones (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    machote_id uuid NOT NULL REFERENCES public.inspeccion_machotes(id),
+    titulo text NOT NULL,
+    descripcion text,
+    fecha_inspeccion timestamp with time zone NOT NULL,
+    inspector_id uuid REFERENCES auth.users(id),
+    inspector_nombre text NOT NULL,
+    estado text NOT NULL DEFAULT 'en_progreso', -- 'en_progreso', 'completada', 'cancelada'
+    resultado_general text, -- 'aprobada', 'reprobada', 'con_observaciones'
+    observaciones_generales text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de resultados de cada prueba en una inspección
+CREATE TABLE IF NOT EXISTS public.inspeccion_resultados (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    inspeccion_id uuid NOT NULL REFERENCES public.vehiculo_inspecciones(id) ON DELETE CASCADE,
+    prueba_id uuid NOT NULL REFERENCES public.inspeccion_pruebas(id),
+    resultado text NOT NULL, -- 'aprobada', 'reprobada', 'observacion'
+    observacion text,
+    valor_medido text, -- Para pruebas de medición
+    unidad text, -- Para pruebas de medición
+    evidencia_url text, -- URL de foto o documento
+    fecha_resultado timestamp with time zone DEFAULT now(),
+    evaluado_por_id uuid REFERENCES auth.users(id),
+    evaluado_por_nombre text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de comentarios en inspecciones
+CREATE TABLE IF NOT EXISTS public.inspeccion_comentarios (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    inspeccion_id uuid NOT NULL REFERENCES public.vehiculo_inspecciones(id) ON DELETE CASCADE,
+    usuario_id uuid REFERENCES auth.users(id),
+    usuario_nombre text NOT NULL,
+    comentario text NOT NULL,
+    tipo text DEFAULT 'general', -- 'general', 'prueba_especifica', 'sistema'
+    prueba_id uuid REFERENCES public.inspeccion_pruebas(id), -- Si es comentario de prueba específica
+    created_at timestamp with time zone DEFAULT now()
+);
+
+-- Índices para inspecciones
+CREATE INDEX IF NOT EXISTS idx_vehiculo_inspecciones_vehiculo_id ON public.vehiculo_inspecciones(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_inspecciones_fecha ON public.vehiculo_inspecciones(fecha_inspeccion);
+CREATE INDEX IF NOT EXISTS idx_inspeccion_resultados_inspeccion_id ON public.inspeccion_resultados(inspeccion_id);
+
+-- =====================================================
+-- 9.3 BITÁCORA Y COMENTARIOS (Estilo WhatsApp)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS public.vehiculo_bitacora (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    usuario_id uuid REFERENCES auth.users(id),
+    usuario_nombre text NOT NULL,
+    usuario_avatar text,
+    mensaje text NOT NULL,
+    tipo text DEFAULT 'texto', -- 'texto', 'imagen', 'documento', 'ubicacion'
+    contenido_url text, -- Para imágenes, documentos, etc.
+    mensaje_padre_id uuid REFERENCES public.vehiculo_bitacora(id), -- Para respuestas
+    reacciones jsonb DEFAULT '{}', -- Emojis y reacciones
+    leido_por jsonb DEFAULT '[]', -- Lista de usuarios que han leído
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Índices para bitácora
+CREATE INDEX IF NOT EXISTS idx_vehiculo_bitacora_vehiculo_id ON public.vehiculo_bitacora(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_bitacora_fecha ON public.vehiculo_bitacora(created_at);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_bitacora_usuario ON public.vehiculo_bitacora(usuario_id);
+
+-- =====================================================
+-- 9.4 KILOMETRAJE / MILLAJE (Registros inborrables)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS public.vehiculo_kilometraje (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    valor numeric NOT NULL CHECK (valor >= 0),
+    unidad text NOT NULL DEFAULT 'km', -- 'km', 'mi'
+    tipo_registro text NOT NULL DEFAULT 'manual', -- 'manual', 'gps', 'sistema'
+    fecha_registro timestamp with time zone NOT NULL,
+    usuario_id uuid REFERENCES auth.users(id),
+    usuario_nombre text NOT NULL,
+    observaciones text,
+    evidencia_url text, -- Foto del odómetro
+    created_at timestamp with time zone DEFAULT now()
+);
+
+-- Índices para kilometraje
+CREATE INDEX IF NOT EXISTS idx_vehiculo_kilometraje_vehiculo_id ON public.vehiculo_kilometraje(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_kilometraje_fecha ON public.vehiculo_kilometraje(fecha_registro);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_kilometraje_valor ON public.vehiculo_kilometraje(valor);
+
+-- =====================================================
+-- 9.5 DISPOSITIVOS GPS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS public.vehiculo_gps_dispositivos (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    modelo text NOT NULL,
+    numero_serie text NOT NULL,
+    numero_sim text NOT NULL,
+    proveedor text,
+    plan_datos text,
+    estado text DEFAULT 'activo', -- 'activo', 'inactivo', 'mantenimiento'
+    fecha_instalacion date,
+    fecha_vencimiento_plan date,
+    responsable_id uuid REFERENCES auth.users(id),
+    responsable_nombre text,
+    observaciones text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de comentarios y archivos para dispositivos GPS
+CREATE TABLE IF NOT EXISTS public.gps_comentarios (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    dispositivo_id uuid NOT NULL REFERENCES public.vehiculo_gps_dispositivos(id) ON DELETE CASCADE,
+    usuario_id uuid REFERENCES auth.users(id),
+    usuario_nombre text NOT NULL,
+    comentario text NOT NULL,
+    tipo_contenido text DEFAULT 'texto', -- 'texto', 'imagen', 'documento', 'pantallazo'
+    contenido_url text, -- URL del archivo adjunto
+    created_at timestamp with time zone DEFAULT now()
+);
+
+-- Índices para GPS
+CREATE INDEX IF NOT EXISTS idx_vehiculo_gps_dispositivos_vehiculo_id ON public.vehiculo_gps_dispositivos(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehiculo_gps_dispositivos_serie ON public.vehiculo_gps_dispositivos(numero_serie);
+CREATE INDEX IF NOT EXISTS idx_gps_comentarios_dispositivo_id ON public.gps_comentarios(dispositivo_id);
+
+-- =====================================================
+-- 9.6 SOLICITUDES DE REPUESTOS (Sistema Kanban)
+-- =====================================================
+
+-- Tabla principal de solicitudes
+CREATE TABLE IF NOT EXISTS public.solicitudes_repuestos (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vehiculo_id uuid NOT NULL REFERENCES public.vehiculos(id) ON DELETE CASCADE,
+    titulo text NOT NULL,
+    nombre_repuesto text NOT NULL,
+    numero_parte text,
+    descripcion text,
+    prioridad text DEFAULT 'media', -- 'baja', 'media', 'alta', 'urgente'
+    estado text DEFAULT 'nueva', -- 'nueva', 'en_proceso', 'completada'
+    categoria text, -- 'motor', 'frenos', 'suspension', 'electrico', 'otros'
+    cantidad_solicitada integer DEFAULT 1,
+    cantidad_aprobada integer,
+    costo_estimado numeric,
+    proveedor_sugerido text,
+    fecha_solicitud timestamp with time zone DEFAULT now(),
+    fecha_requerida date,
+    fecha_aprobacion timestamp with time zone,
+    fecha_completada timestamp with time zone,
+    solicitante_id uuid REFERENCES auth.users(id),
+    solicitante_nombre text NOT NULL,
+    responsable_id uuid REFERENCES auth.users(id),
+    responsable_nombre text,
+    aprobador_id uuid REFERENCES auth.users(id),
+    aprobador_nombre text,
+    observaciones text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de comentarios en solicitudes
+CREATE TABLE IF NOT EXISTS public.solicitud_comentarios (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    solicitud_id uuid NOT NULL REFERENCES public.solicitudes_repuestos(id) ON DELETE CASCADE,
+    usuario_id uuid REFERENCES auth.users(id),
+    usuario_nombre text NOT NULL,
+    comentario text NOT NULL,
+    tipo_contenido text DEFAULT 'texto', -- 'texto', 'imagen', 'documento', 'pantallazo'
+    contenido_url text, -- URL del archivo adjunto
+    created_at timestamp with time zone DEFAULT now()
+);
+
+-- Tabla de archivos adjuntos en solicitudes
+CREATE TABLE IF NOT EXISTS public.solicitud_archivos (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    solicitud_id uuid NOT NULL REFERENCES public.solicitudes_repuestos(id) ON DELETE CASCADE,
+    nombre_archivo text NOT NULL,
+    url_archivo text NOT NULL,
+    tipo_archivo text NOT NULL, -- 'imagen', 'documento', 'pdf', 'excel'
+    descripcion text,
+    subido_por_id uuid REFERENCES auth.users(id),
+    subido_por_nombre text,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+-- Índices para solicitudes
+CREATE INDEX IF NOT EXISTS idx_solicitudes_repuestos_vehiculo_id ON public.solicitudes_repuestos(vehiculo_id);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_repuestos_estado ON public.solicitudes_repuestos(estado);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_repuestos_prioridad ON public.solicitudes_repuestos(prioridad);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_repuestos_fecha ON public.solicitudes_repuestos(fecha_solicitud);
+CREATE INDEX IF NOT EXISTS idx_solicitudes_repuestos_responsable ON public.solicitudes_repuestos(responsable_id);
+
+-- =====================================================
+-- 9.7 TRIGGERS Y FUNCIONES AUTOMÁTICAS
+-- =====================================================
+
+-- Función para generar tareas automáticamente cuando una inspección falla
+CREATE OR REPLACE FUNCTION generar_tarea_inspeccion_fallida()
+RETURNS TRIGGER AS $$
 BEGIN
-    -- Lista de columnas que quieres hacer opcionales (ajusta según tu tabla)
-    FOR col_record IN 
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_schema = 'public' 
-        AND table_name = 'vehiculos'
-        AND column_name IN (
-            'marca_id', 'modelo_id', 'arrendadora_id', 'estado_inventario_id',
-            'color', 'carroceria', 'combustible', 'transmision', 'traccion',
-            'cilindrada', 'cilindros', 'vin', 'renta_semanal', 'ubicacion'
-        )
-        AND is_nullable = 'NO'
-    LOOP
-        EXECUTE format('ALTER TABLE public.vehiculos ALTER COLUMN %I DROP NOT NULL', col_record.column_name);
-        RAISE NOTICE 'Columna % hecha opcional', col_record.column_name;
-    END LOOP;
+    -- Si el resultado es 'reprobada', generar tarea automáticamente
+    IF NEW.resultado = 'reprobada' THEN
+        INSERT INTO public.tareas (
+            titulo,
+            descripcion,
+            vehiculo_id,
+            responsable_id,
+            responsable_nombre,
+            prioridad,
+            estado,
+            tipo,
+            fecha_creacion,
+            fecha_limite,
+            observaciones
+        ) VALUES (
+            'Tarea generada por inspección fallida',
+            'Se requiere atención inmediata debido a resultado de inspección: ' || 
+            (SELECT nombre FROM public.inspeccion_pruebas WHERE id = NEW.prueba_id),
+            (SELECT vehiculo_id FROM public.vehiculo_inspecciones WHERE id = NEW.inspeccion_id),
+            (SELECT inspector_id FROM public.vehiculo_inspecciones WHERE id = NEW.inspeccion_id),
+            (SELECT inspector_nombre FROM public.vehiculo_inspecciones WHERE id = NEW.inspeccion_id),
+            'alta',
+            'pendiente',
+            'inspeccion',
+            now(),
+            now() + interval '7 days',
+            'Tarea generada automáticamente por sistema de inspecciones'
+        );
+    END IF;
     
-    RAISE NOTICE 'Proceso completado';
-END $$;
-*/
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para generar tareas automáticamente
+CREATE TRIGGER trigger_generar_tarea_inspeccion
+    AFTER INSERT OR UPDATE ON public.inspeccion_resultados
+    FOR EACH ROW
+    EXECUTE FUNCTION generar_tarea_inspeccion_fallida();
+
+-- Función para actualizar timestamp de actualización
+CREATE OR REPLACE FUNCTION actualizar_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers para actualizar timestamps
+CREATE TRIGGER trigger_actualizar_vehiculo_fotos
+    BEFORE UPDATE ON public.vehiculo_fotos
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_inspeccion_machotes
+    BEFORE UPDATE ON public.inspeccion_machotes
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_inspeccion_pruebas
+    BEFORE UPDATE ON public.inspeccion_pruebas
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_vehiculo_inspecciones
+    BEFORE UPDATE ON public.vehiculo_inspecciones
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_inspeccion_resultados
+    BEFORE UPDATE ON public.inspeccion_resultados
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_vehiculo_bitacora
+    BEFORE UPDATE ON public.vehiculo_bitacora
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_vehiculo_gps_dispositivos
+    BEFORE UPDATE ON public.vehiculo_gps_dispositivos
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trigger_actualizar_solicitudes_repuestos
+    BEFORE UPDATE ON public.solicitudes_repuestos
+    FOR EACH ROW
+    EXECUTE FUNCTION actualizar_timestamp();
+
+-- =====================================================
+-- 9.8 DATOS INICIALES PARA MACHOTES DE INSPECCIÓN
+-- =====================================================
+
+-- Insertar machotes básicos de inspección
+INSERT INTO public.inspeccion_machotes (nombre, descripcion, categoria, creado_por_nombre) VALUES
+    ('Inspección Preventiva Mensual', 'Inspección general mensual del vehículo', 'preventiva', 'Sistema'),
+    ('Inspección Pre-Viaje', 'Inspección antes de salir a ruta', 'preventiva', 'Sistema'),
+    ('Inspección Post-Viaje', 'Inspección después de regresar de ruta', 'preventiva', 'Sistema'),
+    ('Inspección de Seguridad', 'Verificación de elementos de seguridad', 'correctiva', 'Sistema'),
+    ('Inspección de Mantenimiento', 'Verificación post-mantenimiento', 'especial', 'Sistema')
+ON CONFLICT DO NOTHING;
+
+-- Insertar pruebas básicas para el machote de inspección preventiva mensual
+INSERT INTO public.inspeccion_pruebas (machote_id, nombre, descripcion, tipo, criterio_aceptacion, orden) VALUES
+    ((SELECT id FROM public.inspeccion_machotes WHERE nombre = 'Inspección Preventiva Mensual'), 'Estado de llantas', 'Verificar desgaste y presión de llantas', 'visual', 'Llantas con buen estado y presión correcta', 1),
+    ((SELECT id FROM public.inspeccion_machotes WHERE nombre = 'Inspección Preventiva Mensual'), 'Nivel de aceite', 'Verificar nivel y estado del aceite del motor', 'medicion', 'Nivel entre mínimo y máximo, aceite limpio', 2),
+    ((SELECT id FROM public.inspeccion_machotes WHERE nombre = 'Inspección Preventiva Mensual'), 'Estado de frenos', 'Verificar funcionamiento de frenos', 'prueba', 'Frenos responden correctamente', 3),
+    ((SELECT id FROM public.inspeccion_machotes WHERE nombre = 'Inspección Preventiva Mensual'), 'Luces y señalización', 'Verificar funcionamiento de todas las luces', 'visual', 'Todas las luces funcionan correctamente', 4),
+    ((SELECT id FROM public.inspeccion_machotes WHERE nombre = 'Inspección Preventiva Mensual'), 'Documentación', 'Verificar documentos del vehículo', 'documento', 'Documentos vigentes y completos', 5)
+ON CONFLICT DO NOTHING;
+
+-- =====================================================
+-- 9.9 POLÍTICAS DE SEGURIDAD RLS (Row Level Security)
+-- =====================================================
+
+-- Habilitar RLS en todas las tablas nuevas
+ALTER TABLE public.vehiculo_fotos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inspeccion_machotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inspeccion_pruebas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehiculo_inspecciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inspeccion_resultados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inspeccion_comentarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehiculo_bitacora ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehiculo_kilometraje ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehiculo_gps_dispositivos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.gps_comentarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.solicitudes_repuestos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.solicitud_comentarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.solicitud_archivos ENABLE ROW LEVEL SECURITY;
+
+-- =====================================================
+-- 9.10 VERIFICACIÓN FINAL DEL SISTEMA
+-- =====================================================
+
+-- Verificar que todas las nuevas tablas se crearon correctamente
+SELECT 'NUEVAS TABLAS CREADAS:' as status, table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name IN (
+    'vehiculo_fotos', 'inspeccion_machotes', 'inspeccion_pruebas',
+    'vehiculo_inspecciones', 'inspeccion_resultados', 'inspeccion_comentarios',
+    'vehiculo_bitacora', 'vehiculo_kilometraje', 'vehiculo_gps_dispositivos',
+    'gps_comentarios', 'solicitudes_repuestos', 'solicitud_comentarios',
+    'solicitud_archivos'
+)
+ORDER BY table_name;
+
+-- Verificar triggers creados
+SELECT 
+    trigger_name,
+    event_manipulation,
+    event_object_table,
+    action_statement
+FROM information_schema.triggers 
+WHERE trigger_schema = 'public'
+AND event_object_table IN (
+    'inspeccion_resultados', 'vehiculo_fotos', 'inspeccion_machotes',
+    'inspeccion_pruebas', 'vehiculo_inspecciones', 'vehiculo_bitacora',
+    'vehiculo_gps_dispositivos', 'solicitudes_repuestos'
+)
+ORDER BY event_object_table, trigger_name;
+
+-- Verificar funciones creadas
+SELECT 
+    routine_name,
+    routine_type,
+    data_type
+FROM information_schema.routines 
+WHERE routine_schema = 'public'
+AND routine_name IN (
+    'generar_tarea_inspeccion_fallida',
+    'actualizar_timestamp'
+)
+ORDER BY routine_name;
