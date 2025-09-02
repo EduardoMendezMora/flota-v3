@@ -1167,6 +1167,475 @@ class ApiService {
         const currentYear = new Date().getFullYear();
         return year >= FORM_CONSTANTS.minYear && year <= currentYear + 2;
     }
+
+    // ========================================
+    // APIs PARA PESTAÑAS DE VEHÍCULOS
+    // ========================================
+
+    // GALERÍA DE FOTOS
+    async getVehiculoFotos(vehiculoId) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_fotos')
+                .select('*')
+                .eq('vehiculo_id', vehiculoId)
+                .eq('activo', true)
+                .order('orden', { ascending: true });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo fotos del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async uploadVehiculoFoto(vehiculoId, fotoData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_fotos')
+                .insert([{
+                    vehiculo_id: vehiculoId,
+                    nombre_archivo: fotoData.nombre,
+                    url_archivo: fotoData.url,
+                    descripcion: fotoData.descripcion || '',
+                    orden: fotoData.orden || 0,
+                    subido_por_id: this.currentUser?.id,
+                    subido_por_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario'
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error subiendo foto del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteVehiculoFoto(fotoId) {
+        try {
+            const { error } = await this.supabase
+                .from('vehiculo_fotos')
+                .update({ activo: false })
+                .eq('id', fotoId);
+
+            if (error) throw error;
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Error eliminando foto del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // TAREAS DEL VEHÍCULO
+    async getVehiculoTareas(vehiculoId, filtros = {}) {
+        try {
+            let query = this.supabase
+                .from('tareas')
+                .select('*')
+                .eq('vehiculo_id', vehiculoId)
+                .order('created_at', { ascending: false });
+
+            // Aplicar filtros
+            if (filtros.estado) {
+                query = query.eq('estado', filtros.estado);
+            }
+            if (filtros.prioridad) {
+                query = query.eq('prioridad', filtros.prioridad);
+            }
+            if (filtros.asignado_a) {
+                query = query.eq('asignado_a_id', filtros.asignado_a);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo tareas del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // INSPECCIONES
+    async getInspeccionMachotes() {
+        try {
+            const { data, error } = await this.supabase
+                .from('inspeccion_machotes')
+                .select('*')
+                .eq('activo', true)
+                .order('nombre', { ascending: true });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo machotes de inspección:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async getInspeccionPruebas(machoteId) {
+        try {
+            const { data, error } = await this.supabase
+                .from('inspeccion_pruebas')
+                .select('*')
+                .eq('machote_id', machoteId)
+                .eq('activo', true)
+                .order('orden', { ascending: true });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo pruebas de inspección:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async getVehiculoInspecciones(vehiculoId, filtros = {}) {
+        try {
+            let query = this.supabase
+                .from('vehiculo_inspecciones')
+                .select(`
+                    *,
+                    inspeccion_machotes(nombre),
+                    inspeccion_resultados(*)
+                `)
+                .eq('vehiculo_id', vehiculoId)
+                .order('fecha_inspeccion', { ascending: false });
+
+            if (filtros.estado) {
+                query = query.eq('estado', filtros.estado);
+            }
+            if (filtros.machote_id) {
+                query = query.eq('machote_id', filtros.machote_id);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo inspecciones del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async crearInspeccion(inspeccionData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_inspecciones')
+                .insert([{
+                    vehiculo_id: inspeccionData.vehiculo_id,
+                    machote_id: inspeccionData.machote_id,
+                    titulo: inspeccionData.titulo,
+                    descripcion: inspeccionData.descripcion,
+                    fecha_inspeccion: inspeccionData.fecha_inspeccion,
+                    inspector_id: this.currentUser?.id,
+                    inspector_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    estado: 'en_proceso'
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error creando inspección:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async guardarResultadoInspeccion(resultadoData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('inspeccion_resultados')
+                .insert([{
+                    inspeccion_id: resultadoData.inspeccion_id,
+                    prueba_id: resultadoData.prueba_id,
+                    resultado: resultadoData.resultado,
+                    observaciones: resultadoData.observaciones,
+                    inspector_id: this.currentUser?.id
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error guardando resultado de inspección:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // BITÁCORA Y COMENTARIOS
+    async getVehiculoBitacora(vehiculoId, limit = 50) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_bitacora')
+                .select(`
+                    *,
+                    usuario:usuario_id(id, user_metadata)
+                `)
+                .eq('vehiculo_id', vehiculoId)
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo bitácora del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async enviarMensajeBitacora(mensajeData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_bitacora')
+                .insert([{
+                    vehiculo_id: mensajeData.vehiculo_id,
+                    usuario_id: this.currentUser?.id,
+                    usuario_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    mensaje: mensajeData.mensaje,
+                    tipo: mensajeData.tipo || 'comentario',
+                    contenido_url: mensajeData.contenido_url || null,
+                    mensaje_padre_id: mensajeData.mensaje_padre_id || null
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error enviando mensaje a bitácora:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // KILOMETRAJE
+    async getVehiculoKilometraje(vehiculoId, limit = 100) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_kilometraje')
+                .select(`
+                    *,
+                    usuario:usuario_id(id, user_metadata)
+                `)
+                .eq('vehiculo_id', vehiculoId)
+                .order('fecha_registro', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo kilometraje del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async registrarKilometraje(kilometrajeData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_kilometraje')
+                .insert([{
+                    vehiculo_id: kilometrajeData.vehiculo_id,
+                    valor: kilometrajeData.valor,
+                    unidad: kilometrajeData.unidad,
+                    tipo_registro: kilometrajeData.tipo_registro,
+                    fecha_registro: kilometrajeData.fecha_registro || new Date().toISOString(),
+                    usuario_id: this.currentUser?.id,
+                    usuario_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    observaciones: kilometrajeData.observaciones || '',
+                    evidencia_url: kilometrajeData.evidencia_url || null
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error registrando kilometraje:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // DISPOSITIVOS GPS
+    async getVehiculoGPS(vehiculoId) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_gps_dispositivos')
+                .select(`
+                    *,
+                    gps_comentarios(*)
+                `)
+                .eq('vehiculo_id', vehiculoId)
+                .eq('activo', true)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo dispositivos GPS del vehículo:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async agregarDispositivoGPS(gpsData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('vehiculo_gps_dispositivos')
+                .insert([{
+                    vehiculo_id: gpsData.vehiculo_id,
+                    modelo: gpsData.modelo,
+                    numero_serie: gpsData.numero_serie,
+                    numero_sim: gpsData.numero_sim,
+                    estado: gpsData.estado || 'activo',
+                    observaciones: gpsData.observaciones || '',
+                    instalado_por_id: this.currentUser?.id,
+                    instalado_por_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario'
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error agregando dispositivo GPS:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async agregarComentarioGPS(comentarioData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('gps_comentarios')
+                .insert([{
+                    dispositivo_id: comentarioData.dispositivo_id,
+                    usuario_id: this.currentUser?.id,
+                    usuario_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    comentario: comentarioData.comentario,
+                    tipo_contenido: comentarioData.tipo_contenido || 'texto',
+                    contenido_url: comentarioData.contenido_url || null
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error agregando comentario GPS:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // SOLICITUDES DE REPUESTOS
+    async getSolicitudesRepuestos(filtros = {}) {
+        try {
+            let query = this.supabase
+                .from('solicitudes_repuestos')
+                .select(`
+                    *,
+                    vehiculo:vehiculo_id(placas, numero_economico),
+                    solicitante:solicitante_id(id, user_metadata),
+                    responsable:responsable_id(id, user_metadata)
+                `)
+                .order('created_at', { ascending: false });
+
+            // Aplicar filtros
+            if (filtros.estado) {
+                query = query.eq('estado', filtros.estado);
+            }
+            if (filtros.vehiculo_id) {
+                query = query.eq('vehiculo_id', filtros.vehiculo_id);
+            }
+            if (filtros.prioridad) {
+                query = query.eq('prioridad', filtros.prioridad);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('❌ Error obteniendo solicitudes de repuestos:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async crearSolicitudRepuesto(solicitudData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('solicitudes_repuestos')
+                .insert([{
+                    vehiculo_id: solicitudData.vehiculo_id,
+                    titulo: solicitudData.titulo,
+                    nombre_repuesto: solicitudData.nombre_repuesto,
+                    numero_parte: solicitudData.numero_parte || '',
+                    descripcion: solicitudData.descripcion || '',
+                    prioridad: solicitudData.prioridad || 'media',
+                    estado: 'nueva',
+                    cantidad_solicitada: solicitudData.cantidad_solicitada || 1,
+                    costo_estimado: solicitudData.costo_estimado || null,
+                    proveedor_sugerido: solicitudData.proveedor_sugerido || '',
+                    fecha_requerida: solicitudData.fecha_requerida || null,
+                    solicitante_id: this.currentUser?.id,
+                    solicitante_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    observaciones: solicitudData.observaciones || ''
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error creando solicitud de repuesto:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async actualizarEstadoSolicitud(solicitudId, nuevoEstado, responsableId = null) {
+        try {
+            const updateData = { estado: nuevoEstado };
+            
+            if (responsableId) {
+                updateData.responsable_id = responsableId;
+                // Obtener nombre del responsable
+                const { data: userData } = await this.supabase.auth.getUser();
+                if (userData?.user) {
+                    updateData.responsable_nombre = userData.user.user_metadata?.full_name || 'Usuario';
+                }
+            }
+
+            if (nuevoEstado === 'completada') {
+                updateData.fecha_completada = new Date().toISOString();
+            }
+
+            const { data, error } = await this.supabase
+                .from('solicitudes_repuestos')
+                .update(updateData)
+                .eq('id', solicitudId)
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error actualizando estado de solicitud:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async agregarComentarioSolicitud(comentarioData) {
+        try {
+            const { data, error } = await this.supabase
+                .from('solicitud_comentarios')
+                .insert([{
+                    solicitud_id: comentarioData.solicitud_id,
+                    usuario_id: this.currentUser?.id,
+                    usuario_nombre: this.currentUser?.user_metadata?.full_name || 'Usuario',
+                    comentario: comentarioData.comentario,
+                    tipo_contenido: comentarioData.tipo_contenido || 'texto',
+                    contenido_url: comentarioData.contenido_url || null
+                }])
+                .select();
+
+            if (error) throw error;
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error agregando comentario a solicitud:', error);
+            return { success: false, error: error.message };
+        }
+    },
 }
 
 // Instancia global del servicio API

@@ -2052,18 +2052,18 @@ class ModalManager {
                 </h3>
                 
                 <div class="galeria-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.uploadFoto(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.uploadFoto()">
                         <i class="fas fa-upload"></i>
                         Subir Nueva Foto
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshGaleria(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshGaleria()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
                 </div>
 
-                <div class="galeria-grid" id="galeria-vehiculo-${item.id}">
-                    <div class="galeria-loading">
+                <div class="galeria-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando galería...</p>
                     </div>
@@ -2087,26 +2087,26 @@ class ModalManager {
                 </h3>
                 
                 <div class="tareas-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.crearTareaVehiculo(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.crearTareaVehiculo()">
                         <i class="fas fa-plus"></i>
                         Nueva Tarea
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshTareasVehiculo(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshTareasVehiculo()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
                 </div>
 
                 <div class="tareas-filtros">
-                    <select class="form-select" id="filtro-estado-tareas">
+                    <select class="form-select tareas-filtro" id="filtro-estado-tareas">
                         <option value="">Todos los estados</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="en_progreso">En Progreso</option>
+                        <option value="en_proceso">En Proceso</option>
                         <option value="completada">Completada</option>
                         <option value="cancelada">Cancelada</option>
                     </select>
                     
-                    <select class="form-select" id="filtro-prioridad-tareas">
+                    <select class="form-select tareas-filtro" id="filtro-prioridad-tareas">
                         <option value="">Todas las prioridades</option>
                         <option value="baja">Baja</option>
                         <option value="media">Media</option>
@@ -2115,8 +2115,8 @@ class ModalManager {
                     </select>
                 </div>
 
-                <div class="tareas-list" id="tareas-vehiculo-${item.id}">
-                    <div class="tareas-loading">
+                <div class="tareas-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando tareas...</p>
                     </div>
@@ -2135,35 +2135,35 @@ class ModalManager {
                 </h3>
                 
                 <div class="inspecciones-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevaInspeccion(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevaInspeccion()">
                         <i class="fas fa-plus"></i>
                         Nueva Inspección
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.manageMachotes()">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.manageMachotes()">
                         <i class="fas fa-cog"></i>
                         Gestionar Machotes
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshInspecciones(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshInspecciones()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
                 </div>
 
                 <div class="inspecciones-filtros">
-                    <select class="form-select" id="filtro-estado-inspecciones">
+                    <select class="form-select inspecciones-filtro" id="filtro-estado-inspecciones">
                         <option value="">Todos los estados</option>
-                        <option value="en_progreso">En Progreso</option>
+                        <option value="en_proceso">En Proceso</option>
                         <option value="completada">Completada</option>
                         <option value="cancelada">Cancelada</option>
                     </select>
                     
-                    <select class="form-select" id="filtro-machote-inspecciones">
+                    <select class="form-select inspecciones-filtro" id="filtro-machote-inspecciones">
                         <option value="">Todos los machotes</option>
                     </select>
                 </div>
 
-                <div class="inspecciones-list" id="inspecciones-vehiculo-${item.id}">
-                    <div class="inspecciones-loading">
+                <div class="inspecciones-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando inspecciones...</p>
                     </div>
@@ -2183,28 +2183,28 @@ class ModalManager {
                 
                 <div class="bitacora-controls">
                     <div class="bitacora-input-group">
-                        <input type="text" class="form-control" id="mensaje-bitacora" 
+                        <input type="text" class="form-control bitacora-input" 
                                placeholder="Escribe un comentario..." maxlength="500">
-                        <button type="button" class="btn btn-primary" onclick="modalManager.enviarMensajeBitacora(${item.id})">
+                        <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.enviarMensajeBitacora()">
                             <i class="fas fa-paper-plane"></i>
                             Enviar
                         </button>
                     </div>
                     
                     <div class="bitacora-actions">
-                        <button type="button" class="btn btn-outline-secondary" onclick="modalManager.adjuntarArchivoBitacora(${item.id})">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.adjuntarArchivoBitacora()">
                             <i class="fas fa-paperclip"></i>
                             Adjuntar
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshBitacora(${item.id})">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshBitacora()">
                             <i class="fas fa-sync-alt"></i>
                             Actualizar
                         </button>
                     </div>
                 </div>
 
-                <div class="bitacora-chat" id="bitacora-vehiculo-${item.id}">
-                    <div class="bitacora-loading">
+                <div class="bitacora-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando bitácora...</p>
                     </div>
@@ -2223,11 +2223,11 @@ class ModalManager {
                 </h3>
                 
                 <div class="kilometraje-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevoRegistroKilometraje(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevoRegistroKilometraje()">
                         <i class="fas fa-plus"></i>
                         Nuevo Registro
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshKilometraje(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshKilometraje()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
@@ -2245,7 +2245,7 @@ class ModalManager {
                 </div>
 
                 <div class="kilometraje-filtros">
-                    <select class="form-select" id="filtro-periodo-kilometraje">
+                    <select class="form-select kilometraje-filtro" id="filtro-periodo-kilometraje">
                         <option value="30">Últimos 30 días</option>
                         <option value="90">Últimos 3 meses</option>
                         <option value="365">Último año</option>
@@ -2253,8 +2253,8 @@ class ModalManager {
                     </select>
                 </div>
 
-                <div class="kilometraje-list" id="kilometraje-vehiculo-${item.id}">
-                    <div class="kilometraje-loading">
+                <div class="kilometraje-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando historial...</p>
                     </div>
@@ -2273,18 +2273,18 @@ class ModalManager {
                 </h3>
                 
                 <div class="gps-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevoDispositivoGPS(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevoDispositivoGPS()">
                         <i class="fas fa-plus"></i>
                         Nuevo Dispositivo
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshGPS(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshGPS()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
                 </div>
 
                 <div class="gps-filtros">
-                    <select class="form-select" id="filtro-estado-gps">
+                    <select class="form-select gps-filtro" id="filtro-estado-gps">
                         <option value="">Todos los estados</option>
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
@@ -2292,8 +2292,8 @@ class ModalManager {
                     </select>
                 </div>
 
-                <div class="gps-list" id="gps-vehiculo-${item.id}">
-                    <div class="gps-loading">
+                <div class="gps-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando dispositivos GPS...</p>
                     </div>
@@ -2312,25 +2312,25 @@ class ModalManager {
                 </h3>
                 
                 <div class="repuestos-controls">
-                    <button type="button" class="btn btn-primary" onclick="modalManager.nuevaSolicitudRepuesto(${item.id})">
+                    <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevaSolicitudRepuesto()">
                         <i class="fas fa-plus"></i>
                         Nueva Solicitud
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="modalManager.refreshRepuestos(${item.id})">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshRepuestos()">
                         <i class="fas fa-sync-alt"></i>
                         Actualizar
                     </button>
                 </div>
 
                 <div class="repuestos-filtros">
-                    <select class="form-select" id="filtro-estado-repuestos">
+                    <select class="form-select repuestos-filtro" id="filtro-estado-repuestos">
                         <option value="">Todos los estados</option>
                         <option value="nueva">Nueva</option>
                         <option value="en_proceso">En Proceso</option>
                         <option value="completada">Completada</option>
                     </select>
                     
-                    <select class="form-select" id="filtro-prioridad-repuestos">
+                    <select class="form-select repuestos-filtro" id="filtro-prioridad-repuestos">
                         <option value="">Todas las prioridades</option>
                         <option value="baja">Baja</option>
                         <option value="media">Media</option>
@@ -2339,8 +2339,8 @@ class ModalManager {
                     </select>
                 </div>
 
-                <div class="repuestos-list" id="repuestos-vehiculo-${item.id}">
-                    <div class="repuestos-loading">
+                <div class="repuestos-content">
+                    <div class="text-center text-muted py-4">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p>Cargando solicitudes...</p>
                     </div>

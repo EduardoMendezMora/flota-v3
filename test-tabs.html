@@ -3,77 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test - Sistema de Pestañas para Vehículos</title>
+    <title>Test - Pestañas de Vehículos</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-light font-inter">
+<body>
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="mb-4">Test - Sistema de Pestañas para Vehículos</h1>
-                
+        <h1 class="text-center mb-4">🧪 Test de Pestañas de Vehículos</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Modal de Vehículo con Pestañas</h5>
-                    </div>
                     <div class="card-body">
+                        <h5 class="card-title">Prueba de Modal con Pestañas</h5>
+                        <p class="card-text">Haz clic en el botón para abrir el modal de vehículo con pestañas.</p>
                         <button class="btn btn-primary" onclick="testVehiculoTabs()">
-                            <i class="fas fa-car me-2"></i>
-                            Abrir Modal con Pestañas
+                            <i class="fas fa-car"></i> Abrir Modal de Vehículo
                         </button>
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Información del Sistema</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Estado de las Pestañas:</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="fas fa-check text-success me-2"></i>Información General</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Galería de Fotos</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Tareas Relacionadas</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Inspecciones</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Bitácora / Comentarios</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Kilometraje</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Dispositivos GPS</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Solicitudes de Repuestos</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Características Implementadas:</h6>
-                                <ul class="list-unstyled">
-                                    <li><i class="fas fa-check text-success me-2"></i>Sistema de navegación por pestañas</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Interfaz responsive</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Estilos Apple minimalistas</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Controles y filtros</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Estados de carga</li>
-                                    <li><i class="fas fa-check text-success me-2"></i>Manejo de errores</li>
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <div id="modal-overlay" class="modal-overlay d-none">
-        <div id="modal-content" class="modal-content">
-            <!-- El contenido del modal se insertará aquí -->
-        </div>
-    </div>
-
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="config.js"></script>
     <script src="api.js"></script>
     <script src="app.js"></script>
@@ -81,71 +41,65 @@
     <script src="vehiculo-tabs.js"></script>
 
     <script>
-        // Función de prueba para abrir el modal con pestañas
+        // Mock de la API para testing
+        window.api = {
+            currentUser: {
+                id: 'test-user-id',
+                user_metadata: {
+                    full_name: 'Usuario de Prueba'
+                }
+            },
+            getVehiculoFotos: async () => ({ success: true, data: [] }),
+            getVehiculoTareas: async () => ({ success: true, data: [] }),
+            getInspeccionMachotes: async () => ({ success: true, data: [] }),
+            getVehiculoInspecciones: async () => ({ success: true, data: [] }),
+            getVehiculoBitacora: async () => ({ success: true, data: [] }),
+            getVehiculoKilometraje: async () => ({ success: true, data: [] }),
+            getVehiculoGPS: async () => ({ success: true, data: [] }),
+            getSolicitudesRepuestos: async () => ({ success: true, data: [] }),
+            enviarMensajeBitacora: async () => ({ success: true, data: { id: 'test-msg' } })
+        };
+
+        // Mock de la app para testing
+        window.app = {
+            showToast: (message, type) => {
+                console.log(`Toast [${type}]:`, message);
+                alert(`${type.toUpperCase()}: ${message}`);
+            }
+        };
+
         function testVehiculoTabs() {
-            // Crear un vehículo de prueba
+            // Crear datos de prueba
             const vehiculoTest = {
-                id: 'test-vehiculo-001',
-                placas: 'ABC123',
+                id: 'test-vehiculo-id',
+                placas: 'ABC-123',
+                numero_economico: '001',
                 marca: 'Toyota',
                 modelo: 'Corolla',
-                año: 2022,
+                anio: 2020,
                 color: 'Blanco',
-                estatus: 'disponible',
-                renta_semanal: 50000,
-                ubicacion: 'San José',
-                kilometraje_actual: 15000,
+                kilometraje_actual: 50000,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
 
+            console.log('🚗 Abriendo modal para vehículo:', vehiculoTest);
+            
             // Abrir el modal con pestañas
-            if (window.app) {
-                window.app.openModal('vehiculo', vehiculoTest);
-            } else {
-                console.error('App no está disponible');
+            window.app.openModal('vehiculo', vehiculoTest);
+        }
+
+        // Función para probar las pestañas individualmente
+        function testTab(tabName) {
+            console.log(`🧪 Probando pestaña: ${tabName}`);
+            if (window.vehiculoTabsManager) {
+                window.vehiculoTabsManager.switchTab(tabName);
             }
         }
 
-        // Simular la app si no está disponible
-        if (!window.app) {
-            window.app = {
-                showToast: function(message, type) {
-                    console.log(`Toast [${type}]: ${message}`);
-                    alert(`${type.toUpperCase()}: ${message}`);
-                }
-            };
-        }
-
-        // Simular la API si no está disponible
-        if (!window.api) {
-            window.api = {
-                getVehiculo: async function(id) {
-                    return {
-                        id: id,
-                        placas: 'ABC123',
-                        marca: 'Toyota',
-                        modelo: 'Corolla',
-                        año: 2022,
-                        color: 'Blanco',
-                        estatus: 'disponible',
-                        renta_semanal: 50000,
-                        ubicacion: 'San José',
-                        kilometraje_actual: 15000,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    };
-                }
-            };
-        }
-
-        // Mostrar mensaje de bienvenida
-        console.log('🚗 Test del Sistema de Pestañas para Vehículos');
-        console.log('✅ Todas las pestañas están implementadas');
-        console.log('✅ Sistema de navegación funcional');
-        console.log('✅ Estilos Apple minimalistas aplicados');
-        console.log('✅ Interfaz responsive configurada');
-        console.log('📱 Haz clic en "Abrir Modal con Pestañas" para probar');
+        // Exponer funciones de prueba globalmente
+        window.testTab = testTab;
+        window.testVehiculoTabs = testVehiculoTabs;
     </script>
 </body>
 </html>
