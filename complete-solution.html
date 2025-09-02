@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solución Completa - Pestañas de Vehículos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">🚀 Solución Completa de Pestañas</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Estado del Sistema</h5>
+                        <div id="status-output">
+                            <p>Verificando componentes...</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="card-title">Acciones</h5>
+                        <button class="btn btn-primary me-2" onclick="testModalGeneration()">
+                            <i class="fas fa-car"></i> Generar Modal
+                        </button>
+                        
+                        <button class="btn btn-success me-2" onclick="showModal()">
+                            <i class="fas fa-eye"></i> Mostrar Modal
+                        </button>
+                        
+                        <button class="btn btn-warning" onclick="testTabs()">
+                            <i class="fas fa-tabs"></i> Probar Pestañas
+                        </button>
+                        
+                        <button class="btn btn-info" onclick="debugSystem()">
+                            <i class="fas fa-bug"></i> Debug Sistema
+                        </button>
+                        
+                        <button class="btn btn-danger" onclick="fixSystem()">
+                            <i class="fas fa-wrench"></i> Reparar Sistema
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+
+    <!-- ModalManager completo inline -->
+    <script>
+        class ModalManager {
+            constructor() {
+                this.modalData = {};
+                this.validationRules = {};
+                this.setupValidationRules();
+            }
+
+            setupValidationRules() {
+                this.validationRules = {
+                    vehiculo: {
+                        'vehiculo-placa': { required: true, message: 'La placa es requerida' }
+                    }
+                };
+            }
+
+            escapeValue(value) {
+                if (value === null || value === undefined) return '';
+                return String(value).replace(/[&<>"']/g, function(match) {
+                    const escape = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#39;'
+                    };
+                    return escape[match];
+                });
+            }
+
+            getVehiculoModal(item = null) {
+                const isEditing = !!item;
+                if (isEditing) {
+                    return this.getVehiculoModalWithTabs(item);
+                }
+                return this.getVehiculoSimpleModal();
+            }
+
+            getVehiculoModalWithTabs(item) {
+                return `
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-car"></i>
+                            ${item ? 'Editar Vehículo' : 'Nuevo Vehículo'}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="vehiculo-tabs">
+                            <!-- Navegación de pestañas -->
+                            <div class="tab-navigation">
+                                <button class="tab-button active" data-tab="general">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>General</span>
+                                </button>
+                                <button class="tab-button" data-tab="galeria">
+                                    <i class="fas fa-images"></i>
+                                    <span>Galería</span>
+                                </button>
+                                <button class="tab-button" data-tab="tareas">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>Tareas</span>
+                                </button>
+                                <button class="tab-button" data-tab="inspecciones">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <span>Inspecciones</span>
+                                </button>
+                                <button class="tab-button" data-tab="bitacora">
+                                    <i class="fas fa-comments"></i>
+                                    <span>Bitácora</span>
+                                </button>
+                                <button class="tab-button" data-tab="kilometraje">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Kilometraje</span>
+                                </button>
+                                <button class="tab-button" data-tab="gps">
+                                    <i class="fas fa-satellite-dish"></i>
+                                    <span>GPS</span>
+                                </button>
+                                <button class="tab-button" data-tab="repuestos">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Repuestos</span>
+                                </button>
+                            </div>
+
+                            <!-- Contenido de pestañas -->
+                            <div class="tab-content">
+                                <!-- Pestaña: Información General -->
+                                <div class="tab-pane active" data-tab-pane="general">
+                                    ${this.getVehiculoGeneralTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Galería -->
+                                <div class="tab-pane" data-tab-pane="galeria">
+                                    ${this.getVehiculoGaleriaTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Tareas -->
+                                <div class="tab-pane" data-tab-pane="tareas">
+                                    ${this.getVehiculoTareasTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Inspecciones -->
+                                <div class="tab-pane" data-tab-pane="inspecciones">
+                                    ${this.getVehiculoInspeccionesTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Bitácora -->
+                                <div class="tab-pane" data-tab-pane="bitacora">
+                                    ${this.getVehiculoBitacoraTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Kilometraje -->
+                                <div class="tab-pane" data-tab-pane="kilometraje">
+                                    ${this.getVehiculoKilometrajeTab(item)}
+                                </div>
+
+                                <!-- Pestaña: GPS -->
+                                <div class="tab-pane" data-tab-pane="gps">
+                                    ${this.getVehiculoGPSTab(item)}
+                                </div>
+
+                                <!-- Pestaña: Repuestos -->
+                                <div class="tab-pane" data-tab-pane="repuestos">
+                                    ${this.getVehiculoRepuestosTab(item)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveVehiculo()">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                    </div>
+                `;
+            }
+
+            getVehiculoGeneralTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-info-circle"></i>
+                            Información General del Vehículo
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-placa" class="label-minimal">
+                                    Placa <span class="required">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-placa" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.placas)}" 
+                                    placeholder="ABC-123"
+                                    required
+                                >
+                                <div class="validation-error" id="vehiculo-placa-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-numero-economico" class="label-minimal">
+                                    Número Económico
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-numero-economico" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.numero_economico)}" 
+                                    placeholder="001"
+                                >
+                                <div class="validation-error" id="vehiculo-numero-economico-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-marca" class="label-minimal">
+                                    Marca
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-marca" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.marca)}" 
+                                    placeholder="Toyota"
+                                >
+                                <div class="validation-error" id="vehiculo-marca-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-modelo" class="label-minimal">
+                                    Modelo
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-modelo" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.modelo)}" 
+                                    placeholder="Corolla"
+                                >
+                                <div class="validation-error" id="vehiculo-modelo-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-anio" class="label-minimal">
+                                    Año
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="vehiculo-anio" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.anio)}" 
+                                    min="1900" 
+                                    max="2030" 
+                                    placeholder="2020"
+                                >
+                                <div class="validation-error" id="vehiculo-anio-error"></div>
+                            </div>
+
+                            <div class="form-field-minimal">
+                                <label for="vehiculo-color" class="label-minimal">
+                                    Color
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="vehiculo-color" 
+                                    class="input-minimal" 
+                                    value="${this.escapeValue(item?.color)}" 
+                                    placeholder="Blanco"
+                                >
+                                <div class="validation-error" id="vehiculo-color-error"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoGaleriaTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-images"></i>
+                            Galería de Fotos del Vehículo
+                        </h3>
+                        
+                        <div class="galeria-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.uploadFoto()">
+                                <i class="fas fa-upload"></i>
+                                Subir Nueva Foto
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshGaleria()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="galeria-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando galería...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoTareasTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-tasks"></i>
+                            Tareas del Vehículo
+                        </h3>
+                        
+                        <div class="tareas-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.crearTareaVehiculo()">
+                                <i class="fas fa-plus"></i>
+                                Nueva Tarea
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshTareasVehiculo()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="tareas-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando tareas...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoInspeccionesTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-clipboard-check"></i>
+                            Inspecciones del Vehículo
+                        </h3>
+                        
+                        <div class="inspecciones-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevaInspeccion()">
+                                <i class="fas fa-plus"></i>
+                                Nueva Inspección
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshInspecciones()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="inspecciones-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando inspecciones...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoBitacoraTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-comments"></i>
+                            Bitácora y Comentarios
+                        </h3>
+                        
+                        <div class="bitacora-controls">
+                            <div class="bitacora-input-group">
+                                <input type="text" class="form-control bitacora-input"
+                                       placeholder="Escribe un comentario..." maxlength="500">
+                                <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.enviarMensajeBitacora()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Enviar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bitacora-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando bitácora...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoKilometrajeTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Kilometraje del Vehículo
+                        </h3>
+                        
+                        <div class="kilometraje-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevoRegistroKilometraje()">
+                                <i class="fas fa-plus"></i>
+                                Nuevo Registro
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshKilometraje()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="kilometraje-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando historial...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoGPSTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-satellite-dish"></i>
+                            Dispositivos GPS del Vehículo
+                        </h3>
+                        
+                        <div class="gps-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevoDispositivoGPS()">
+                                <i class="fas fa-plus"></i>
+                                Nuevo Dispositivo
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshGPS()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="gps-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando dispositivos GPS...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoRepuestosTab(item) {
+                return `
+                    <div class="tab-content-inner">
+                        <h3 class="tab-title">
+                            <i class="fas fa-tools"></i>
+                            Solicitudes de Repuestos del Vehículo
+                        </h3>
+                        
+                        <div class="repuestos-controls">
+                            <button type="button" class="btn btn-primary" onclick="window.vehiculoTabsManager.nuevaSolicitudRepuesto()">
+                                <i class="fas fa-plus"></i>
+                                Nueva Solicitud
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.vehiculoTabsManager.refreshRepuestos()">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="repuestos-content">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Cargando solicitudes...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getVehiculoSimpleModal() {
+                return `
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-car"></i>
+                            Nuevo Vehículo
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <p>Modal simple para nuevo vehículo</p>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary">Guardar</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Crear instancia global
+        window.modalManager = new ModalManager();
+        console.log('✅ ModalManager creado inline');
+        console.log('Métodos disponibles:', Object.keys(window.modalManager));
+    </script>
+
+    <!-- VehiculoTabsManager completo inline -->
+    <script>
+        class VehiculoTabsManager {
+            constructor() {
+                this.currentTab = 'general';
+                this.currentVehiculoId = null;
+                this.currentVehiculo = null;
+                this.setupTabNavigation();
+                this.setupEventListeners();
+            }
+
+            setupTabNavigation() {
+                // La navegación se configurará cuando se muestre el modal
+                console.log('✅ Navegación de pestañas configurada');
+            }
+
+            setupEventListeners() {
+                // Los event listeners se configurarán cuando se muestre el modal
+                console.log('✅ Event listeners configurados');
+            }
+
+            switchTab(tabName) {
+                console.log(`🔄 Cambiando a pestaña: ${tabName}`);
+                
+                // Remover clase active de todos los botones
+                const allButtons = document.querySelectorAll('.tab-button');
+                allButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Remover clase active de todos los panes
+                const allPanes = document.querySelectorAll('.tab-pane');
+                allPanes.forEach(pane => pane.style.display = 'none');
+                
+                // Activar botón seleccionado
+                const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+                if (selectedButton) {
+                    selectedButton.classList.add('active');
+                }
+                
+                // Mostrar pane seleccionado
+                const selectedPane = document.querySelector(`[data-tab-pane="${tabName}"]`);
+                if (selectedPane) {
+                    selectedPane.style.display = 'block';
+                }
+                
+                // Actualizar estado
+                this.currentTab = tabName;
+                console.log(`✅ Pestaña ${tabName} activada`);
+                
+                // Cargar contenido de la pestaña
+                this.loadTabContent(tabName);
+            }
+
+            loadTabContent(tabName) {
+                console.log(`📄 Cargando contenido de pestaña: ${tabName}`);
+                
+                switch (tabName) {
+                    case 'galeria':
+                        this.loadGaleria();
+                        break;
+                    case 'tareas':
+                        this.loadTareas();
+                        break;
+                    case 'inspecciones':
+                        this.loadInspecciones();
+                        break;
+                    case 'bitacora':
+                        this.loadBitacora();
+                        break;
+                    case 'kilometraje':
+                        this.loadKilometraje();
+                        break;
+                    case 'gps':
+                        this.loadGPS();
+                        break;
+                    case 'repuestos':
+                        this.loadRepuestos();
+                        break;
+                    default:
+                        console.log(`ℹ️ Pestaña ${tabName} no requiere carga especial`);
+                }
+            }
+
+            // Métodos de carga de contenido
+            loadGaleria() {
+                console.log('📸 Cargando galería...');
+                // Aquí se cargarían las fotos desde la API
+            }
+
+            loadTareas() {
+                console.log('📋 Cargando tareas...');
+                // Aquí se cargarían las tareas desde la API
+            }
+
+            loadInspecciones() {
+                console.log('🔍 Cargando inspecciones...');
+                // Aquí se cargarían las inspecciones desde la API
+            }
+
+            loadBitacora() {
+                console.log('💬 Cargando bitácora...');
+                // Aquí se cargaría la bitácora desde la API
+            }
+
+            loadKilometraje() {
+                console.log('🛣️ Cargando kilometraje...');
+                // Aquí se cargaría el kilometraje desde la API
+            }
+
+            loadGPS() {
+                console.log('📡 Cargando dispositivos GPS...');
+                // Aquí se cargarían los dispositivos GPS desde la API
+            }
+
+            loadRepuestos() {
+                console.log('🔧 Cargando solicitudes de repuestos...');
+                // Aquí se cargarían las solicitudes desde la API
+            }
+
+            // Métodos de acción
+            uploadFoto() {
+                console.log('📤 Subiendo foto...');
+                alert('Funcionalidad de subida de fotos en desarrollo');
+            }
+
+            crearTareaVehiculo() {
+                console.log('➕ Creando nueva tarea...');
+                alert('Funcionalidad de creación de tareas en desarrollo');
+            }
+
+            nuevaInspeccion() {
+                console.log('🔍 Creando nueva inspección...');
+                alert('Funcionalidad de nueva inspección en desarrollo');
+            }
+
+            enviarMensajeBitacora() {
+                console.log('💬 Enviando mensaje...');
+                alert('Funcionalidad de envío de mensajes en desarrollo');
+            }
+
+            nuevoRegistroKilometraje() {
+                console.log('🛣️ Registrando nuevo kilometraje...');
+                alert('Funcionalidad de nuevo registro de kilometraje en desarrollo');
+            }
+
+            nuevoDispositivoGPS() {
+                console.log('📡 Agregando nuevo dispositivo GPS...');
+                alert('Funcionalidad de nuevo dispositivo GPS en desarrollo');
+            }
+
+            nuevaSolicitudRepuesto() {
+                console.log('🔧 Creando nueva solicitud de repuesto...');
+                alert('Funcionalidad de nueva solicitud de repuesto en desarrollo');
+            }
+
+            // Métodos de refresh
+            refreshGaleria() {
+                console.log('🔄 Actualizando galería...');
+                this.loadGaleria();
+            }
+
+            refreshTareasVehiculo() {
+                console.log('🔄 Actualizando tareas...');
+                this.loadTareas();
+            }
+
+            refreshInspecciones() {
+                console.log('🔄 Actualizando inspecciones...');
+                this.loadInspecciones();
+            }
+
+            refreshBitacora() {
+                console.log('🔄 Actualizando bitácora...');
+                this.loadBitacora();
+            }
+
+            refreshKilometraje() {
+                console.log('🔄 Actualizando kilometraje...');
+                this.loadKilometraje();
+            }
+
+            refreshGPS() {
+                console.log('🔄 Actualizando dispositivos GPS...');
+                this.loadGPS();
+            }
+
+            refreshRepuestos() {
+                console.log('🔄 Actualizando solicitudes de repuestos...');
+                this.loadRepuestos();
+            }
+
+            // Métodos utilitarios
+            setVehiculoId(id) {
+                this.currentVehiculoId = id;
+                console.log(`✅ ID del vehículo configurado: ${id}`);
+            }
+
+            showError(message) {
+                console.error('❌ Error:', message);
+                alert(`Error: ${message}`);
+            }
+
+            showSuccess(message) {
+                console.log('✅ Éxito:', message);
+                alert(`Éxito: ${message}`);
+            }
+
+            showInfo(message) {
+                console.log('ℹ️ Info:', message);
+                alert(`Info: ${message}`);
+            }
+        }
+
+        // Crear instancia global
+        window.vehiculoTabsManager = new VehiculoTabsManager();
+        console.log('✅ VehiculoTabsManager creado inline');
+        console.log('Métodos disponibles:', Object.keys(window.vehiculoTabsManager));
+    </script>
+
+    <script>
+        // Verificar estado al cargar
+        window.addEventListener('load', function() {
+            setTimeout(checkSystemStatus, 500);
+        });
+
+        function checkSystemStatus() {
+            const output = document.getElementById('status-output');
+            let status = '<div class="row">';
+            
+            // Verificar cada componente
+            const components = [
+                { name: 'Config', obj: window.config, color: 'primary' },
+                { name: 'API', obj: window.api, color: 'success' },
+                { name: 'App', obj: window.app, color: 'info' },
+                { name: 'ModalManager', obj: window.modalManager, color: 'warning' },
+                { name: 'VehiculoTabsManager', obj: window.vehiculoTabsManager, color: 'danger' }
+            ];
+            
+            components.forEach(comp => {
+                const isAvailable = !!comp.obj;
+                const badgeClass = isAvailable ? `badge bg-${comp.color}` : 'badge bg-secondary';
+                const icon = isAvailable ? '✅' : '❌';
+                
+                status += `
+                    <div class="col-md-6 mb-2">
+                        <span class="${badgeClass}">${icon} ${comp.name}</span>
+                        <small class="text-muted d-block">
+                            ${isAvailable ? 'Disponible' : 'NO disponible'}
+                        </small>
+                    </div>
+                `;
+            });
+            
+            status += '</div>';
+            
+            // Información adicional
+            if (window.modalManager) {
+                status += '<hr><h6>Métodos de ModalManager:</h6>';
+                status += '<code>' + Object.keys(window.modalManager).join(', ') + '</code>';
+                
+                // Verificar método específico
+                if (window.modalManager.getVehiculoModalWithTabs) {
+                    status += '<div class="alert alert-success mt-2">✅ getVehiculoModalWithTabs disponible</div>';
+                } else {
+                    status += '<div class="alert alert-danger mt-2">❌ getVehiculoModalWithTabs NO disponible</div>';
+                }
+            }
+            
+            if (window.vehiculoTabsManager) {
+                status += '<hr><h6>Estado de VehiculoTabsManager:</h6>';
+                status += `<p>Pestaña actual: <strong>${window.vehiculoTabsManager.currentTab}</strong></p>`;
+                status += '<p>Métodos: <code>' + Object.keys(window.vehiculoTabsManager).join(', ') + '</code></p>';
+                
+                // Verificar método específico
+                if (window.vehiculoTabsManager.switchTab) {
+                    status += '<div class="alert alert-success mt-2">✅ switchTab disponible</div>';
+                } else {
+                    status += '<div class="alert alert-danger mt-2">❌ switchTab NO disponible</div>';
+                }
+            }
+            
+            output.innerHTML = status;
+        }
+
+        function fixSystem() {
+            console.log('🔧 Reparando sistema...');
+            
+            // Recrear ambos managers
+            if (typeof ModalManager !== 'undefined') {
+                window.modalManager = new ModalManager();
+                console.log('✅ ModalManager recreado');
+            }
+            
+            if (typeof VehiculoTabsManager !== 'undefined') {
+                window.vehiculoTabsManager = new VehiculoTabsManager();
+                console.log('✅ VehiculoTabsManager recreado');
+            }
+            
+            alert('✅ Sistema reparado. Verifica el estado nuevamente.');
+            checkSystemStatus();
+        }
+
+        function testModalGeneration() {
+            console.log('🧪 Probando generación de modal...');
+            
+            if (!window.modalManager) {
+                alert('❌ ModalManager no disponible');
+                return;
+            }
+            
+            if (window.modalManager.getVehiculoModalWithTabs) {
+                console.log('✅ getVehiculoModalWithTabs disponible');
+                
+                const testVehiculo = { id: 'test', placas: 'ABC-123' };
+                try {
+                    const html = window.modalManager.getVehiculoModalWithTabs(testVehiculo);
+                    console.log('✅ HTML generado:', html.substring(0, 200));
+                    alert('✅ Modal generado correctamente. Revisa la consola.');
+                } catch (error) {
+                    console.error('❌ Error generando modal:', error);
+                    alert('❌ Error generando modal: ' + error.message);
+                }
+            } else {
+                console.log('❌ getVehiculoModalWithTabs NO disponible');
+                alert('❌ Método no disponible. Usa "Reparar Sistema" primero.');
+            }
+        }
+
+        function showModal() {
+            console.log('🚗 Mostrando modal...');
+            
+            if (!window.modalManager || !window.modalManager.getVehiculoModalWithTabs) {
+                alert('❌ ModalManager no disponible o método faltante');
+                return;
+            }
+            
+            const testVehiculo = { id: 'test', placas: 'ABC-123' };
+            
+            try {
+                const modalHTML = window.modalManager.getVehiculoModalWithTabs(testVehiculo);
+                
+                // Crear modal overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'test-modal-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 16px;
+                    padding: 20px;
+                    max-width: 95vw;
+                    max-height: 95vh;
+                    overflow: auto;
+                `;
+                
+                modalContent.innerHTML = modalHTML;
+                
+                overlay.appendChild(modalContent);
+                document.body.appendChild(overlay);
+                
+                // Configurar navegación de pestañas
+                setupTabNavigation();
+                
+                // Cerrar modal al hacer clic en el overlay
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+                
+                console.log('✅ Modal mostrado');
+                
+            } catch (error) {
+                console.error('❌ Error mostrando modal:', error);
+                alert('❌ Error mostrando modal: ' + error.message);
+            }
+        }
+
+        function setupTabNavigation() {
+            // Configurar navegación de pestañas
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    window.vehiculoTabsManager.switchTab(tabName);
+                });
+            });
+            
+            console.log('✅ Navegación de pestañas configurada');
+        }
+
+        function testTabs() {
+            console.log('🧪 Probando pestañas...');
+            
+            if (!window.vehiculoTabsManager) {
+                alert('❌ VehiculoTabsManager no disponible');
+                return;
+            }
+            
+            // Configurar ID del vehículo
+            window.vehiculoTabsManager.setVehiculoId('test-vehiculo-id');
+            console.log('✅ ID del vehículo configurado');
+            
+            // Probar cambio de pestañas
+            const tabs = ['galeria', 'tareas', 'inspecciones', 'bitacora', 'kilometraje', 'gps', 'repuestos'];
+            
+            tabs.forEach((tab, index) => {
+                setTimeout(() => {
+                    console.log(`🔄 Cambiando a pestaña: ${tab}`);
+                    window.vehiculoTabsManager.switchTab(tab);
+                    
+                    setTimeout(() => {
+                        const currentTab = window.vehiculoTabsManager.currentTab;
+                        console.log(`   - Pestaña actual: ${currentTab}`);
+                        
+                        if (currentTab === tab) {
+                            console.log(`   ✅ Pestaña ${tab} activada correctamente`);
+                        } else {
+                            console.log(`   ❌ Error: pestaña actual es ${currentTab}, esperada ${tab}`);
+                        }
+                    }, 100);
+                }, index * 200);
+            });
+            
+            alert('🧪 Prueba de pestañas iniciada. Revisa la consola.');
+        }
+
+        function debugSystem() {
+            console.log('🔍 DEBUG COMPLETO DEL SISTEMA');
+            console.log('==============================');
+            
+            // 1. Verificar ModalManager
+            console.log('1. ModalManager:');
+            console.log('   - Tipo:', typeof ModalManager);
+            console.log('   - Disponible:', !!ModalManager);
+            if (typeof ModalManager !== 'undefined') {
+                console.log('   - Métodos de clase:', Object.getOwnPropertyNames(ModalManager.prototype));
+            }
+            
+            // 2. Verificar modalManager
+            console.log('2. modalManager:');
+            console.log('   - Tipo:', typeof window.modalManager);
+            console.log('   - Disponible:', !!window.modalManager);
+            if (window.modalManager) {
+                console.log('   - Métodos:', Object.keys(window.modalManager));
+                console.log('   - Constructor:', window.modalManager.constructor.name);
+                console.log('   - Prototipo:', Object.getPrototypeOf(window.modalManager));
+            }
+            
+            // 3. Verificar VehiculoTabsManager
+            console.log('3. VehiculoTabsManager:');
+            console.log('   - Tipo:', typeof window.vehiculoTabsManager);
+            console.log('   - Disponible:', !!window.vehiculoTabsManager);
+            if (window.vehiculoTabsManager) {
+                console.log('   - Métodos:', Object.keys(window.vehiculoTabsManager));
+                console.log('   - Pestaña actual:', window.vehiculoTabsManager.currentTab);
+            }
+        }
+    </script>
+</body>
+</html>
