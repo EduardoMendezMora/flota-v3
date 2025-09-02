@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Solo Modals.js</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">🧪 Test Solo Modals.js</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Estado de Modals.js</h5>
+                        <div id="status-output">
+                            <p>Verificando...</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="card-title">Acciones</h5>
+                        <button class="btn btn-primary me-2" onclick="checkModalManager()">
+                            <i class="fas fa-search"></i> Verificar ModalManager
+                        </button>
+                        
+                        <button class="btn btn-success me-2" onclick="testModalGeneration()">
+                            <i class="fas fa-car"></i> Probar Generación
+                        </button>
+                        
+                        <button class="btn btn-warning" onclick="showErrors()">
+                            <i class="fas fa-exclamation-triangle"></i> Ver Errores
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solo modals.js -->
+    <script src="modals.js"></script>
+
+    <script>
+        // Verificar estado al cargar
+        window.addEventListener('load', function() {
+            setTimeout(checkStatus, 100);
+        });
+
+        function checkStatus() {
+            const output = document.getElementById('status-output');
+            let status = '';
+            
+            // Verificar ModalManager
+            if (window.modalManager) {
+                status += '<div class="alert alert-success">✅ ModalManager disponible</div>';
+                status += '<p><strong>Métodos:</strong> ' + Object.keys(window.modalManager).join(', ') + '</p>';
+                status += '<p><strong>Tipo:</strong> ' + typeof window.modalManager + '</p>';
+            } else {
+                status += '<div class="alert alert-danger">❌ ModalManager NO disponible</div>';
+            }
+            
+            // Verificar clase ModalManager
+            if (typeof ModalManager !== 'undefined') {
+                status += '<div class="alert alert-success">✅ Clase ModalManager definida</div>';
+            } else {
+                status += '<div class="alert alert-danger">❌ Clase ModalManager NO definida</div>';
+            }
+            
+            // Verificar errores
+            if (window.onerror) {
+                status += '<div class="alert alert-warning">⚠️ Hay manejador de errores global</div>';
+            }
+            
+            output.innerHTML = status;
+        }
+
+        function checkModalManager() {
+            console.log('🔍 Verificando ModalManager...');
+            console.log('window.modalManager:', window.modalManager);
+            console.log('typeof window.modalManager:', typeof window.modalManager);
+            console.log('Object.keys(window.modalManager):', Object.keys(window.modalManager));
+            
+            if (window.modalManager) {
+                console.log('✅ ModalManager está disponible');
+                console.log('Métodos disponibles:', Object.keys(window.modalManager));
+            } else {
+                console.log('❌ ModalManager NO está disponible');
+            }
+            
+            // Verificar si la clase se definió
+            console.log('typeof ModalManager:', typeof ModalManager);
+            console.log('ModalManager:', ModalManager);
+        }
+
+        function testModalGeneration() {
+            console.log('🧪 Probando generación de modal...');
+            
+            if (!window.modalManager) {
+                alert('❌ ModalManager no disponible');
+                return;
+            }
+            
+            // Buscar cualquier método que contenga "Vehiculo"
+            const methods = Object.keys(window.modalManager);
+            console.log('Métodos disponibles:', methods);
+            
+            const vehiculoMethods = methods.filter(m => m.toLowerCase().includes('vehiculo'));
+            console.log('Métodos de vehículo:', vehiculoMethods);
+            
+            if (vehiculoMethods.length > 0) {
+                alert('✅ Encontrados métodos de vehículo: ' + vehiculoMethods.join(', '));
+            } else {
+                alert('❌ No se encontraron métodos de vehículo');
+            }
+        }
+
+        function showErrors() {
+            console.log('🚨 Verificando errores...');
+            
+            // Verificar errores en la consola
+            console.log('¿Hay errores de JavaScript?');
+            
+            // Verificar si hay errores de carga de scripts
+            const scripts = document.querySelectorAll('script');
+            scripts.forEach((script, i) => {
+                console.log(`Script ${i}:`, script.src || 'inline', 'loaded:', script.complete);
+            });
+            
+            // Verificar si hay errores de sintaxis
+            try {
+                // Intentar evaluar el contenido de modals.js
+                console.log('Intentando evaluar modals.js...');
+            } catch (error) {
+                console.error('Error en modals.js:', error);
+            }
+        }
+
+        // Capturar errores globales
+        window.addEventListener('error', function(e) {
+            console.error('🚨 Error global detectado:', e.error);
+            console.error('Archivo:', e.filename);
+            console.error('Línea:', e.lineno);
+            console.error('Columna:', e.colno);
+        });
+
+        // Capturar errores de promesas
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('🚨 Promesa rechazada:', e.reason);
+        });
+    </script>
+</body>
+</html>

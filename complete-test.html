@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Completo - Pestañas de Vehículos</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">🧪 Test Completo de Pestañas</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Estado del Sistema</h5>
+                        <div id="status-output">
+                            <p>Verificando componentes...</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="card-title">Acciones</h5>
+                        <button class="btn btn-primary me-2" onclick="testModalGeneration()">
+                            <i class="fas fa-car"></i> Generar Modal
+                        </button>
+                        
+                        <button class="btn btn-success me-2" onclick="showModal()">
+                            <i class="fas fa-eye"></i> Mostrar Modal
+                        </button>
+                        
+                        <button class="btn btn-warning" onclick="testTabs()">
+                            <i class="fas fa-tabs"></i> Probar Pestañas
+                        </button>
+                        
+                        <button class="btn btn-info" onclick="debugSystem()">
+                            <i class="fas fa-bug"></i> Debug Sistema
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+
+    <script>
+        // Verificar estado al cargar
+        window.addEventListener('load', function() {
+            setTimeout(checkSystemStatus, 500);
+        });
+
+        function checkSystemStatus() {
+            const output = document.getElementById('status-output');
+            let status = '<div class="row">';
+            
+            // Verificar cada componente
+            const components = [
+                { name: 'Config', obj: window.config, color: 'primary' },
+                { name: 'API', obj: window.api, color: 'success' },
+                { name: 'App', obj: window.app, color: 'info' },
+                { name: 'ModalManager', obj: window.modalManager, color: 'warning' },
+                { name: 'VehiculoTabsManager', obj: window.vehiculoTabsManager, color: 'danger' }
+            ];
+            
+            components.forEach(comp => {
+                const isAvailable = !!comp.obj;
+                const badgeClass = isAvailable ? `badge bg-${comp.color}` : 'badge bg-secondary';
+                const icon = isAvailable ? '✅' : '❌';
+                
+                status += `
+                    <div class="col-md-6 mb-2">
+                        <span class="${badgeClass}">${icon} ${comp.name}</span>
+                        <small class="text-muted d-block">
+                            ${isAvailable ? 'Disponible' : 'NO disponible'}
+                        </small>
+                    </div>
+                `;
+            });
+            
+            status += '</div>';
+            
+            // Información adicional
+            if (window.modalManager) {
+                status += '<hr><h6>Métodos de ModalManager:</h6>';
+                status += '<code>' + Object.keys(window.modalManager).join(', ') + '</code>';
+                
+                // Verificar método específico
+                if (window.modalManager.getVehiculoModalWithTabs) {
+                    status += '<div class="alert alert-success mt-2">✅ getVehiculoModalWithTabs disponible</div>';
+                } else {
+                    status += '<div class="alert alert-danger mt-2">❌ getVehiculoModalWithTabs NO disponible</div>';
+                }
+            }
+            
+            if (window.vehiculoTabsManager) {
+                status += '<hr><h6>Estado de VehiculoTabsManager:</h6>';
+                status += `<p>Pestaña actual: <strong>${window.vehiculoTabsManager.currentTab}</strong></p>`;
+                status += '<p>Métodos: <code>' + Object.keys(window.vehiculoTabsManager).join(', ') + '</code></p>';
+            }
+            
+            output.innerHTML = status;
+        }
+
+        function debugSystem() {
+            console.log('🔍 DEBUG COMPLETO DEL SISTEMA');
+            console.log('==============================');
+            
+            // 1. Verificar ModalManager
+            console.log('1. ModalManager:');
+            console.log('   - Tipo:', typeof ModalManager);
+            console.log('   - Disponible:', !!ModalManager);
+            if (typeof ModalManager !== 'undefined') {
+                console.log('   - Métodos de clase:', Object.getOwnPropertyNames(ModalManager.prototype));
+            }
+            
+            // 2. Verificar modalManager
+            console.log('2. modalManager:');
+            console.log('   - Tipo:', typeof window.modalManager);
+            console.log('   - Disponible:', !!window.modalManager);
+            if (window.modalManager) {
+                console.log('   - Métodos:', Object.keys(window.modalManager));
+                console.log('   - Constructor:', window.modalManager.constructor.name);
+                console.log('   - Prototipo:', Object.getPrototypeOf(window.modalManager));
+            }
+            
+            // 3. Verificar VehiculoTabsManager
+            console.log('3. VehiculoTabsManager:');
+            console.log('   - Tipo:', typeof window.vehiculoTabsManager);
+            console.log('   - Disponible:', !!window.vehiculoTabsManager);
+            if (window.vehiculoTabsManager) {
+                console.log('   - Métodos:', Object.keys(window.vehiculoTabsManager));
+                console.log('   - Pestaña actual:', window.vehiculoTabsManager.currentTab);
+            }
+            
+            // 4. Verificar scripts
+            console.log('4. Scripts cargados:');
+            const scripts = document.querySelectorAll('script');
+            scripts.forEach((script, i) => {
+                console.log(`   ${i}: ${script.src || 'inline'} - Estado: ${script.readyState}`);
+            });
+            
+            // 5. Verificar errores
+            console.log('5. Errores:');
+            console.log('   - onerror global:', !!window.onerror);
+            console.log('   - Errores en consola: Revisar consola del navegador');
+        }
+
+        function testModalGeneration() {
+            console.log('🧪 Probando generación de modal...');
+            
+            if (!window.modalManager) {
+                alert('❌ ModalManager no disponible');
+                return;
+            }
+            
+            // Verificar métodos disponibles
+            console.log('Métodos disponibles:', Object.keys(window.modalManager));
+            
+            // Buscar el método correcto
+            const methods = Object.keys(window.modalManager);
+            const modalMethod = methods.find(m => m.includes('Vehiculo') && m.includes('Tabs'));
+            
+            if (modalMethod) {
+                console.log('✅ Método encontrado:', modalMethod);
+                
+                const testVehiculo = { id: 'test', placas: 'ABC-123' };
+                try {
+                    const html = window.modalManager[modalMethod](testVehiculo);
+                    console.log('✅ HTML generado:', html.substring(0, 200));
+                    alert('✅ Modal generado correctamente. Revisa la consola.');
+                } catch (error) {
+                    console.error('❌ Error generando modal:', error);
+                    alert('❌ Error generando modal: ' + error.message);
+                }
+            } else {
+                console.log('❌ Método de modal con pestañas no encontrado');
+                
+                // Intentar crear ModalManager manualmente
+                if (typeof ModalManager !== 'undefined') {
+                    console.log('🔧 Intentando crear ModalManager manualmente...');
+                    try {
+                        const newModalManager = new ModalManager();
+                        console.log('✅ ModalManager creado manualmente');
+                        console.log('Métodos:', Object.keys(newModalManager));
+                        
+                        if (newModalManager.getVehiculoModalWithTabs) {
+                            console.log('✅ getVehiculoModalWithTabs disponible en nueva instancia');
+                            window.modalManager = newModalManager;
+                            alert('✅ ModalManager recreado. Intenta generar el modal nuevamente.');
+                        } else {
+                            console.log('❌ getVehiculoModalWithTabs NO disponible');
+                        }
+                    } catch (error) {
+                        console.error('❌ Error creando ModalManager:', error);
+                    }
+                }
+                
+                alert('❌ Método de modal con pestañas no encontrado');
+            }
+        }
+
+        function showModal() {
+            console.log('🚗 Mostrando modal...');
+            
+            if (!window.modalManager) {
+                alert('❌ ModalManager no disponible');
+                return;
+            }
+            
+            // Buscar el método correcto
+            const methods = Object.keys(window.modalManager);
+            const modalMethod = methods.find(m => m.includes('Vehiculo') && m.includes('Tabs'));
+            
+            if (!modalMethod) {
+                alert('❌ Método de modal con pestañas no encontrado');
+                return;
+            }
+            
+            const testVehiculo = { id: 'test', placas: 'ABC-123' };
+            
+            try {
+                const modalHTML = window.modalManager[modalMethod](testVehiculo);
+                
+                // Crear modal overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'test-modal-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 16px;
+                    padding: 20px;
+                    max-width: 95vw;
+                    max-height: 95vh;
+                    overflow: auto;
+                `;
+                
+                modalContent.innerHTML = modalHTML;
+                
+                overlay.appendChild(modalContent);
+                document.body.appendChild(overlay);
+                
+                // Cerrar modal al hacer clic en el overlay
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+                
+                console.log('✅ Modal mostrado');
+                
+            } catch (error) {
+                console.error('❌ Error mostrando modal:', error);
+                alert('❌ Error mostrando modal: ' + error.message);
+            }
+        }
+
+        function testTabs() {
+            console.log('🧪 Probando pestañas...');
+            
+            if (!window.vehiculoTabsManager) {
+                alert('❌ VehiculoTabsManager no disponible');
+                return;
+            }
+            
+            // Configurar ID del vehículo
+            window.vehiculoTabsManager.setVehiculoId('test-vehiculo-id');
+            console.log('✅ ID del vehículo configurado');
+            
+            // Probar cambio de pestañas
+            const tabs = ['galeria', 'tareas', 'inspecciones', 'bitacora', 'kilometraje', 'gps', 'repuestos'];
+            
+            tabs.forEach((tab, index) => {
+                setTimeout(() => {
+                    console.log(`🔄 Cambiando a pestaña: ${tab}`);
+                    window.vehiculoTabsManager.switchTab(tab);
+                    
+                    setTimeout(() => {
+                        const currentTab = window.vehiculoTabsManager.currentTab;
+                        console.log(`   - Pestaña actual: ${currentTab}`);
+                        
+                        if (currentTab === tab) {
+                            console.log(`   ✅ Pestaña ${tab} activada correctamente`);
+                        } else {
+                            console.log(`   ❌ Error: pestaña actual es ${currentTab}, esperada ${tab}`);
+                        }
+                    }, 100);
+                }, index * 200);
+            });
+            
+            alert('🧪 Prueba de pestañas iniciada. Revisa la consola.');
+        }
+    </script>
+</body>
+</html>
