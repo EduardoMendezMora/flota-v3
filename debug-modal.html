@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Modal - Flota</title>
+    <style>
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>Debug Modal - Flota</h1>
+    
+    <div class="debug-section info">
+        <h3>1. Verificar Scripts Cargados</h3>
+        <div id="scripts-status"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>2. Verificar Objetos Disponibles</h3>
+        <div id="objects-status"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>3. Probar Botón Nuevo Vehículo</h3>
+        <button onclick="testNuevoVehiculo()" class="btn btn-primary">Probar Nuevo Vehículo</button>
+        <div id="button-test-result"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>4. Verificar Modal Manager</h3>
+        <div id="modal-manager-status"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>5. Verificar Vehiculo Tabs Manager</h3>
+        <div id="tabs-manager-status"></div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== DEBUG MODAL INICIADO ===');
+        
+        function updateStatus(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = content;
+                element.className = `debug-section ${type}`;
+            }
+        }
+
+        function testNuevoVehiculo() {
+            console.log('🧪 Probando botón nuevo vehículo...');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    openModal('vehiculo');
+                    updateStatus('button-test-result', '✅ Función openModal ejecutada correctamente', 'success');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    updateStatus('button-test-result', '❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                updateStatus('button-test-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkScriptsStatus() {
+            const scripts = [
+                { name: 'config.js', check: () => typeof SUPABASE_CONFIG !== 'undefined' },
+                { name: 'api.js', check: () => typeof api !== 'undefined' },
+                { name: 'app.js', check: () => typeof window.app !== 'undefined' },
+                { name: 'modals.js', check: () => typeof ModalManager !== 'undefined' },
+                { name: 'vehiculo-tabs.js', check: () => typeof VehiculoTabsManager !== 'undefined' }
+            ];
+
+            let status = '';
+            scripts.forEach(script => {
+                const isLoaded = script.check();
+                const icon = isLoaded ? '✅' : '❌';
+                const color = isLoaded ? 'success' : 'error';
+                status += `<p class="${color}">${icon} ${script.name}: ${isLoaded ? 'Cargado' : 'No cargado'}</p>`;
+            });
+
+            updateStatus('scripts-status', status);
+        }
+
+        function checkObjectsStatus() {
+            let status = '';
+            
+            // Verificar window.app
+            if (window.app) {
+                status += '<p class="success">✅ window.app: Disponible</p>';
+                
+                // Verificar modalManager
+                if (window.app.modalManager) {
+                    status += '<p class="success">✅ window.app.modalManager: Disponible</p>';
+                } else {
+                    status += '<p class="error">❌ window.app.modalManager: No disponible</p>';
+                }
+            } else {
+                status += '<p class="error">❌ window.app: No disponible</p>';
+            }
+
+            // Verificar api
+            if (typeof api !== 'undefined') {
+                status += '<p class="success">✅ Variable api: Disponible</p>';
+            } else {
+                status += '<p class="error">❌ Variable api: No disponible</p>';
+            }
+
+            updateStatus('objects-status', status);
+        }
+
+        function checkModalManagerStatus() {
+            let status = '';
+            
+            if (window.app && window.app.modalManager) {
+                const modalManager = window.app.modalManager;
+                status += '<p class="success">✅ ModalManager instanciado</p>';
+                
+                // Verificar métodos
+                if (typeof modalManager.getModalContent === 'function') {
+                    status += '<p class="success">✅ getModalContent: Disponible</p>';
+                } else {
+                    status += '<p class="error">❌ getModalContent: No disponible</p>';
+                }
+                
+                if (typeof modalManager.loadModalData === 'function') {
+                    status += '<p class="success">✅ loadModalData: Disponible</p>';
+                } else {
+                    status += '<p class="error">❌ loadModalData: No disponible</p>';
+                }
+            } else {
+                status += '<p class="error">❌ ModalManager no disponible</p>';
+            }
+
+            updateStatus('modal-manager-status', status);
+        }
+
+        function checkTabsManagerStatus() {
+            let status = '';
+            
+            if (window.vehiculoTabsManager) {
+                status += '<p class="success">✅ VehiculoTabsManager: Disponible</p>';
+                
+                // Verificar métodos
+                if (typeof window.vehiculoTabsManager.setVehiculoId === 'function') {
+                    status += '<p class="success">✅ setVehiculoId: Disponible</p>';
+                } else {
+                    status += '<p class="error">❌ setVehiculoId: No disponible</p>';
+                }
+                
+                if (typeof window.vehiculoTabsManager.switchTab === 'function') {
+                    status += '<p class="success">✅ switchTab: Disponible</p>';
+                } else {
+                    status += '<p class="error">❌ switchTab: No disponible</p>';
+                }
+            } else {
+                status += '<p class="error">❌ VehiculoTabsManager: No disponible</p>';
+            }
+
+            updateStatus('tabs-manager-status', status);
+        }
+
+        // Ejecutar verificaciones cuando se cargue la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada, ejecutando verificaciones...');
+            
+            // Esperar un poco para que todos los scripts se inicialicen
+            setTimeout(() => {
+                checkScriptsStatus();
+                checkObjectsStatus();
+                checkModalManagerStatus();
+                checkTabsManagerStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
