@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - Flota</title>
+</head>
+<body>
+    <h1>Debug Test - Flota</h1>
+    <div id="output"></div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        console.log('=== DEBUG TEST INICIADO ===');
+        console.log('1. Verificando Supabase:', typeof supabase);
+        console.log('2. Verificando SUPABASE_CONFIG:', typeof SUPABASE_CONFIG);
+        
+        try {
+            // Cargar config.js
+            const configScript = document.createElement('script');
+            configScript.src = 'config.js';
+            configScript.onload = function() {
+                console.log('3. config.js cargado');
+                console.log('4. SUPABASE_CONFIG disponible:', typeof SUPABASE_CONFIG);
+                console.log('5. PERFORMANCE_CONFIG disponible:', typeof PERFORMANCE_CONFIG);
+                
+                // Cargar api.js
+                const apiScript = document.createElement('script');
+                apiScript.src = 'api.js';
+                apiScript.onload = function() {
+                    console.log('6. api.js cargado');
+                    console.log('7. Variable api definida:', typeof api);
+                    console.log('8. Instancia de ApiService:', api);
+                    
+                    if (typeof api !== 'undefined') {
+                        document.getElementById('output').innerHTML = `
+                            <p style="color: green;">✅ ÉXITO: Variable api definida correctamente</p>
+                            <p>Tipo: ${typeof api}</p>
+                            <p>Constructor: ${api.constructor.name}</p>
+                        `;
+                    } else {
+                        document.getElementById('output').innerHTML = `
+                            <p style="color: red;">❌ ERROR: Variable api no definida</p>
+                        `;
+                    }
+                };
+                apiScript.onerror = function() {
+                    console.error('❌ Error cargando api.js');
+                    document.getElementById('output').innerHTML = `
+                        <p style="color: red;">❌ Error cargando api.js</p>
+                    `;
+                };
+                document.head.appendChild(apiScript);
+            };
+            configScript.onerror = function() {
+                console.error('❌ Error cargando config.js');
+                document.getElementById('output').innerHTML = `
+                    <p style="color: red;">❌ Error cargando config.js</p>
+                `;
+            };
+            document.head.appendChild(configScript);
+        } catch (error) {
+            console.error('❌ Error en el test:', error);
+            document.getElementById('output').innerHTML = `
+                <p style="color: red;">❌ Error en el test: ${error.message}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

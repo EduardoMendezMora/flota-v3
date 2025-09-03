@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - Flota</title>
+</head>
+<body>
+    <h1>Test API - Flota</h1>
+    <div id="output"></div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    
+    <script>
+        console.log('=== TEST API INICIADO ===');
+        
+        try {
+            // Verificar configuraciones
+            console.log('1. SUPABASE_CONFIG:', typeof SUPABASE_CONFIG);
+            console.log('2. PERFORMANCE_CONFIG:', typeof PERFORMANCE_CONFIG);
+            
+            // Verificar variable api
+            console.log('3. Variable api:', typeof api);
+            
+            if (typeof api !== 'undefined') {
+                console.log('4. Instancia de ApiService:', api);
+                console.log('5. Constructor:', api.constructor.name);
+                console.log('6. Métodos disponibles:', Object.getOwnPropertyNames(Object.getPrototypeOf(api)));
+                
+                // Verificar método específico
+                if (typeof api.getVehiculos === 'function') {
+                    console.log('7. Método getVehiculos disponible: ✅');
+                } else {
+                    console.log('7. Método getVehiculos NO disponible: ❌');
+                }
+                
+                document.getElementById('output').innerHTML = `
+                    <p style="color: green;">✅ ÉXITO: Variable api definida correctamente</p>
+                    <p>Tipo: ${typeof api}</p>
+                    <p>Constructor: ${api.constructor.name}</p>
+                    <p>Método getVehiculos: ${typeof api.getVehiculos === 'function' ? 'Disponible' : 'No disponible'}</p>
+                `;
+            } else {
+                console.log('4. Variable api NO definida: ❌');
+                document.getElementById('output').innerHTML = `
+                    <p style="color: red;">❌ ERROR: Variable api no definida</p>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('❌ Error en el test:', error);
+            document.getElementById('output').innerHTML = `
+                <p style="color: red;">❌ Error en el test: ${error.message}</p>
+                <p>Stack: ${error.stack}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

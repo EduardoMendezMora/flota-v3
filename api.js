@@ -1194,7 +1194,7 @@ class ApiService {
             console.error('❌ Error obteniendo fotos del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async uploadVehiculoFoto(vehiculoId, fotoData) {
         try {
@@ -1217,7 +1217,7 @@ class ApiService {
             console.error('❌ Error subiendo foto del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async deleteVehiculoFoto(fotoId) {
         try {
@@ -1232,7 +1232,7 @@ class ApiService {
             console.error('❌ Error eliminando foto del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // TAREAS DEL VEHÍCULO
     async getVehiculoTareas(vehiculoId, filtros = {}) {
@@ -1261,7 +1261,7 @@ class ApiService {
             console.error('❌ Error obteniendo tareas del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // INSPECCIONES
     async getInspeccionMachotes() {
@@ -1278,7 +1278,7 @@ class ApiService {
             console.error('❌ Error obteniendo machotes de inspección:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async getInspeccionPruebas(machoteId) {
         try {
@@ -1295,7 +1295,7 @@ class ApiService {
             console.error('❌ Error obteniendo pruebas de inspección:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async getVehiculoInspecciones(vehiculoId, filtros = {}) {
         try {
@@ -1323,7 +1323,7 @@ class ApiService {
             console.error('❌ Error obteniendo inspecciones del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async crearInspeccion(inspeccionData) {
         try {
@@ -1347,7 +1347,7 @@ class ApiService {
             console.error('❌ Error creando inspección:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async guardarResultadoInspeccion(resultadoData) {
         try {
@@ -1368,7 +1368,7 @@ class ApiService {
             console.error('❌ Error guardando resultado de inspección:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // BITÁCORA Y COMENTARIOS
     async getVehiculoBitacora(vehiculoId, limit = 50) {
@@ -1389,7 +1389,7 @@ class ApiService {
             console.error('❌ Error obteniendo bitácora del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async enviarMensajeBitacora(mensajeData) {
         try {
@@ -1412,7 +1412,7 @@ class ApiService {
             console.error('❌ Error enviando mensaje a bitácora:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // KILOMETRAJE
     async getVehiculoKilometraje(vehiculoId, limit = 100) {
@@ -1433,7 +1433,7 @@ class ApiService {
             console.error('❌ Error obteniendo kilometraje del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async registrarKilometraje(kilometrajeData) {
         try {
@@ -1458,7 +1458,7 @@ class ApiService {
             console.error('❌ Error registrando kilometraje:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // DISPOSITIVOS GPS
     async getVehiculoGPS(vehiculoId) {
@@ -1479,7 +1479,7 @@ class ApiService {
             console.error('❌ Error obteniendo dispositivos GPS del vehículo:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async agregarDispositivoGPS(gpsData) {
         try {
@@ -1503,7 +1503,7 @@ class ApiService {
             console.error('❌ Error agregando dispositivo GPS:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async agregarComentarioGPS(comentarioData) {
         try {
@@ -1525,7 +1525,7 @@ class ApiService {
             console.error('❌ Error agregando comentario GPS:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     // SOLICITUDES DE REPUESTOS
     async getSolicitudesRepuestos(filtros = {}) {
@@ -1558,7 +1558,7 @@ class ApiService {
             console.error('❌ Error obteniendo solicitudes de repuestos:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async crearSolicitudRepuesto(solicitudData) {
         try {
@@ -1588,7 +1588,7 @@ class ApiService {
             console.error('❌ Error creando solicitud de repuesto:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async actualizarEstadoSolicitud(solicitudId, nuevoEstado, responsableId = null) {
         try {
@@ -1619,7 +1619,7 @@ class ApiService {
             console.error('❌ Error actualizando estado de solicitud:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 
     async agregarComentarioSolicitud(comentarioData) {
         try {

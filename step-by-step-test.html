@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step by Step Test - Flota</title>
+    <style>
+        .step { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .pending { background-color: #fff3cd; border-color: #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>Step by Step Test - Flota</h1>
+    <div id="steps"></div>
+
+    <script>
+        const steps = [
+            { id: 'supabase', name: 'Cargar Supabase CDN', status: 'pending' },
+            { id: 'config', name: 'Cargar config.js', status: 'pending' },
+            { id: 'api', name: 'Cargar api.js', status: 'pending' },
+            { id: 'app', name: 'Cargar app.js', status: 'pending' }
+        ];
+
+        function updateStep(id, status, message = '') {
+            const step = steps.find(s => s.id === id);
+            if (step) {
+                step.status = status;
+                step.message = message;
+                renderSteps();
+            }
+        }
+
+        function renderSteps() {
+            const container = document.getElementById('steps');
+            container.innerHTML = steps.map(step => `
+                <div class="step ${step.status}">
+                    <strong>${step.name}:</strong> 
+                    <span style="color: ${step.status === 'success' ? 'green' : step.status === 'error' ? 'red' : 'orange'}">
+                        ${step.status === 'success' ? '✅' : step.status === 'error' ? '❌' : '⏳'} 
+                        ${step.status.toUpperCase()}
+                    </span>
+                    ${step.message ? `<br><small>${step.message}</small>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function loadScript(src, stepId) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    updateStep(stepId, 'success', 'Script cargado correctamente');
+                    resolve();
+                };
+                script.onerror = () => {
+                    updateStep(stepId, 'error', `Error cargando ${src}`);
+                    reject(new Error(`Error cargando ${src}`));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function runTest() {
+            renderSteps();
+            
+            try {
+                // Paso 1: Verificar Supabase
+                console.log('1. Verificando Supabase...');
+                if (typeof supabase !== 'undefined') {
+                    updateStep('supabase', 'success', 'Supabase ya disponible');
+                } else {
+                    updateStep('supabase', 'error', 'Supabase no disponible');
+                    return;
+                }
+
+                // Paso 2: Cargar config.js
+                console.log('2. Cargando config.js...');
+                await loadScript('config.js', 'config');
+                
+                // Verificar configuraciones
+                if (typeof SUPABASE_CONFIG === 'undefined') {
+                    updateStep('config', 'error', 'SUPABASE_CONFIG no definido');
+                    return;
+                }
+                if (typeof PERFORMANCE_CONFIG === 'undefined') {
+                    updateStep('config', 'error', 'PERFORMANCE_CONFIG no definido');
+                    return;
+                }
+                updateStep('config', 'success', 'Configuraciones disponibles');
+
+                // Paso 3: Cargar api.js
+                console.log('3. Cargando api.js...');
+                await loadScript('api.js', 'api');
+                
+                // Verificar variable api
+                if (typeof api === 'undefined') {
+                    updateStep('api', 'error', 'Variable api no definida');
+                    return;
+                }
+                updateStep('api', 'success', `Variable api definida como ${typeof api}`);
+
+                // Paso 4: Cargar app.js
+                console.log('4. Cargando app.js...');
+                await loadScript('app.js', 'app');
+                
+                if (typeof window.app === 'undefined') {
+                    updateStep('app', 'error', 'window.app no definido');
+                    return;
+                }
+                updateStep('app', 'success', 'Aplicación inicializada correctamente');
+
+                console.log('✅ Todos los scripts cargados correctamente');
+                
+            } catch (error) {
+                console.error('❌ Error en el test:', error);
+            }
+        }
+
+        // Iniciar test cuando se cargue la página
+        window.addEventListener('load', runTest);
+    </script>
+</body>
+</html>

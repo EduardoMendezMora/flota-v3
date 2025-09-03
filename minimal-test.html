@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test - Flota</title>
+</head>
+<body>
+    <h1>Minimal Test - Flota</h1>
+    <div id="output"></div>
+
+    <script>
+        console.log('=== MINIMAL TEST INICIADO ===');
+        
+        // Paso 1: Verificar Supabase
+        console.log('1. Supabase disponible:', typeof supabase !== 'undefined');
+        
+        // Paso 2: Cargar config.js
+        const configScript = document.createElement('script');
+        configScript.src = 'config.js';
+        configScript.onload = function() {
+            console.log('2. config.js cargado');
+            console.log('   SUPABASE_CONFIG:', typeof SUPABASE_CONFIG);
+            console.log('   PERFORMANCE_CONFIG:', typeof PERFORMANCE_CONFIG);
+            
+            // Paso 3: Cargar api.js
+            const apiScript = document.createElement('script');
+            apiScript.src = 'api.js';
+            apiScript.onload = function() {
+                console.log('3. api.js cargado');
+                console.log('   Variable api:', typeof api);
+                
+                if (typeof api !== 'undefined') {
+                    console.log('✅ ÉXITO: api definida');
+                    document.getElementById('output').innerHTML = '<p style="color: green;">✅ ÉXITO: Variable api definida</p>';
+                } else {
+                    console.log('❌ ERROR: api no definida');
+                    document.getElementById('output').innerHTML = '<p style="color: red;">❌ ERROR: Variable api no definida</p>';
+                }
+            };
+            apiScript.onerror = function() {
+                console.error('❌ Error cargando api.js');
+                document.getElementById('output').innerHTML = '<p style="color: red;">❌ Error cargando api.js</p>';
+            };
+            document.head.appendChild(apiScript);
+        };
+        configScript.onerror = function() {
+            console.error('❌ Error cargando config.js');
+            document.getElementById('output').innerHTML = '<p style="color: red;">❌ Error cargando config.js</p>';
+        };
+        
+        // Cargar Supabase primero
+        const supabaseScript = document.createElement('script');
+        supabaseScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        supabaseScript.onload = function() {
+            console.log('0. Supabase cargado');
+            document.head.appendChild(configScript);
+        };
+        supabaseScript.onerror = function() {
+            console.error('❌ Error cargando Supabase');
+            document.getElementById('output').innerHTML = '<p style="color: red;">❌ Error cargando Supabase</p>';
+        };
+        document.head.appendChild(supabaseScript);
+    </script>
+</body>
+</html>
