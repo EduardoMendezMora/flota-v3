@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug OpenModal - Flota</title>
+</head>
+<body>
+    <h1>Debug OpenModal - Flota</h1>
+    
+    <div id="status"></div>
+    
+    <button onclick="testOpenModal()">Probar openModal('vehiculo')</button>
+    <button onclick="testOpenModalWithItem()">Probar openModal('vehiculo', {id: 1})</button>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== DEBUG OPENMODAL INICIADO ===');
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<p style="color: ${type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue'}">${message}</p>`;
+        }
+        
+        function testOpenModal() {
+            console.log('🧪 Probando openModal("vehiculo")...');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    console.log('🔄 Llamando a openModal("vehiculo")...');
+                    openModal('vehiculo');
+                    updateStatus('✅ openModal("vehiculo") ejecutado', 'success');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    updateStatus('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testOpenModalWithItem() {
+            console.log('🧪 Probando openModal("vehiculo", {id: 1})...');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    console.log('🔄 Llamando a openModal("vehiculo", {id: 1})...');
+                    openModal('vehiculo', {id: 1});
+                    updateStatus('✅ openModal("vehiculo", {id: 1}) ejecutado', 'success');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    updateStatus('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Verificar estado cuando se cargue la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada');
+            
+            setTimeout(() => {
+                console.log('📊 Estado de la aplicación:');
+                console.log('- window.app:', window.app);
+                console.log('- typeof openModal:', typeof openModal);
+                console.log('- api disponible:', typeof api !== 'undefined');
+                
+                if (window.app) {
+                    updateStatus('✅ window.app inicializado correctamente', 'success');
+                    
+                    // Verificar modalManager
+                    if (window.app.modalManager) {
+                        console.log('✅ modalManager disponible');
+                        
+                        // Verificar métodos del modalManager
+                        if (typeof window.app.modalManager.getModalContent === 'function') {
+                            console.log('✅ getModalContent disponible');
+                        } else {
+                            console.log('❌ getModalContent no disponible');
+                        }
+                        
+                        if (typeof window.app.modalManager.loadModalData === 'function') {
+                            console.log('✅ loadModalData disponible');
+                        } else {
+                            console.log('❌ loadModalData no disponible');
+                        }
+                    } else {
+                        console.log('❌ modalManager no disponible');
+                    }
+                } else {
+                    updateStatus('❌ window.app no se inicializó', 'error');
+                }
+            }, 1000);
+        });
+        
+        // Interceptar la función openModal para debug
+        const originalOpenModal = window.openModal;
+        window.openModal = function(type, item = null) {
+            console.log('🔍 openModal interceptado:');
+            console.log('- type:', type);
+            console.log('- item:', item);
+            console.log('- window.app:', window.app);
+            
+            if (window.app) {
+                console.log('✅ window.app disponible, llamando al método...');
+                return window.app.openModal(type, item);
+            } else {
+                console.log('❌ window.app no disponible');
+                updateStatus('❌ window.app no disponible al llamar openModal', 'error');
+            }
+        };
+    </script>
+</body>
+</html>

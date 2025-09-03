@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test App - Flota</title>
+</head>
+<body>
+    <h1>Test App - Flota</h1>
+    
+    <div id="status"></div>
+    
+    <button onclick="testOpenModal()">Probar openModal('vehiculo')</button>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST APP INICIADO ===');
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<p style="color: ${type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue'}">${message}</p>`;
+        }
+        
+        function testOpenModal() {
+            console.log('🧪 Probando openModal...');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    openModal('vehiculo');
+                    updateStatus('✅ openModal ejecutado correctamente', 'success');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    updateStatus('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Verificar estado cuando se cargue la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada');
+            
+            setTimeout(() => {
+                console.log('📊 Estado de la aplicación:');
+                console.log('- window.app:', window.app);
+                console.log('- typeof openModal:', typeof openModal);
+                console.log('- api disponible:', typeof api !== 'undefined');
+                
+                if (window.app) {
+                    updateStatus('✅ window.app inicializado correctamente', 'success');
+                } else {
+                    updateStatus('❌ window.app no se inicializó', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
