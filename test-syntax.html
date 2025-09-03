@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Syntax</title>
+</head>
+<body>
+    <h1>Testing JavaScript Syntax</h1>
+    <div id="output"></div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        try {
+            console.log('✅ All scripts loaded successfully');
+            console.log('API object:', typeof api);
+            console.log('App object:', typeof window.app);
+            
+            document.getElementById('output').innerHTML = `
+                <p style="color: green;">✅ All scripts loaded successfully!</p>
+                <p>API type: ${typeof api}</p>
+                <p>App type: ${typeof window.app}</p>
+            `;
+        } catch (error) {
+            console.error('❌ Error:', error);
+            document.getElementById('output').innerHTML = `
+                <p style="color: red;">❌ Error: ${error.message}</p>
+                <p>Stack: ${error.stack}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

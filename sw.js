@@ -176,10 +176,14 @@ async function staleWhileRevalidate(request) {
 
     // Siempre intentar actualizar desde la red en background
     const networkResponsePromise = fetch(request)
-        .then((networkResponse) => {
+        .then(async (networkResponse) => {
             if (networkResponse.ok && isAppropriateToCache(request)) {
-                const cache = caches.open(CACHE_NAME)
-                    .then(cache => cache.put(request, networkResponse.clone()));
+                try {
+                    const cache = await caches.open(CACHE_NAME);
+                    await cache.put(request, networkResponse.clone());
+                } catch (cloneError) {
+                    console.log('🔄 Service Worker: Error clonando respuesta para cache:', cloneError);
+                }
             }
             return networkResponse;
         })

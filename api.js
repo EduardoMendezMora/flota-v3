@@ -5,7 +5,19 @@ class ApiService {
         this.headers = SUPABASE_CONFIG.headers;
         this.cache = new Map();
         this.isOnline = navigator.onLine;
+        this.currentUser = null;
         this.setupNetworkListeners();
+        this.initializeSupabase();
+    }
+
+    initializeSupabase() {
+        // Inicializar cliente de Supabase si está disponible
+        if (typeof supabase !== 'undefined') {
+            this.supabase = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.apiKey);
+        } else {
+            console.warn('⚠️ Supabase no está disponible, usando API REST');
+            this.supabase = null;
+        }
     }
 
     setupNetworkListeners() {
@@ -98,36 +110,30 @@ class ApiService {
 
     handleError(error) {
         if (error.message.includes('Failed to fetch')) {
-            return new Error(MESSAGES.error.network);
+            return new Error('Error de conexión. Verifica tu conexión a internet.');
         }
         return error;
     }
 
-    // Sistema de cache mejorado
+    // Métodos de cache
     isCached(key) {
-        if (!PERFORMANCE_CONFIG.enableCache) return false;
         const cached = this.cache.get(key);
         if (!cached) return false;
-
-        const isExpired = Date.now() - cached.timestamp > PERFORMANCE_CONFIG.cacheTimeout;
-        if (isExpired) {
-            this.cache.delete(key);
-            return false;
-        }
-        return true;
+        
+        const now = Date.now();
+        return (now - cached.timestamp) < (PERFORMANCE_CONFIG?.cacheExpiry || 300000); // 5 minutos por defecto
     }
 
     getFromCache(key) {
-        return this.cache.get(key).data;
+        const cached = this.cache.get(key);
+        return cached ? cached.data : null;
     }
 
     setCache(key, data) {
-        if (PERFORMANCE_CONFIG.enableCache) {
-            this.cache.set(key, {
-                data,
-                timestamp: Date.now()
-            });
-        }
+        this.cache.set(key, {
+            data,
+            timestamp: Date.now()
+        });
     }
 
     clearCache() {
@@ -1635,7 +1641,7 @@ class ApiService {
             console.error('❌ Error agregando comentario a solicitud:', error);
             return { success: false, error: error.message };
         }
-    },
+    }
 }
 
 // Instancia global del servicio API
