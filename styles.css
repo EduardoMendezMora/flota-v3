@@ -757,6 +757,91 @@ textarea:focus {
     }
 }
 
+/* ===== ESTILOS PARA PÁGINA DE DETALLE DE VEHÍCULO ===== */
+.vehicle-detail-container {
+    background: var(--apple-gray-light);
+    min-height: 100vh;
+}
+
+.vehicle-info-card {
+    background: var(--apple-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--apple-gray-medium);
+}
+
+.vehicle-info-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.vehicle-info-card .card-header {
+    border-bottom: 1px solid var(--apple-gray-medium);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.vehicle-info-card .card-body {
+    padding: var(--spacing-lg);
+}
+
+.vehicle-info-card .form-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--apple-gray);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vehicle-info-card .fw-medium {
+    font-weight: 500;
+    color: var(--apple-black);
+    font-size: 0.9rem;
+}
+
+.vehicle-info-card .fw-bold {
+    font-weight: 600;
+}
+
+.vehicle-info-card .fs-5 {
+    font-size: 1.1rem;
+}
+
+/* Colores específicos para cada sección */
+.vehicle-info-card .card-header.bg-primary {
+    background: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-blue-dark) 100%) !important;
+}
+
+.vehicle-info-card .card-header.bg-success {
+    background: linear-gradient(135deg, var(--apple-green) 0%, var(--apple-green-dark) 100%) !important;
+}
+
+.vehicle-info-card .card-header.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+}
+
+.vehicle-info-card .card-header.bg-warning {
+    background: linear-gradient(135deg, var(--apple-orange) 0%, #e67e22 100%) !important;
+}
+
+/* Estilos para el contenido de las pestañas */
+.tab-content-inner {
+    background: var(--apple-white);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    min-height: 400px;
+}
+
+.tab-content-inner .text-center {
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.tab-content-inner .fa-spinner {
+    color: var(--apple-blue);
+}
+
 /* ===== SISTEMA DE PESTAÑAS PARA VEHÍCULOS ===== */
 
 /* Modal con pestañas */

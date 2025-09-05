@@ -74,7 +74,9 @@ class VehiculoTabsManager {
         // Cargar contenido específico de cada pestaña si es necesario
         switch (tabName) {
             case 'general':
-                // El contenido ya está en el HTML
+                // La información general ya está cargada en el HTML
+                // Solo necesitamos asegurar que esté visible
+                this.loadGeneralInfo();
                 break;
             case 'galeria':
                 this.loadGaleria();
@@ -98,6 +100,15 @@ class VehiculoTabsManager {
                 this.loadRepuestos();
                 break;
         }
+    }
+
+    // ========================================
+    // INFORMACIÓN GENERAL
+    // ========================================
+    loadGeneralInfo() {
+        // La información general ya está cargada en el HTML
+        // Esta función puede ser usada para refrescar o actualizar datos si es necesario
+        console.log('✅ Información general cargada');
     }
 
     // ========================================
