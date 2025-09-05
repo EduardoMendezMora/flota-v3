@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Edición de Vehículos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>🧪 Test de Edición de Vehículos</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fas fa-car me-2"></i>Información del Vehículo</h6>
+                        <button class="btn btn-sm btn-outline-light" onclick="toggleEdit()" id="edit-btn">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted small">Marca</label>
+                                <div id="vehicle-brand" class="fw-medium">Toyota</div>
+                                <input type="text" class="form-control form-control-sm d-none" id="edit-vehicle-brand" placeholder="Marca del vehículo">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted small">Modelo</label>
+                                <div id="vehicle-model" class="fw-medium">Corolla</div>
+                                <input type="text" class="form-control form-control-sm d-none" id="edit-vehicle-model" placeholder="Modelo del vehículo">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted small">Año</label>
+                                <div id="vehicle-year" class="fw-medium">2020</div>
+                                <input type="number" class="form-control form-control-sm d-none" id="edit-vehicle-year" placeholder="Año" min="1900" max="2030">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted small">Color</label>
+                                <div id="vehicle-color" class="fw-medium">Blanco</div>
+                                <input type="text" class="form-control form-control-sm d-none" id="edit-vehicle-color" placeholder="Color del vehículo">
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-none" id="actions">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button class="btn btn-sm btn-success" onclick="saveChanges()">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="cancelEdit()">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Log de Pruebas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="log" class="small">
+                            <p>✅ Página cargada correctamente</p>
+                            <p>🔄 Haz clic en "Editar" para probar la funcionalidad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEditing = false;
+        let originalData = {};
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<p>[${timestamp}] ${message}</p>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function toggleEdit() {
+            if (isEditing) {
+                cancelEdit();
+            } else {
+                startEdit();
+            }
+        }
+
+        function startEdit() {
+            isEditing = true;
+            log('🔄 Iniciando modo de edición...');
+            
+            // Guardar datos originales
+            originalData = {
+                brand: document.getElementById('vehicle-brand').textContent,
+                model: document.getElementById('vehicle-model').textContent,
+                year: document.getElementById('vehicle-year').textContent,
+                color: document.getElementById('vehicle-color').textContent
+            };
+            
+            // Ocultar elementos de visualización
+            document.querySelectorAll('.fw-medium').forEach(el => el.classList.add('d-none'));
+            
+            // Mostrar inputs
+            document.querySelectorAll('[id^="edit-vehicle-"]').forEach(input => {
+                input.classList.remove('d-none');
+                // Cargar valores actuales
+                const fieldName = input.id.replace('edit-vehicle-', '');
+                const currentValue = originalData[fieldName];
+                input.value = currentValue;
+            });
+            
+            // Mostrar botones de acción
+            document.getElementById('actions').classList.remove('d-none');
+            
+            // Cambiar botón de editar
+            const editBtn = document.getElementById('edit-btn');
+            editBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar';
+            editBtn.classList.remove('btn-outline-light');
+            editBtn.classList.add('btn-outline-danger');
+            
+            log('✅ Modo de edición activado');
+        }
+
+        function cancelEdit() {
+            isEditing = false;
+            log('❌ Cancelando edición...');
+            
+            // Mostrar elementos de visualización
+            document.querySelectorAll('.fw-medium').forEach(el => el.classList.remove('d-none'));
+            
+            // Ocultar inputs
+            document.querySelectorAll('[id^="edit-vehicle-"]').forEach(input => {
+                input.classList.add('d-none');
+            });
+            
+            // Ocultar botones de acción
+            document.getElementById('actions').classList.add('d-none');
+            
+            // Restaurar botón de editar
+            const editBtn = document.getElementById('edit-btn');
+            editBtn.innerHTML = '<i class="fas fa-edit"></i> Editar';
+            editBtn.classList.remove('btn-outline-danger');
+            editBtn.classList.add('btn-outline-light');
+            
+            log('✅ Edición cancelada, datos restaurados');
+        }
+
+        function saveChanges() {
+            log('💾 Guardando cambios...');
+            
+            // Recopilar datos
+            const newData = {
+                brand: document.getElementById('edit-vehicle-brand').value,
+                model: document.getElementById('edit-vehicle-model').value,
+                year: document.getElementById('edit-vehicle-year').value,
+                color: document.getElementById('edit-vehicle-color').value
+            };
+            
+            // Validación básica
+            if (!newData.brand || !newData.model || !newData.year || !newData.color) {
+                log('❌ Error: Todos los campos son requeridos');
+                alert('Todos los campos son requeridos');
+                return;
+            }
+            
+            // Simular guardado exitoso
+            setTimeout(() => {
+                // Actualizar visualización
+                document.getElementById('vehicle-brand').textContent = newData.brand;
+                document.getElementById('vehicle-model').textContent = newData.model;
+                document.getElementById('vehicle-year').textContent = newData.year;
+                document.getElementById('vehicle-color').textContent = newData.color;
+                
+                // Salir del modo edición
+                cancelEdit();
+                
+                log('✅ Cambios guardados exitosamente');
+                log(`📝 Datos actualizados: ${newData.brand} ${newData.model} ${newData.year} - ${newData.color}`);
+            }, 1000);
+        }
+
+        // Inicializar
+        log('🚀 Test de edición iniciado');
+    </script>
+</body>
+</html>
