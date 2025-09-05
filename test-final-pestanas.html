@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Final Pestañas - Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; max-width: 95%; max-height: 95%; overflow-y: auto; z-index: 1001; }
+        .d-none { display: none !important; }
+        .test-info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .success-message { background: #e8f5e8; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Test Final - Pestañas del Modal de Vehículo</h1>
+    
+    <div class="test-info">
+        <h3>📋 Instrucciones:</h3>
+        <ol>
+            <li>Haz clic en el botón "Abrir Modal con Pestañas"</li>
+            <li>Verifica que aparezcan las 8 pestañas en la parte superior</li>
+            <li>Haz clic en diferentes pestañas para verificar que funcionan</li>
+            <li>Revisa la consola del navegador para ver los logs de debug</li>
+        </ol>
+    </div>
+    
+    <div class="success-message">
+        <h4>✅ Correcciones Implementadas:</h4>
+        <ul>
+            <li>✅ Función <code>initializeTabs()</code> agregada al VehiculoTabsManager</li>
+            <li>✅ Inicialización automática de pestañas en app.js</li>
+            <li>✅ Función <code>loadTabContent()</code> mejorada</li>
+            <li>✅ Logs de debug agregados para troubleshooting</li>
+            <li>✅ Manejo de errores mejorado</li>
+        </ul>
+    </div>
+    
+    <button onclick="abrirModalConPestanas()" class="btn btn-primary btn-lg">
+        🚗 Abrir Modal con Pestañas
+    </button>
+    
+    <button onclick="cerrarModal()" class="btn btn-secondary">
+        ❌ Cerrar Modal
+    </button>
+    
+    <div id="status" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+        <strong>Estado:</strong> <span id="status-text">Listo para probar</span>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay d-none">
+        <div id="modal-content" class="modal-content">
+            <!-- El contenido del modal se insertará aquí -->
+        </div>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST FINAL PESTAÑAS INICIADO ===');
+        
+        function actualizarEstado(mensaje) {
+            document.getElementById('status-text').textContent = mensaje;
+        }
+        
+        function abrirModalConPestanas() {
+            console.log('🚗 Abriendo modal con pestañas...');
+            actualizarEstado('Abriendo modal...');
+            
+            try {
+                // Crear un vehículo de prueba
+                const vehiculoPrueba = {
+                    id: 1,
+                    placas: 'ABC123',
+                    marca: 'Toyota',
+                    modelo: 'Corolla',
+                    anio: 2020,
+                    estatus: 'disponible',
+                    color: 'Blanco',
+                    vin: '1HGBH41JXMN109186'
+                };
+                
+                console.log('📋 Vehículo de prueba:', vehiculoPrueba);
+                
+                // Abrir el modal
+                openModal('vehiculo', vehiculoPrueba);
+                
+                // Verificar que el modal se abrió
+                setTimeout(() => {
+                    const modalOverlay = document.getElementById('modal-overlay');
+                    const isModalOpen = modalOverlay && !modalOverlay.classList.contains('d-none');
+                    
+                    if (isModalOpen) {
+                        console.log('✅ Modal abierto correctamente');
+                        actualizarEstado('Modal abierto - Verificando pestañas...');
+                        
+                        // Verificar pestañas
+                        setTimeout(() => {
+                            verificarPestanas();
+                        }, 500);
+                    } else {
+                        console.log('❌ Modal no se abrió');
+                        actualizarEstado('Error: Modal no se abrió');
+                    }
+                }, 200);
+                
+            } catch (error) {
+                console.error('❌ Error al abrir modal:', error);
+                actualizarEstado('Error: ' + error.message);
+            }
+        }
+        
+        function verificarPestanas() {
+            console.log('🔍 Verificando pestañas...');
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            console.log(`📊 Pestañas encontradas: ${tabButtons.length} botones, ${tabPanes.length} panes`);
+            
+            if (tabButtons.length >= 8 && tabPanes.length >= 8) {
+                console.log('✅ Todas las pestañas están presentes');
+                actualizarEstado(`✅ Modal con ${tabButtons.length} pestañas funcionando correctamente`);
+                
+                // Mostrar información de las pestañas
+                tabButtons.forEach((button, index) => {
+                    const tabName = button.dataset.tab;
+                    const isActive = button.classList.contains('active');
+                    console.log(`📑 Pestaña ${index + 1}: ${tabName} (${isActive ? 'ACTIVA' : 'inactiva'})`);
+                });
+                
+            } else {
+                console.log('❌ Faltan pestañas');
+                actualizarEstado(`❌ Solo se encontraron ${tabButtons.length} pestañas (esperadas: 8)`);
+            }
+        }
+        
+        function cerrarModal() {
+            const modalOverlay = document.getElementById('modal-overlay');
+            if (modalOverlay) {
+                modalOverlay.classList.add('d-none');
+                actualizarEstado('Modal cerrado');
+                console.log('❌ Modal cerrado');
+            }
+        }
+        
+        // Verificar estado inicial
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada');
+            
+            setTimeout(() => {
+                // Verificar que todos los componentes estén disponibles
+                const componentes = {
+                    'window.app': window.app !== undefined,
+                    'openModal': typeof openModal === 'function',
+                    'window.vehiculoTabsManager': window.vehiculoTabsManager !== undefined,
+                    'ModalManager': typeof ModalManager !== 'undefined'
+                };
+                
+                console.log('📊 Estado de componentes:');
+                Object.entries(componentes).forEach(([nombre, disponible]) => {
+                    console.log(`${disponible ? '✅' : '❌'} ${nombre}: ${disponible ? 'Disponible' : 'No disponible'}`);
+                });
+                
+                const todosDisponibles = Object.values(componentes).every(disponible => disponible);
+                if (todosDisponibles) {
+                    actualizarEstado('✅ Todos los componentes cargados - Listo para probar');
+                } else {
+                    actualizarEstado('❌ Algunos componentes no están disponibles');
+                }
+            }, 1000);
+        });
+        
+        // Interceptar logs de VehiculoTabsManager
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            
+            // Mostrar logs importantes en la página
+            const message = args.join(' ');
+            if (message.includes('Pestaña') || message.includes('inicializadas') || message.includes('Cambiando')) {
+                const statusDiv = document.getElementById('status');
+                const logDiv = document.createElement('div');
+                logDiv.style.fontSize = '12px';
+                logDiv.style.color = '#666';
+                logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                statusDiv.appendChild(logDiv);
+            }
+        };
+    </script>
+</body>
+</html>

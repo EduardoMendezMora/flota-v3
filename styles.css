@@ -816,6 +816,22 @@ textarea:focus {
     font-size: var(--font-size-base);
 }
 
+/* Tarjetas clickeables */
+.vehicle-card-clickable {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.vehicle-card-clickable:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-color: var(--apple-blue);
+}
+
+.vehicle-card-clickable:active {
+    transform: translateY(-2px);
+}
+
 /* Contenido de las pestañas */
 .tab-content {
     flex: 1;

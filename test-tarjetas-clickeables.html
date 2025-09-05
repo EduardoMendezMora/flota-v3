@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tarjetas Clickeables - Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .test-info { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .success-message { background: #e8f5e8; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Test Tarjetas Clickeables - Flota</h1>
+    
+    <div class="test-info">
+        <h3>📋 Instrucciones:</h3>
+        <ol>
+            <li>Haz clic en cualquier parte de una tarjeta de vehículo (excepto los botones)</li>
+            <li>Deberías ser redirigido a la página de detalle del vehículo</li>
+            <li>Haz clic en los botones para verificar que no activan el click de la tarjeta</li>
+            <li>Verifica que las pestañas funcionen en la página de detalle</li>
+        </ol>
+    </div>
+    
+    <div class="success-message">
+        <h4>✅ Mejoras Implementadas:</h4>
+        <ul>
+            <li>✅ Toda la tarjeta es clickeable (excepto botones y enlaces)</li>
+            <li>✅ Efectos hover y animaciones agregados</li>
+            <li>✅ Página de detalle del vehículo creada</li>
+            <li>✅ 8 pestañas funcionando en la página de detalle</li>
+            <li>✅ Botón "Editar" redirige al modal desde la página de detalle</li>
+            <li>✅ Navegación fluida entre páginas</li>
+        </ul>
+    </div>
+    
+    <div class="test-section info">
+        <h3>🚗 Vehículos de Prueba</h3>
+        <p>Haz clic en cualquier tarjeta para ver el detalle del vehículo con pestañas:</p>
+        
+        <div id="vehicles-container">
+            <div class="row" id="vehicles-grid">
+                <!-- Las tarjetas se cargarán aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>📊 Estado de la Prueba</h3>
+        <div id="test-status">
+            <p><strong>Estado:</strong> <span id="status-text">Cargando vehículos...</span></p>
+            <p><strong>Vehículos cargados:</strong> <span id="vehicles-count">0</span></p>
+            <p><strong>Última acción:</strong> <span id="last-action">-</span></p>
+        </div>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST TARJETAS CLICKEABLES INICIADO ===');
+        
+        function actualizarEstado(mensaje) {
+            document.getElementById('status-text').textContent = mensaje;
+        }
+        
+        function actualizarUltimaAccion(accion) {
+            document.getElementById('last-action').textContent = accion;
+        }
+        
+        function actualizarContadorVehiculos(count) {
+            document.getElementById('vehicles-count').textContent = count;
+        }
+        
+        // Interceptar la función openVehiculoDetail para debug
+        const originalOpenVehiculoDetail = window.app ? window.app.openVehiculoDetail : null;
+        
+        // Cargar vehículos de prueba
+        async function cargarVehiculosPrueba() {
+            try {
+                actualizarEstado('Cargando vehículos...');
+                
+                // Crear vehículos de prueba
+                const vehiculosPrueba = [
+                    {
+                        id: 1,
+                        placa: 'ABC123',
+                        marcas: { nombre: 'Toyota' },
+                        modelos: { nombre: 'Corolla' },
+                        anio: 2020,
+                        color: 'Blanco',
+                        vin: '1HGBH41JXMN109186',
+                        arrendadoras: { nombre: 'Arrendadora Central' },
+                        estados_inventario: { nombre: 'Disponible' },
+                        precio_semanal: 150000,
+                        gastos_adms: 25000,
+                        created_at: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        placa: 'XYZ789',
+                        marcas: { nombre: 'Honda' },
+                        modelos: { nombre: 'Civic' },
+                        anio: 2021,
+                        color: 'Azul',
+                        vin: '2HGBH41JXMN109187',
+                        arrendadoras: { nombre: 'Arrendadora Norte' },
+                        estados_inventario: { nombre: 'Rentado' },
+                        precio_semanal: 180000,
+                        gastos_adms: 30000,
+                        created_at: new Date().toISOString()
+                    },
+                    {
+                        id: 3,
+                        placa: 'DEF456',
+                        marcas: { nombre: 'Nissan' },
+                        modelos: { nombre: 'Sentra' },
+                        anio: 2019,
+                        color: 'Rojo',
+                        vin: '3HGBH41JXMN109188',
+                        arrendadoras: { nombre: 'Arrendadora Sur' },
+                        estados_inventario: { nombre: 'Mantenimiento' },
+                        precio_semanal: 140000,
+                        gastos_adms: 20000,
+                        created_at: new Date().toISOString()
+                    }
+                ];
+                
+                // Renderizar tarjetas
+                const grid = document.getElementById('vehicles-grid');
+                grid.innerHTML = vehiculosPrueba.map(vehiculo => renderVehiculoCard(vehiculo)).join('');
+                
+                actualizarContadorVehiculos(vehiculosPrueba.length);
+                actualizarEstado('Vehículos cargados correctamente');
+                actualizarUltimaAccion('Tarjetas renderizadas');
+                
+                console.log('✅ Vehículos de prueba cargados:', vehiculosPrueba.length);
+                
+            } catch (error) {
+                console.error('❌ Error cargando vehículos:', error);
+                actualizarEstado('Error cargando vehículos: ' + error.message);
+            }
+        }
+        
+        // Función para renderizar tarjetas (copiada de app.js)
+        function renderVehiculoCard(vehiculo) {
+            const estadoClass = 'bg-success'; // Simplificado para la prueba
+            
+            return `
+                <div class="col-lg-4 col-md-6 mb-4" data-vehicle-id="${vehiculo.id}">
+                    <div class="card h-100 vehicle-card-clickable" onclick="abrirDetalleVehiculo(${vehiculo.id})" style="cursor: pointer;">
+                        <!-- Header de la tarjeta -->
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="h5 mb-1">${vehiculo.placa}</div>
+                                    <div class="text-muted small">
+                                        ${vehiculo.marcas?.nombre || 'Sin marca'} 
+                                        ${vehiculo.modelos?.nombre || 'Sin modelo'}
+                                    </div>
+                                    ${vehiculo.vin ? `<div class="text-muted small">VIN: ${vehiculo.vin}</div>` : ''}
+                                </div>
+                                <div class="d-flex flex-column align-items-end gap-1">
+                                    <span class="badge bg-secondary small">#${vehiculo.id}</span>
+                                    <span class="badge bg-info small">${vehiculo.anio || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Body de la tarjeta -->
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Arrendadora</span>
+                                    <span class="fw-medium">${vehiculo.arrendadoras?.nombre || 'Sin asignar'}</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="vehicle-card-label">Estado</span>
+                                    <span class="badge ${estadoClass}">
+                                        ${vehiculo.estados_inventario?.nombre || 'Sin estado'}
+                                    </span>
+                                </div>
+                                
+                                ${vehiculo.precio_semanal ? `
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Precio Semanal</span>
+                                    <span class="fw-medium">₡${vehiculo.precio_semanal.toLocaleString()}</span>
+                                </div>
+                                ` : ''}
+                                
+                                ${vehiculo.gastos_adms ? `
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Gastos Admin</span>
+                                    <span class="fw-medium">₡${vehiculo.gastos_adms.toLocaleString()}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Acciones de la tarjeta -->
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    ${new Date(vehiculo.created_at).toLocaleDateString()}
+                                </small>
+                                <div class="btn-group btn-group-sm" onclick="event.stopPropagation();">
+                                    <button onclick="probarBotonTareas(${vehiculo.id})" 
+                                            class="btn btn-outline-info" 
+                                            title="Ver tareas del vehículo">
+                                        <i class="fas fa-tasks"></i>
+                                    </button>
+                                    <button onclick="probarBotonEditar(${vehiculo.id})" 
+                                            class="btn btn-outline-primary" 
+                                            title="Editar vehículo">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="probarBotonEliminar(${vehiculo.id})" 
+                                            class="btn btn-outline-danger" 
+                                            title="Eliminar vehículo">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Funciones de prueba
+        function abrirDetalleVehiculo(id) {
+            console.log(`🚗 Abriendo detalle del vehículo ID: ${id}`);
+            actualizarUltimaAccion(`Click en tarjeta del vehículo ${id}`);
+            
+            // Simular redirección a la página de detalle
+            window.location.href = `vehiculo-detail.html?id=${id}`;
+        }
+        
+        function probarBotonTareas(id) {
+            console.log(`📋 Botón tareas clickeado para vehículo ${id}`);
+            actualizarUltimaAccion(`Click en botón tareas del vehículo ${id}`);
+            alert(`Botón tareas clickeado para vehículo ${id} - No debería abrir el detalle`);
+        }
+        
+        function probarBotonEditar(id) {
+            console.log(`✏️ Botón editar clickeado para vehículo ${id}`);
+            actualizarUltimaAccion(`Click en botón editar del vehículo ${id}`);
+            alert(`Botón editar clickeado para vehículo ${id} - No debería abrir el detalle`);
+        }
+        
+        function probarBotonEliminar(id) {
+            console.log(`🗑️ Botón eliminar clickeado para vehículo ${id}`);
+            actualizarUltimaAccion(`Click en botón eliminar del vehículo ${id}`);
+            alert(`Botón eliminar clickeado para vehículo ${id} - No debería abrir el detalle`);
+        }
+        
+        // Cargar vehículos cuando se carga la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada, cargando vehículos de prueba...');
+            
+            setTimeout(() => {
+                cargarVehiculosPrueba();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

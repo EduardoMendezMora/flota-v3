@@ -422,7 +422,7 @@ class FlotaApp {
 
         return `
             <div class="col-lg-4 col-md-6 mb-4" data-vehicle-id="${vehiculo.id}">
-                <div class="card h-100">
+                <div class="card h-100 vehicle-card-clickable" onclick="app.openVehiculoDetail(${vehiculo.id})" style="cursor: pointer;">
                     <!-- Header de la tarjeta -->
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-start">
@@ -473,7 +473,7 @@ class FlotaApp {
                             ${vehiculo.link_fotos ? `
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted small">Fotos</span>
-                                <a href="${this.escapeHtml(vehiculo.link_fotos)}" target="_blank" class="text-decoration-none">
+                                <a href="${this.escapeHtml(vehiculo.link_fotos)}" target="_blank" class="text-decoration-none" onclick="event.stopPropagation();">
                                     <i class="fas fa-images me-1"></i>Ver galería
                                 </a>
                             </div>
@@ -488,7 +488,7 @@ class FlotaApp {
                                 <i class="fas fa-clock me-1"></i>
                                 ${api.formatDate(vehiculo.created_at)}
                             </small>
-                            <div class="btn-group btn-group-sm">
+                            <div class="btn-group btn-group-sm" onclick="event.stopPropagation();">
                                 <button onclick="app.showVehiculoTareas(${vehiculo.id})" 
                                         class="btn btn-outline-info" 
                                         title="Ver tareas del vehículo">
@@ -1726,6 +1726,11 @@ class FlotaApp {
         }
     }
 
+    openVehiculoDetail(id) {
+        // Redirigir a la página de detalle del vehículo
+        window.location.href = `vehiculo-detail.html?id=${id}`;
+    }
+
     async deleteVehiculo(id) {
         if (!await this.confirmDelete('este vehículo')) return;
 
@@ -1932,6 +1937,21 @@ class FlotaApp {
 // Inicializar la aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new FlotaApp();
+    
+    // Verificar si hay un vehículo para editar en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const editVehicleId = urlParams.get('edit_vehicle');
+    if (editVehicleId) {
+        // Limpiar la URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Abrir el modal de edición
+        setTimeout(() => {
+            if (window.app) {
+                window.app.editVehiculo(editVehicleId);
+            }
+        }, 1000);
+    }
 });
 
 // Funciones globales para los botones
