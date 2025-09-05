@@ -49,6 +49,8 @@ class VehiculoTabsManager {
     }
 
     switchTab(tabName) {
+        console.log(`🔄 Cambiando a pestaña: ${tabName}`);
+        
         // Remover clase active de todos los botones y panes
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
@@ -62,11 +64,18 @@ class VehiculoTabsManager {
             activePane.classList.add('active');
             this.currentTab = tabName;
             this.loadTabContent(tabName);
+            console.log(`✅ Pestaña ${tabName} activada correctamente`);
+        } else {
+            console.warn(`⚠️ No se encontraron elementos para la pestaña: ${tabName}`);
         }
     }
 
     loadTabContent(tabName) {
+        // Cargar contenido específico de cada pestaña si es necesario
         switch (tabName) {
+            case 'general':
+                // El contenido ya está en el HTML
+                break;
             case 'galeria':
                 this.loadGaleria();
                 break;
@@ -749,6 +758,26 @@ class VehiculoTabsManager {
         this.currentVehiculoId = id;
         // Cargar datos del vehículo si es necesario
         this.loadCurrentVehiculoData();
+    }
+
+    initializeTabs() {
+        // Asegurar que la primera pestaña esté activa
+        const firstTab = document.querySelector('.tab-button[data-tab="general"]');
+        const firstPane = document.querySelector('.tab-pane[data-tab-pane="general"]');
+        
+        if (firstTab && firstPane) {
+            // Remover active de todos
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Activar la primera pestaña
+            firstTab.classList.add('active');
+            firstPane.classList.add('active');
+            
+            console.log('✅ Pestañas inicializadas correctamente');
+        } else {
+            console.warn('⚠️ No se encontraron elementos de pestañas para inicializar');
+        }
     }
 
     async loadCurrentVehiculoData() {

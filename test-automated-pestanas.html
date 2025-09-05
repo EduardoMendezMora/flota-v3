@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Automatizado Pestañas - Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; max-width: 95%; max-height: 95%; overflow-y: auto; z-index: 1001; }
+        .d-none { display: none !important; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        .test-result { margin: 5px 0; padding: 5px; border-radius: 3px; }
+        .test-pass { background-color: #d4edda; color: #155724; }
+        .test-fail { background-color: #f8d7da; color: #721c24; }
+        .test-info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Test Automatizado de Pestañas - Flota</h1>
+    
+    <div class="test-section info">
+        <h3>🧪 Pruebas Automatizadas</h3>
+        <button onclick="ejecutarTodasLasPruebas()" class="btn btn-primary">Ejecutar Todas las Pruebas</button>
+        <button onclick="limpiarResultados()" class="btn btn-secondary">Limpiar Resultados</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>📊 Resumen de Pruebas</h3>
+        <div id="test-summary">
+            <p>Total de pruebas: <span id="total-tests">0</span></p>
+            <p>Pruebas exitosas: <span id="passed-tests">0</span></p>
+            <p>Pruebas fallidas: <span id="failed-tests">0</span></p>
+        </div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>📝 Logs Detallados</h3>
+        <div id="detailed-logs" class="log"></div>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay d-none">
+        <div id="modal-content" class="modal-content">
+            <!-- El contenido del modal se insertará aquí -->
+        </div>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST AUTOMATIZADO INICIADO ===');
+        
+        let testResults = [];
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+        
+        function addTestResult(testName, passed, message, details = '') {
+            const result = {
+                name: testName,
+                passed: passed,
+                message: message,
+                details: details,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            testResults.push(result);
+            totalTests++;
+            if (passed) passedTests++; else failedTests++;
+            
+            updateTestDisplay();
+            addDetailedLog(`${passed ? '✅' : '❌'} ${testName}: ${message}`, passed ? 'success' : 'error');
+        }
+        
+        function updateTestDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            const summaryDiv = document.getElementById('test-summary');
+            
+            // Actualizar resumen
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            
+            // Actualizar resultados detallados
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="test-result ${result.passed ? 'test-pass' : 'test-fail'}">
+                    <strong>${result.name}</strong> - ${result.message}
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                </div>`
+            ).join('');
+        }
+        
+        function addDetailedLog(message, type = 'info') {
+            const logsDiv = document.getElementById('detailed-logs');
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function limpiarResultados() {
+            testResults = [];
+            totalTests = 0;
+            passedTests = 0;
+            failedTests = 0;
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('detailed-logs').innerHTML = '';
+            updateTestDisplay();
+        }
+        
+        async function ejecutarTodasLasPruebas() {
+            addDetailedLog('🚀 Iniciando pruebas automatizadas...', 'info');
+            
+            // Prueba 1: Verificar scripts cargados
+            await pruebaScriptsCargados();
+            
+            // Prueba 2: Verificar objetos globales
+            await pruebaObjetosGlobales();
+            
+            // Prueba 3: Abrir modal con pestañas
+            await pruebaAbrirModal();
+            
+            // Prueba 4: Verificar pestañas presentes
+            await pruebaPestanasPresentes();
+            
+            // Prueba 5: Probar cambio de pestañas
+            await pruebaCambioPestanas();
+            
+            // Prueba 6: Verificar inicialización de VehiculoTabsManager
+            await pruebaInicializacionTabsManager();
+            
+            addDetailedLog('🏁 Pruebas completadas', 'info');
+        }
+        
+        async function pruebaScriptsCargados() {
+            addDetailedLog('📋 Verificando scripts cargados...', 'info');
+            
+            const scripts = [
+                { name: 'config.js', check: () => typeof SUPABASE_CONFIG !== 'undefined' },
+                { name: 'api.js', check: () => typeof api !== 'undefined' },
+                { name: 'app.js', check: () => typeof FlotaApp !== 'undefined' },
+                { name: 'modals.js', check: () => typeof ModalManager !== 'undefined' },
+                { name: 'vehiculo-tabs.js', check: () => typeof VehiculoTabsManager !== 'undefined' }
+            ];
+            
+            let allLoaded = true;
+            let details = '';
+            
+            scripts.forEach(script => {
+                const isLoaded = script.check();
+                if (!isLoaded) allLoaded = false;
+                details += `${script.name}: ${isLoaded ? 'OK' : 'FALLO'}, `;
+            });
+            
+            addTestResult(
+                'Scripts Cargados',
+                allLoaded,
+                allLoaded ? 'Todos los scripts están cargados' : 'Algunos scripts no están cargados',
+                details
+            );
+        }
+        
+        async function pruebaObjetosGlobales() {
+            addDetailedLog('🌐 Verificando objetos globales...', 'info');
+            
+            const objects = [
+                { name: 'window.app', check: () => window.app !== undefined },
+                { name: 'window.app.modalManager', check: () => window.app && window.app.modalManager },
+                { name: 'openModal function', check: () => typeof openModal === 'function' },
+                { name: 'window.vehiculoTabsManager', check: () => window.vehiculoTabsManager !== undefined }
+            ];
+            
+            let allAvailable = true;
+            let details = '';
+            
+            objects.forEach(obj => {
+                const isAvailable = obj.check();
+                if (!isAvailable) allAvailable = false;
+                details += `${obj.name}: ${isAvailable ? 'OK' : 'FALLO'}, `;
+            });
+            
+            addTestResult(
+                'Objetos Globales',
+                allAvailable,
+                allAvailable ? 'Todos los objetos están disponibles' : 'Algunos objetos no están disponibles',
+                details
+            );
+        }
+        
+        async function pruebaAbrirModal() {
+            addDetailedLog('🚪 Probando apertura de modal...', 'info');
+            
+            try {
+                const vehiculoPrueba = {
+                    id: 1,
+                    placas: 'ABC123',
+                    marca: 'Toyota',
+                    modelo: 'Corolla',
+                    anio: 2020,
+                    estatus: 'disponible'
+                };
+                
+                openModal('vehiculo', vehiculoPrueba);
+                
+                // Esperar un poco para que el modal se abra
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const modalOverlay = document.getElementById('modal-overlay');
+                const isModalOpen = modalOverlay && !modalOverlay.classList.contains('d-none');
+                
+                addTestResult(
+                    'Apertura de Modal',
+                    isModalOpen,
+                    isModalOpen ? 'Modal se abrió correctamente' : 'Modal no se abrió',
+                    isModalOpen ? 'Modal visible' : 'Modal no visible'
+                );
+                
+            } catch (error) {
+                addTestResult(
+                    'Apertura de Modal',
+                    false,
+                    'Error al abrir modal',
+                    error.message
+                );
+            }
+        }
+        
+        async function pruebaPestanasPresentes() {
+            addDetailedLog('📑 Verificando pestañas presentes...', 'info');
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            const expectedTabs = 8;
+            const hasCorrectButtons = tabButtons.length >= expectedTabs;
+            const hasCorrectPanes = tabPanes.length >= expectedTabs;
+            
+            const allPresent = hasCorrectButtons && hasCorrectPanes;
+            
+            addTestResult(
+                'Pestañas Presentes',
+                allPresent,
+                allPresent ? 'Todas las pestañas están presentes' : 'Faltan pestañas',
+                `Botones: ${tabButtons.length}/${expectedTabs}, Panes: ${tabPanes.length}/${expectedTabs}`
+            );
+        }
+        
+        async function pruebaCambioPestanas() {
+            addDetailedLog('🔄 Probando cambio de pestañas...', 'info');
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            
+            if (tabButtons.length < 2) {
+                addTestResult(
+                    'Cambio de Pestañas',
+                    false,
+                    'No hay suficientes pestañas para probar',
+                    'Solo hay ' + tabButtons.length + ' pestañas'
+                );
+                return;
+            }
+            
+            try {
+                // Hacer clic en la segunda pestaña
+                const segundaPestana = tabButtons[1];
+                segundaPestana.click();
+                
+                // Esperar un poco para que se procese el cambio
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Verificar que la segunda pestaña esté activa
+                const isSecondTabActive = segundaPestana.classList.contains('active');
+                
+                addTestResult(
+                    'Cambio de Pestañas',
+                    isSecondTabActive,
+                    isSecondTabActive ? 'Cambio de pestañas funciona' : 'Cambio de pestañas no funciona',
+                    `Segunda pestaña activa: ${isSecondTabActive}`
+                );
+                
+            } catch (error) {
+                addTestResult(
+                    'Cambio de Pestañas',
+                    false,
+                    'Error al cambiar pestañas',
+                    error.message
+                );
+            }
+        }
+        
+        async function pruebaInicializacionTabsManager() {
+            addDetailedLog('⚙️ Verificando inicialización de VehiculoTabsManager...', 'info');
+            
+            if (!window.vehiculoTabsManager) {
+                addTestResult(
+                    'Inicialización TabsManager',
+                    false,
+                    'VehiculoTabsManager no está disponible',
+                    'Objeto no encontrado'
+                );
+                return;
+            }
+            
+            const hasInitializeMethod = typeof window.vehiculoTabsManager.initializeTabs === 'function';
+            const hasSwitchTabMethod = typeof window.vehiculoTabsManager.switchTab === 'function';
+            const hasSetVehiculoIdMethod = typeof window.vehiculoTabsManager.setVehiculoId === 'function';
+            
+            const allMethodsAvailable = hasInitializeMethod && hasSwitchTabMethod && hasSetVehiculoIdMethod;
+            
+            addTestResult(
+                'Inicialización TabsManager',
+                allMethodsAvailable,
+                allMethodsAvailable ? 'VehiculoTabsManager está correctamente inicializado' : 'Faltan métodos en VehiculoTabsManager',
+                `initializeTabs: ${hasInitializeMethod}, switchTab: ${hasSwitchTabMethod}, setVehiculoId: ${hasSetVehiculoIdMethod}`
+            );
+        }
+        
+        // Ejecutar verificaciones básicas al cargar
+        window.addEventListener('load', function() {
+            addDetailedLog('🔄 Página cargada, verificando estado inicial...', 'info');
+            
+            setTimeout(() => {
+                addDetailedLog('📊 Estado inicial verificado', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

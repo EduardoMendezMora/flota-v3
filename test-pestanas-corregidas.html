@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Pestañas Corregidas - Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; max-width: 95%; max-height: 95%; overflow-y: auto; z-index: 1001; }
+        .d-none { display: none !important; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Pestañas Corregidas - Flota</h1>
+    
+    <div class="test-section info">
+        <h3>1. Estado de Scripts</h3>
+        <div id="scripts-status">Verificando...</div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>2. Pruebas de Modal con Pestañas</h3>
+        <button onclick="testModalConPestanas()" class="btn btn-primary">Probar Modal con Pestañas</button>
+        <button onclick="testCambioPestanas()" class="btn btn-success">Probar Cambio de Pestañas</button>
+        <button onclick="cerrarModal()" class="btn btn-secondary">Cerrar Modal</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>3. Estado del Modal</h3>
+        <div id="modal-status">No hay modal activo</div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>4. Logs de Consola</h3>
+        <div id="console-logs" class="log"></div>
+        <button onclick="clearLogs()" class="btn btn-secondary">Limpiar Logs</button>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay d-none">
+        <div id="modal-content" class="modal-content">
+            <!-- El contenido del modal se insertará aquí -->
+        </div>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST PESTAÑAS CORREGIDAS INICIADO ===');
+        
+        // Interceptar console.log para mostrar en la página
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToLogs(message, type = 'log') {
+            const logsDiv = document.getElementById('console-logs');
+            if (logsDiv) {
+                const logEntry = document.createElement('div');
+                logEntry.style.color = type === 'error' ? 'red' : type === 'warn' ? 'orange' : 'black';
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                logsDiv.appendChild(logEntry);
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLogs(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLogs(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToLogs(args.join(' '), 'warn');
+        };
+        
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            if (resultsDiv) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} mt-2`;
+                resultDiv.innerHTML = message;
+                resultsDiv.appendChild(resultDiv);
+            }
+        }
+        
+        function updateModalStatus(message) {
+            const statusDiv = document.getElementById('modal-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = message;
+            }
+        }
+        
+        function clearLogs() {
+            const logsDiv = document.getElementById('console-logs');
+            if (logsDiv) {
+                logsDiv.innerHTML = '';
+            }
+        }
+        
+        function testModalConPestanas() {
+            console.log('🧪 Probando Modal con Pestañas...');
+            addTestResult('🧪 Probando Modal con Pestañas...', 'info');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    addTestResult('✅ Función openModal disponible', 'success');
+                    
+                    // Crear un vehículo de prueba para editar
+                    const vehiculoPrueba = {
+                        id: 1,
+                        placas: 'ABC123',
+                        marca: 'Toyota',
+                        modelo: 'Corolla',
+                        anio: 2020,
+                        estatus: 'disponible'
+                    };
+                    
+                    console.log('🔄 Llamando a openModal("vehiculo", vehiculoPrueba)...');
+                    addTestResult('🔄 Llamando a openModal("vehiculo", vehiculoPrueba)...', 'info');
+                    
+                    openModal('vehiculo', vehiculoPrueba);
+                    addTestResult('✅ Modal abierto con pestañas', 'success');
+                    updateModalStatus('Modal de editar vehículo abierto - Debería mostrar 8 pestañas');
+                    
+                    // Verificar que las pestañas estén presentes
+                    setTimeout(() => {
+                        const tabButtons = document.querySelectorAll('.tab-button');
+                        const tabPanes = document.querySelectorAll('.tab-pane');
+                        
+                        console.log(`📊 Pestañas encontradas: ${tabButtons.length} botones, ${tabPanes.length} panes`);
+                        addTestResult(`📊 Pestañas encontradas: ${tabButtons.length} botones, ${tabPanes.length} panes`, 'info');
+                        
+                        if (tabButtons.length >= 8 && tabPanes.length >= 8) {
+                            addTestResult('✅ Todas las pestañas están presentes', 'success');
+                        } else {
+                            addTestResult('❌ Faltan pestañas', 'error');
+                        }
+                    }, 500);
+                    
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    addTestResult('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                addTestResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testCambioPestanas() {
+            console.log('🧪 Probando cambio de pestañas...');
+            addTestResult('🧪 Probando cambio de pestañas...', 'info');
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            if (tabButtons.length > 0) {
+                // Probar cambiar a la segunda pestaña
+                const segundaPestana = tabButtons[1];
+                if (segundaPestana) {
+                    console.log('🔄 Haciendo clic en la segunda pestaña...');
+                    addTestResult('🔄 Haciendo clic en la segunda pestaña...', 'info');
+                    segundaPestana.click();
+                    addTestResult('✅ Clic en segunda pestaña ejecutado', 'success');
+                }
+            } else {
+                addTestResult('❌ No hay pestañas disponibles para probar', 'error');
+            }
+        }
+        
+        function cerrarModal() {
+            const modalOverlay = document.getElementById('modal-overlay');
+            if (modalOverlay) {
+                modalOverlay.classList.add('d-none');
+                updateModalStatus('Modal cerrado');
+                addTestResult('✅ Modal cerrado', 'success');
+            }
+        }
+        
+        // Verificar estado cuando se cargue la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada, verificando scripts...');
+            
+            setTimeout(() => {
+                console.log('📊 Verificando estado de la aplicación...');
+                
+                // Verificar scripts
+                const scripts = [
+                    { name: 'config.js', check: () => typeof SUPABASE_CONFIG !== 'undefined' },
+                    { name: 'api.js', check: () => typeof api !== 'undefined' },
+                    { name: 'app.js', check: () => typeof FlotaApp !== 'undefined' },
+                    { name: 'modals.js', check: () => typeof ModalManager !== 'undefined' },
+                    { name: 'vehiculo-tabs.js', check: () => typeof VehiculoTabsManager !== 'undefined' }
+                ];
+                
+                let status = '';
+                scripts.forEach(script => {
+                    const isLoaded = script.check();
+                    const icon = isLoaded ? '✅' : '❌';
+                    const color = isLoaded ? 'success' : 'error';
+                    status += `<p class="${color}">${icon} ${script.name}: ${isLoaded ? 'Cargado' : 'No cargado'}</p>`;
+                });
+                
+                document.getElementById('scripts-status').innerHTML = status;
+                
+                // Verificar objetos principales
+                if (window.app) {
+                    console.log('✅ window.app disponible');
+                    if (window.app.modalManager) {
+                        console.log('✅ modalManager disponible');
+                    } else {
+                        console.log('❌ modalManager no disponible');
+                    }
+                } else {
+                    console.log('❌ window.app no disponible');
+                }
+                
+                if (typeof openModal === 'function') {
+                    console.log('✅ openModal disponible');
+                } else {
+                    console.log('❌ openModal no disponible');
+                }
+                
+                if (window.vehiculoTabsManager) {
+                    console.log('✅ vehiculoTabsManager disponible');
+                } else {
+                    console.log('❌ vehiculoTabsManager no disponible');
+                }
+            }, 1000);
+        });
+        
+        // Interceptar la función openModal para debug
+        const originalOpenModal = window.openModal;
+        window.openModal = function(type, item = null) {
+            console.log('🔍 openModal interceptado:');
+            console.log('- type:', type);
+            console.log('- item:', item);
+            console.log('- window.app:', window.app);
+            
+            if (window.app) {
+                console.log('✅ window.app disponible, llamando al método...');
+                return window.app.openModal(type, item);
+            } else {
+                console.log('❌ window.app no disponible');
+                addTestResult('❌ window.app no disponible al llamar openModal', 'error');
+            }
+        };
+    </script>
+</body>
+</html>

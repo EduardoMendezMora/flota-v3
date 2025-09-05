@@ -1660,6 +1660,10 @@ class FlotaApp {
                 if (type === 'vehiculo' && item) {
                     if (window.vehiculoTabsManager) {
                         window.vehiculoTabsManager.setVehiculoId(item.id);
+                        // Asegurar que las pestañas se inicialicen correctamente
+                        setTimeout(() => {
+                            window.vehiculoTabsManager.initializeTabs();
+                        }, 100);
                     }
                 }
 
