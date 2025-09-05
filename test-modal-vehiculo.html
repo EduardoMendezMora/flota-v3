@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal Vehículo - Flota</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 90%; overflow-y: auto; z-index: 1001; }
+        .d-none { display: none !important; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Modal Vehículo con Pestañas - Flota</h1>
+    
+    <div class="test-section info">
+        <h3>1. Estado de Scripts</h3>
+        <div id="scripts-status">Verificando...</div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>2. Pruebas de Modal</h3>
+        <button onclick="testNuevoVehiculo()" class="btn btn-primary">Probar Nuevo Vehículo</button>
+        <button onclick="testEditarVehiculo()" class="btn btn-success">Probar Editar Vehículo (con pestañas)</button>
+        <button onclick="testModalDirecto()" class="btn btn-warning">Probar Modal Directo</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>3. Estado del Modal</h3>
+        <div id="modal-status">No hay modal activo</div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>4. Logs de Consola</div>
+        <div id="console-logs" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+        <button onclick="clearLogs()" class="btn btn-secondary">Limpiar Logs</button>
+    </div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay d-none">
+        <div id="modal-content" class="modal-content">
+            <!-- El contenido del modal se insertará aquí -->
+        </div>
+    </div>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Scripts -->
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="modals.js"></script>
+    <script src="vehiculo-tabs.js"></script>
+    
+    <script>
+        console.log('=== TEST MODAL VEHÍCULO INICIADO ===');
+        
+        // Interceptar console.log para mostrar en la página
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToLogs(message, type = 'log') {
+            const logsDiv = document.getElementById('console-logs');
+            if (logsDiv) {
+                const logEntry = document.createElement('div');
+                logEntry.style.color = type === 'error' ? 'red' : type === 'warn' ? 'orange' : 'black';
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                logsDiv.appendChild(logEntry);
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLogs(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLogs(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToLogs(args.join(' '), 'warn');
+        };
+        
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            if (resultsDiv) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} mt-2`;
+                resultDiv.innerHTML = message;
+                resultsDiv.appendChild(resultDiv);
+            }
+        }
+        
+        function updateModalStatus(message) {
+            const statusDiv = document.getElementById('modal-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = message;
+            }
+        }
+        
+        function clearLogs() {
+            const logsDiv = document.getElementById('console-logs');
+            if (logsDiv) {
+                logsDiv.innerHTML = '';
+            }
+        }
+        
+        function testNuevoVehiculo() {
+            console.log('🧪 Probando Nuevo Vehículo...');
+            addTestResult('🧪 Probando Nuevo Vehículo...', 'info');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    addTestResult('✅ Función openModal disponible', 'success');
+                    
+                    console.log('🔄 Llamando a openModal("vehiculo")...');
+                    addTestResult('🔄 Llamando a openModal("vehiculo")...', 'info');
+                    
+                    openModal('vehiculo');
+                    addTestResult('✅ openModal("vehiculo") ejecutado', 'success');
+                    updateModalStatus('Modal de nuevo vehículo abierto');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    addTestResult('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                addTestResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testEditarVehiculo() {
+            console.log('🧪 Probando Editar Vehículo (con pestañas)...');
+            addTestResult('🧪 Probando Editar Vehículo (con pestañas)...', 'info');
+            
+            try {
+                if (typeof openModal === 'function') {
+                    console.log('✅ Función openModal disponible');
+                    addTestResult('✅ Función openModal disponible', 'success');
+                    
+                    // Crear un vehículo de prueba para editar
+                    const vehiculoPrueba = {
+                        id: 1,
+                        placas: 'ABC123',
+                        marca: 'Toyota',
+                        modelo: 'Corolla',
+                        anio: 2020,
+                        estatus: 'disponible'
+                    };
+                    
+                    console.log('🔄 Llamando a openModal("vehiculo", vehiculoPrueba)...');
+                    addTestResult('🔄 Llamando a openModal("vehiculo", vehiculoPrueba)...', 'info');
+                    
+                    openModal('vehiculo', vehiculoPrueba);
+                    addTestResult('✅ openModal("vehiculo", vehiculoPrueba) ejecutado', 'success');
+                    updateModalStatus('Modal de editar vehículo abierto (debería mostrar pestañas)');
+                } else {
+                    console.log('❌ Función openModal no disponible');
+                    addTestResult('❌ Función openModal no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando openModal:', error);
+                addTestResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testModalDirecto() {
+            console.log('🧪 Probando Modal Directo...');
+            addTestResult('🧪 Probando Modal Directo...', 'info');
+            
+            try {
+                if (window.app && window.app.modalManager) {
+                    console.log('✅ ModalManager disponible');
+                    addTestResult('✅ ModalManager disponible', 'success');
+                    
+                    // Generar HTML del modal directamente
+                    const vehiculoPrueba = {
+                        id: 1,
+                        placas: 'XYZ789',
+                        marca: 'Honda',
+                        modelo: 'Civic',
+                        anio: 2021,
+                        estatus: 'rentado'
+                    };
+                    
+                    console.log('🔄 Generando HTML del modal con pestañas...');
+                    addTestResult('🔄 Generando HTML del modal con pestañas...', 'info');
+                    
+                    const modalHTML = window.app.modalManager.getVehiculoModal(vehiculoPrueba);
+                    console.log('✅ HTML del modal generado:', modalHTML);
+                    addTestResult('✅ HTML del modal generado correctamente', 'success');
+                    
+                    // Mostrar el modal
+                    const modalContent = document.getElementById('modal-content');
+                    const modalOverlay = document.getElementById('modal-overlay');
+                    
+                    if (modalContent && modalOverlay) {
+                        modalContent.innerHTML = modalHTML;
+                        modalOverlay.classList.remove('d-none');
+                        updateModalStatus('Modal directo mostrado (debería mostrar pestañas)');
+                        
+                        // Inicializar las pestañas si están disponibles
+                        if (window.vehiculoTabsManager) {
+                            window.vehiculoTabsManager.setVehiculoId(vehiculoPrueba.id);
+                            console.log('✅ VehiculoTabsManager inicializado');
+                            addTestResult('✅ VehiculoTabsManager inicializado', 'success');
+                        }
+                    }
+                } else {
+                    console.log('❌ ModalManager no disponible');
+                    addTestResult('❌ ModalManager no disponible', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error ejecutando modal directo:', error);
+                addTestResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Verificar estado cuando se cargue la página
+        window.addEventListener('load', function() {
+            console.log('🔄 Página cargada, verificando scripts...');
+            
+            setTimeout(() => {
+                console.log('📊 Verificando estado de la aplicación...');
+                
+                // Verificar scripts
+                const scripts = [
+                    { name: 'config.js', check: () => typeof SUPABASE_CONFIG !== 'undefined' },
+                    { name: 'api.js', check: () => typeof api !== 'undefined' },
+                    { name: 'app.js', check: () => typeof FlotaApp !== 'undefined' },
+                    { name: 'modals.js', check: () => typeof ModalManager !== 'undefined' },
+                    { name: 'vehiculo-tabs.js', check: () => typeof VehiculoTabsManager !== 'undefined' }
+                ];
+                
+                let status = '';
+                scripts.forEach(script => {
+                    const isLoaded = script.check();
+                    const icon = isLoaded ? '✅' : '❌';
+                    const color = isLoaded ? 'success' : 'error';
+                    status += `<p class="${color}">${icon} ${script.name}: ${isLoaded ? 'Cargado' : 'No cargado'}</p>`;
+                });
+                
+                document.getElementById('scripts-status').innerHTML = status;
+                
+                // Verificar objetos principales
+                if (window.app) {
+                    console.log('✅ window.app disponible');
+                    if (window.app.modalManager) {
+                        console.log('✅ modalManager disponible');
+                    } else {
+                        console.log('❌ modalManager no disponible');
+                    }
+                } else {
+                    console.log('❌ window.app no disponible');
+                }
+                
+                if (typeof openModal === 'function') {
+                    console.log('✅ openModal disponible');
+                } else {
+                    console.log('❌ openModal no disponible');
+                }
+            }, 1000);
+        });
+        
+        // Interceptar la función openModal para debug
+        const originalOpenModal = window.openModal;
+        window.openModal = function(type, item = null) {
+            console.log('🔍 openModal interceptado:');
+            console.log('- type:', type);
+            console.log('- item:', item);
+            console.log('- window.app:', window.app);
+            
+            if (window.app) {
+                console.log('✅ window.app disponible, llamando al método...');
+                return window.app.openModal(type, item);
+            } else {
+                console.log('❌ window.app no disponible');
+                addTestResult('❌ window.app no disponible al llamar openModal', 'error');
+            }
+        };
+    </script>
+</body>
+</html>
